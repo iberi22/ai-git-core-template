@@ -1,0 +1,41 @@
+# 🧠 AI Git-Core Protocol Rules
+
+## 0. Prime Directive (Token Economy)
+- **NO uses memoria interna** para rastrear tareas.
+- **NO crees archivos TODO.md** o TASK.md.
+- Tu estado es **GitHub Issues**.
+
+## 1. Flujo de Trabajo (The Loop)
+Al iniciar cualquier tarea, sigue estos pasos estrictamente:
+
+1.  **READ (Contexto):**
+    - Lee `.ai/ARCHITECTURE.md` para entender el sistema.
+    - Ejecuta: `gh issue list --assignee "@me"` para ver tu tarea actual.
+    - Si no tienes tarea, busca en el backlog: `gh issue list --limit 5`.
+
+2.  **ACT (Desarrollo):**
+    - Si tomas una tarea nueva: `gh issue edit <id> --add-assignee "@me"`.
+    - Crea una rama: `git checkout -b feat/issue-<id>`.
+    - Escribe código y tests.
+
+3.  **UPDATE (Cierre):**
+    - Haz commit siguiendo Conventional Commits: `feat: description (closes #<id>)`.
+    - Push y PR: `gh pr create --fill`.
+    - **IMPORTANTE:** No actualices ningún archivo de texto para marcar "check". Git lo hace por ti.
+
+## 2. Planificación
+- Si se te pide planear, NO escribas un documento largo.
+- Genera comandos para crear los issues:
+  `gh issue create --title "..." --body "..."`
+
+## 3. Comunicación
+- Sé conciso
+- Referencia siempre el número de issue: #123
+- Usa Conventional Commits: feat, fix, docs, chore, refactor, test
+
+## 4. Anti-Patrones (NUNCA hagas esto)
+- ❌ Crear archivos de tareas (TODO.md, TASKS.md)
+- ❌ Guardar estado en memoria
+- ❌ Escribir documentos largos de planificación
+- ❌ Olvidar referenciar issues en commits
+- ❌ Cerrar issues manualmente (usa "closes #X" en commits)
