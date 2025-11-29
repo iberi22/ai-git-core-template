@@ -46,13 +46,13 @@ NC='\033[0m' # No Color
 # Function to organize existing files
 organize_files() {
     echo -e "\n${CYAN}📂 Organizing existing files...${NC}"
-    
+
     # Create directories
     mkdir -p docs/archive scripts tests src
-    
+
     # Files to keep in root
     local keep_in_root="README.md AGENTS.md CHANGELOG.md CONTRIBUTING.md LICENSE.md LICENSE"
-    
+
     # Move markdown files to docs/archive
     for file in *.md; do
         if [ -f "$file" ]; then
@@ -64,7 +64,7 @@ organize_files() {
             fi
         fi
     done
-    
+
     # Move test files
     for pattern in test_*.py *_test.py *.test.js *.test.ts *.spec.js *.spec.ts; do
         for file in $pattern; do
@@ -74,7 +74,7 @@ organize_files() {
             fi
         done
     done
-    
+
     echo -e "${GREEN}✅ Files organized${NC}"
 }
 
@@ -116,7 +116,7 @@ EXISTING_REPO=false
 if [ -d ".git" ]; then
     EXISTING_REPO=true
     echo -e "${CYAN}ℹ️  Existing Git repository detected${NC}"
-    
+
     # Check if remote already exists
     if git remote get-url origin &> /dev/null; then
         echo -e "${GREEN}✓ Remote 'origin' already configured${NC}"
@@ -137,7 +137,7 @@ fi
 # 4. Create GitHub repository (if needed)
 if [ "$SKIP_REPO_CREATE" != true ]; then
     echo -e "\n☁️  Creating GitHub repository..."
-    
+
     if [ "$AUTO_MODE" = true ]; then
         if [ "$PRIVATE_REPO" = true ]; then
             VISIBILITY="--private"
@@ -154,7 +154,7 @@ if [ "$SKIP_REPO_CREATE" != true ]; then
             VISIBILITY="--public"
         fi
     fi
-    
+
     gh repo create "$PROJECT_NAME" $VISIBILITY --source=. --remote=origin --push
 else
     echo -e "\n${CYAN}ℹ️  Skipping repository creation (already exists)${NC}"
@@ -197,7 +197,7 @@ create_label() {
     local name=$1
     local description=$2
     local color=$3
-    
+
     if ! gh label list | grep -q "$name"; then
         gh label create "$name" --description "$description" --color "$color" 2>/dev/null || true
         echo -e "  ${GREEN}✓ $name${NC}"
@@ -213,9 +213,32 @@ create_label "in-progress" "Task in progress" "1D76DB"
 create_label "needs-review" "Requires review" "5319E7"
 
 # 7. Create Initial Issues
-echo -e "\n📝 Creating initial issues..."
+echo -e "\n📝 Checking for existing issues..."
 
-gh issue create \
+# Check if repo already has issues
+EXISTING_ISSUES=$(gh issue list --state all --limit 1 --json number 2>/dev/null | grep -c "number" || echo "0")
+SKIP_ISSUES=false
+
+if [ "$EXISTING_ISSUES" -gt 0 ]; then
+    ISSUE_COUNT=$(gh issue list --state all --json number | grep -c "number" || echo "0")
+    echo -e "${YELLOW}⚠️  This repository already has $ISSUE_COUNT issue(s)${NC}"
+    
+    if [ "$AUTO_MODE" = true ]; then
+        echo -e "  ${CYAN}(Auto mode: skipping issue creation)${NC}"
+        SKIP_ISSUES=true
+    else
+        read -p "Create initial planning issues anyway? (y/N): " CREATE_ISSUES_CHOICE
+        if [[ ! $CREATE_ISSUES_CHOICE =~ ^[Yy]$ ]]; then
+            SKIP_ISSUES=true
+            echo -e "${CYAN}ℹ️  Skipping issue creation${NC}"
+        fi
+    fi
+fi
+
+if [ "$SKIP_ISSUES" = false ]; then
+    echo -e "\n📝 Creating initial issues..."
+    
+    gh issue create \
     --title "🏗️ SETUP: Define Architecture and Tech Stack" \
     --body "## Objective
 Define and document the architectural decisions for the project.
@@ -259,6 +282,7 @@ Create basic documentation.
 ## Notes for AI Agent
 Keep documentation concise and practical." \
     --label "ai-plan"
+fi
 
 # 8. Final message
 echo -e "\n=========================================="

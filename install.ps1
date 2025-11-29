@@ -23,16 +23,16 @@ $AutoMode = $env:GIT_CORE_AUTO -eq "1"
 # Function to organize existing files
 function Invoke-OrganizeFiles {
     Write-Host "📂 Organizando archivos existentes..." -ForegroundColor Yellow
-    
+
     # Create directories
     $dirs = @("docs/archive", "scripts", "tests", "src")
     foreach ($dir in $dirs) {
         New-Item -ItemType Directory -Force -Path $dir -ErrorAction SilentlyContinue | Out-Null
     }
-    
+
     # Files to keep in root
     $keepInRoot = @("README.md", "AGENTS.md", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE.md", "LICENSE")
-    
+
     # Move markdown files to docs/archive
     Get-ChildItem -Filter "*.md" -File -ErrorAction SilentlyContinue | ForEach-Object {
         if ($_.Name -notin $keepInRoot) {
@@ -42,7 +42,7 @@ function Invoke-OrganizeFiles {
             Write-Host "  ✓ Manteniendo $($_.Name) en root" -ForegroundColor Green
         }
     }
-    
+
     # Move test files
     $testPatterns = @("test_*.py", "*_test.py", "*.test.js", "*.test.ts", "*.spec.js", "*.spec.ts")
     foreach ($pattern in $testPatterns) {
@@ -51,7 +51,7 @@ function Invoke-OrganizeFiles {
             Write-Host "  → $($_.Name) movido a tests/" -ForegroundColor Cyan
         }
     }
-    
+
     # Move loose scripts
     Get-ChildItem -Filter "*.bat" -File -ErrorAction SilentlyContinue | ForEach-Object {
         if ($_.DirectoryName -eq (Get-Location).Path) {
@@ -59,7 +59,7 @@ function Invoke-OrganizeFiles {
             Write-Host "  → $($_.Name) movido a scripts/" -ForegroundColor Cyan
         }
     }
-    
+
     Write-Host "✅ Archivos organizados" -ForegroundColor Green
 }
 
@@ -80,7 +80,7 @@ if ($hasFiles -and -not $AutoMode) {
     Write-Host "  3) Cancelar"
     Write-Host ""
     $choice = Read-Host "Selecciona (1/2/3)"
-    
+
     switch ($choice) {
         "1" { Write-Host "Continuando..." }
         "2" { Invoke-OrganizeFiles }

@@ -11,7 +11,7 @@ This repository follows the **Git-Core Protocol** for AI-assisted development.
 
 ```
 ❌ TODO.md, TASKS.md, BACKLOG.md
-❌ PLANNING.md, ROADMAP.md, PROGRESS.md  
+❌ PLANNING.md, ROADMAP.md, PROGRESS.md
 ❌ NOTES.md, SCRATCH.md, IDEAS.md
 ❌ STATUS.md, CHECKLIST.md, CHANGELOG.md (for tracking)
 ❌ Any .md file for task/state management

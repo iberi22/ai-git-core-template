@@ -40,10 +40,10 @@ done
 # Function to organize existing files
 organize_existing_files() {
     echo -e "${YELLOW}📂 Organizando archivos existentes...${NC}"
-    
+
     # Create necessary directories
     mkdir -p docs/archive scripts tests src
-    
+
     # Move markdown files to docs/archive (except special ones)
     for file in *.md; do
         if [ -f "$file" ]; then
@@ -58,7 +58,7 @@ organize_existing_files() {
             esac
         fi
     done
-    
+
     # Move test files
     for pattern in test_*.py *_test.py *_test.js *.test.js *.test.ts test_*.js *.spec.js *.spec.ts; do
         for file in $pattern; do
@@ -68,7 +68,7 @@ organize_existing_files() {
             fi
         done
     done
-    
+
     # Move loose script files to scripts/ (except install.sh)
     for file in *.sh *.ps1 *.bat; do
         if [ -f "$file" ] && [ "$file" != "$pattern" ]; then
@@ -83,7 +83,7 @@ organize_existing_files() {
             esac
         fi
     done
-    
+
     echo -e "${GREEN}✅ Archivos organizados${NC}"
 }
 
@@ -102,7 +102,7 @@ if [ "$(ls -A 2>/dev/null | grep -v '^\.' | head -1)" ] && [ "$AUTO_MODE" = fals
     echo "  3) Cancelar"
     echo ""
     read -p "Selecciona (1/2/3): " CHOICE
-    
+
     case $CHOICE in
         1)
             echo "Continuando..."

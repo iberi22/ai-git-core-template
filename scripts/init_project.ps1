@@ -1,6 +1,6 @@
 # scripts/init_project.ps1
 # 🧠 Git-Core Protocol - Project Initializer (PowerShell)
-# 
+#
 # Options:
 #   -Organize    Organize existing files before setup
 #   -Auto        Non-interactive mode (auto-accept defaults)
@@ -22,16 +22,16 @@ $ErrorActionPreference = "Stop"
 # Function to organize existing files
 function Invoke-OrganizeFiles {
     Write-Host "`n📂 Organizing existing files..." -ForegroundColor Yellow
-    
+
     # Create directories
     $dirs = @("docs/archive", "scripts", "tests", "src")
     foreach ($dir in $dirs) {
         New-Item -ItemType Directory -Force -Path $dir -ErrorAction SilentlyContinue | Out-Null
     }
-    
+
     # Files to keep in root
     $keepInRoot = @("README.md", "AGENTS.md", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE.md", "LICENSE")
-    
+
     # Move markdown files to docs/archive
     Get-ChildItem -Filter "*.md" -File -ErrorAction SilentlyContinue | ForEach-Object {
         if ($_.Name -notin $keepInRoot) {
@@ -41,7 +41,7 @@ function Invoke-OrganizeFiles {
             Write-Host "  ✓ Keeping $($_.Name) in root" -ForegroundColor Green
         }
     }
-    
+
     # Move test files
     $testPatterns = @("test_*.py", "*_test.py", "*.test.js", "*.test.ts", "*.spec.js", "*.spec.ts")
     foreach ($pattern in $testPatterns) {
@@ -50,7 +50,7 @@ function Invoke-OrganizeFiles {
             Write-Host "  → $($_.Name) moved to tests/" -ForegroundColor Cyan
         }
     }
-    
+
     # Move loose scripts (except init scripts)
     $scriptKeep = @("install.sh")
     Get-ChildItem -Filter "*.sh" -File -ErrorAction SilentlyContinue | ForEach-Object {
@@ -65,7 +65,7 @@ function Invoke-OrganizeFiles {
             Write-Host "  → $($_.Name) moved to scripts/" -ForegroundColor Cyan
         }
     }
-    
+
     Write-Host "✅ Files organized" -ForegroundColor Green
 }
 
@@ -113,7 +113,7 @@ $SKIP_REPO_CREATE = $false
 if (Test-Path ".git") {
     $EXISTING_REPO = $true
     Write-Host "ℹ️  Existing Git repository detected" -ForegroundColor Cyan
-    
+
     # Check if remote already exists
     $remoteUrl = git remote get-url origin 2>$null
     if ($LASTEXITCODE -eq 0) {
@@ -152,7 +152,7 @@ if (-not $SKIP_REPO_CREATE) {
     Invoke-Expression "gh repo create $PROJECT_NAME $VISIBILITY --source=. --remote=origin --push"
 } else {
     Write-Host "`nℹ️  Skipping repository creation (already exists)" -ForegroundColor Cyan
-    
+
     # Check for uncommitted changes
     $status = git status --porcelain
     if ($status) {
@@ -191,7 +191,7 @@ Write-Host "`n🏷️  Creating semantic labels..." -ForegroundColor Yellow
 
 function Create-Label {
     param($name, $description, $color)
-    
+
     $existingLabels = gh label list --json name | ConvertFrom-Json
     if ($existingLabels.name -notcontains $name) {
         gh label create $name --description $description --color $color 2>$null
@@ -208,9 +208,32 @@ Create-Label "in-progress" "Task in progress" "1D76DB"
 Create-Label "needs-review" "Requires review" "5319E7"
 
 # 7. Create Initial Issues
-Write-Host "`n📝 Creating initial issues..." -ForegroundColor Yellow
+Write-Host "`n📝 Checking for existing issues..." -ForegroundColor Yellow
 
-gh issue create `
+# Check if repo already has issues
+$existingIssues = gh issue list --state all --limit 1 --json number 2>$null | ConvertFrom-Json
+$SKIP_ISSUES = $false
+
+if ($existingIssues -and $existingIssues.Count -gt 0) {
+    $issueCount = (gh issue list --state all --json number | ConvertFrom-Json).Count
+    Write-Host "⚠️  This repository already has $issueCount issue(s)" -ForegroundColor Yellow
+    
+    if ($Auto) {
+        Write-Host "  (Auto mode: skipping issue creation)" -ForegroundColor Cyan
+        $SKIP_ISSUES = $true
+    } else {
+        $createChoice = Read-Host "Create initial planning issues anyway? (y/N)"
+        if ($createChoice -notmatch "^[Yy]$") {
+            $SKIP_ISSUES = $true
+            Write-Host "ℹ️  Skipping issue creation" -ForegroundColor Cyan
+        }
+    }
+}
+
+if (-not $SKIP_ISSUES) {
+    Write-Host "`n📝 Creating initial issues..." -ForegroundColor Yellow
+    
+    gh issue create `
     --title "🏗️ SETUP: Define Architecture and Tech Stack" `
     --body @"
 ## Objective
@@ -260,6 +283,7 @@ Create basic documentation.
 Keep documentation concise and practical.
 "@ `
     --label "ai-plan"
+}
 
 # 8. Final message
 Write-Host "`n==========================================" -ForegroundColor Cyan
