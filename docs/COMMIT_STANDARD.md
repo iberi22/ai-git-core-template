@@ -213,4 +213,30 @@ feat(authentication-system): implement OAuth2 login with Google, Facebook, and G
 
 ---
 
+## 🏷️ YAML Frontmatter for Agent Docs
+
+When creating documents in `docs/agent-docs/`, always include YAML frontmatter meta tags for rapid AI scanning. See `docs/agent-docs/README.md` for the complete specification.
+
+### Quick Reference
+
+```yaml
+---
+title: "Document Title"
+type: PROMPT | RESEARCH | STRATEGY | SPEC | GUIDE | REPORT | ANALYSIS
+created: 2025-11-29
+agent: copilot | cursor | windsurf | claude | jules
+model: gpt-4o | claude-opus-4 | etc
+summary: "1-3 sentences describing content"
+keywords: [auth, oauth, security]
+tags: ["#auth", "#security"]
+status: draft | review | approved | deprecated
+priority: critical | high | medium | low
+confidence: 0.95
+---
+```
+
+This enables AI agents to scan document metadata without reading full content.
+
+---
+
 *This standard ensures rich, searchable commit history that benefits both human developers and AI agents.*

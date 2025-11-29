@@ -151,6 +151,7 @@ git commit -m "docs(agent): add PROMPT for Jules auth implementation"
 ```
 
 **✅ ONLY create files when user says:**
+
 - "Save this as a document"
 - "Create a prompt file for..."
 - "Document this strategy"
@@ -158,9 +159,46 @@ git commit -m "docs(agent): add PROMPT for Jules auth implementation"
 - "I need this as a reference"
 
 **❌ DO NOT create files, just respond in chat:**
+
 - "Explain how to..."
 - "Summarize this..."
 - "What's the best approach..."
+
+---
+
+## 🏷️ YAML Frontmatter Meta Tags (REQUIRED for agent-docs)
+
+When creating documents in `docs/agent-docs/`, **ALWAYS** include YAML frontmatter for rapid AI scanning:
+
+```yaml
+---
+title: "Authentication System Prompt"
+type: PROMPT
+id: "prompt-jules-auth"
+created: 2025-11-29
+updated: 2025-11-29
+agent: copilot
+model: claude-opus-4
+requested_by: user
+summary: |
+  Prompt for Jules to implement OAuth2 authentication
+  with Google and GitHub providers.
+keywords: [oauth, auth, jules, security]
+tags: ["#auth", "#security", "#jules"]
+topics: [authentication, ai-agents]
+related_issues: ["#42"]
+project: my-project
+module: auth
+language: typescript
+priority: high
+status: approved
+confidence: 0.92
+token_estimate: 800
+complexity: moderate
+---
+```
+
+**Why?** AI agents can read metadata without parsing entire documents. See `docs/agent-docs/README.md` for full spec.
 
 ---
 
@@ -168,7 +206,7 @@ git commit -m "docs(agent): add PROMPT for Jules auth implementation"
 
 Follow Extended Conventional Commits (see `docs/COMMIT_STANDARD.md`):
 
-```
+```text
 <type>(<scope>): <description> #<issue>
 
 [optional body]
@@ -177,7 +215,8 @@ Follow Extended Conventional Commits (see `docs/COMMIT_STANDARD.md`):
 ```
 
 **AI-Context Footer** (for complex decisions):
-```
+
+```text
 AI-Context: architecture | Chose event-driven over REST for real-time requirements
 AI-Context: trade-off | Sacrificed DRY for performance in hot path
 AI-Context: dependency | Selected library X over Y due to bundle size

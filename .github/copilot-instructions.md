@@ -127,11 +127,45 @@ git commit -m "docs(agent): add PROMPT for Jules auth implementation"
 - "Summarize this..."
 - "What's the best approach..."
 
-### 7. Extended Commit Messages
+### 7. YAML Frontmatter Meta Tags (REQUIRED for agent-docs)
+
+When creating documents in `docs/agent-docs/`, **ALWAYS** include YAML frontmatter for rapid AI scanning:
+
+```yaml
+---
+title: "Authentication System Prompt"
+type: PROMPT
+id: "prompt-jules-auth"
+created: 2025-11-29
+updated: 2025-11-29
+agent: copilot
+model: claude-opus-4
+requested_by: user
+summary: |
+  Prompt for Jules to implement OAuth2 authentication
+  with Google and GitHub providers.
+keywords: [oauth, auth, jules, security]
+tags: ["#auth", "#security", "#jules"]
+topics: [authentication, ai-agents]
+related_issues: ["#42"]
+project: my-project
+module: auth
+language: typescript
+priority: high
+status: approved
+confidence: 0.92
+token_estimate: 800
+complexity: moderate
+---
+```
+
+**Why?** AI agents can read metadata without parsing entire documents. See `docs/agent-docs/README.md` for full spec.
+
+### 8. Extended Commit Messages
 
 Use AI-Context section for complex changes:
 
-```
+```text
 feat(auth): implement OAuth2 login #42
 
 Adds OAuth2 authentication with Google and GitHub providers.
@@ -143,13 +177,13 @@ Test credentials in .env.example.
 Closes #42
 ```
 
-### 8. Code Standards
+### 9. Code Standards
 - Follow existing code style
 - Write tests for new features
 - Use Conventional Commits (see docs/COMMIT_STANDARD.md)
 - Keep PRs focused and small
 
-### 9. Communication
+### 10. Communication
 - Be concise in commit messages
 - Reference issues in all commits
 - Use AI-Context for complex changes
