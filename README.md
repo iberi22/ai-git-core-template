@@ -15,7 +15,33 @@
 
 ## 🚀 Quick Start
 
-### Opción 1: Usar como Template
+### Opción 1: Instalación Remota (⚡ Nivel Dios)
+
+**Linux/Mac:**
+```bash
+# En tu carpeta de proyecto
+curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash
+
+# Con organización automática de archivos existentes
+curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --organize
+
+# Modo automático (para AI Agents)
+curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto --organize
+```
+
+**Windows PowerShell:**
+```powershell
+# En tu carpeta de proyecto
+irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+
+# Con organización automática
+$env:GIT_CORE_ORGANIZE = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+
+# Modo automático (para AI Agents)
+$env:GIT_CORE_AUTO = "1"; $env:GIT_CORE_ORGANIZE = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+```
+
+### Opción 2: Usar como Template
 
 1. Click en **"Use this template"** arriba
 2. Clona tu nuevo repositorio
@@ -29,7 +55,7 @@
 .\scripts\init_project.ps1
 ```
 
-### Opción 2: Clonar en proyecto existente
+### Opción 3: Clonar manualmente
 
 ```bash
 # Crear carpeta de proyecto
@@ -55,10 +81,33 @@ git clone https://github.com/iberi22/ai-git-core-template . && rm -rf .git
 ├── scripts/
 │   ├── init_project.sh       # 🐧 Inicializador Linux/Mac
 │   └── init_project.ps1      # 🪟 Inicializador Windows
+├── docs/
+│   └── archive/              # 📚 Archivos .md movidos aquí automáticamente
+├── tests/                    # 🧪 Tests movidos aquí automáticamente
 ├── AGENTS.md                 # 🤖 Configuración para todos los AI agents
 ├── .cursorrules              # 🎯 Reglas para Cursor
 ├── .windsurfrules            # 🌊 Reglas para Windsurf
+├── install.sh                # 🐧 Instalador remoto Linux/Mac
+├── install.ps1               # 🪟 Instalador remoto Windows
 └── .gitignore
+```
+
+## 🗂️ Organización Automática de Archivos
+
+Los scripts pueden organizar automáticamente tu proyecto:
+
+| Tipo de archivo | Destino |
+|-----------------|---------|
+| `*.md` (excepto README, AGENTS, etc.) | `docs/archive/` |
+| `test_*.py`, `*.test.js`, `*.spec.ts` | `tests/` |
+| `*.sh`, `*.bat` (scripts sueltos) | `scripts/` |
+
+```powershell
+# Windows - Organizar archivos existentes
+.\scripts\init_project.ps1 -Organize
+
+# Linux/Mac
+./scripts/init_project.sh  # Selecciona opción 2 cuando pregunte
 ```
 
 ## 🔄 El Flujo de Trabajo

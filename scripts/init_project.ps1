@@ -1,10 +1,79 @@
 # scripts/init_project.ps1
 # 🧠 Git-Core Protocol - Project Initializer (PowerShell)
+# 
+# Options:
+#   -Organize    Organize existing files before creating repo
+#   -Auto        Non-interactive mode (auto-accept defaults)
+#
+# Usage:
+#   .\init_project.ps1
+#   .\init_project.ps1 -Organize
+#   .\init_project.ps1 -Auto -Organize
+
+param(
+    [switch]$Organize,
+    [switch]$Auto
+)
 
 $ErrorActionPreference = "Stop"
 
+# Function to organize existing files
+function Invoke-OrganizeFiles {
+    Write-Host "`n📂 Organizando archivos existentes..." -ForegroundColor Yellow
+    
+    # Create directories
+    $dirs = @("docs/archive", "scripts", "tests", "src")
+    foreach ($dir in $dirs) {
+        New-Item -ItemType Directory -Force -Path $dir -ErrorAction SilentlyContinue | Out-Null
+    }
+    
+    # Files to keep in root
+    $keepInRoot = @("README.md", "AGENTS.md", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE.md", "LICENSE")
+    
+    # Move markdown files to docs/archive
+    Get-ChildItem -Filter "*.md" -File -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.Name -notin $keepInRoot) {
+            Move-Item $_.FullName -Destination "docs/archive/" -Force -ErrorAction SilentlyContinue
+            Write-Host "  → $($_.Name) movido a docs/archive/" -ForegroundColor Cyan
+        } else {
+            Write-Host "  ✓ Manteniendo $($_.Name) en root" -ForegroundColor Green
+        }
+    }
+    
+    # Move test files
+    $testPatterns = @("test_*.py", "*_test.py", "*.test.js", "*.test.ts", "*.spec.js", "*.spec.ts")
+    foreach ($pattern in $testPatterns) {
+        Get-ChildItem -Filter $pattern -File -ErrorAction SilentlyContinue | ForEach-Object {
+            Move-Item $_.FullName -Destination "tests/" -Force -ErrorAction SilentlyContinue
+            Write-Host "  → $($_.Name) movido a tests/" -ForegroundColor Cyan
+        }
+    }
+    
+    # Move loose scripts (except init scripts)
+    $scriptKeep = @("install.sh")
+    Get-ChildItem -Filter "*.sh" -File -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.Name -notin $scriptKeep -and $_.DirectoryName -eq (Get-Location).Path) {
+            Move-Item $_.FullName -Destination "scripts/" -Force -ErrorAction SilentlyContinue
+            Write-Host "  → $($_.Name) movido a scripts/" -ForegroundColor Cyan
+        }
+    }
+    Get-ChildItem -Filter "*.bat" -File -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.DirectoryName -eq (Get-Location).Path) {
+            Move-Item $_.FullName -Destination "scripts/" -Force -ErrorAction SilentlyContinue
+            Write-Host "  → $($_.Name) movido a scripts/" -ForegroundColor Cyan
+        }
+    }
+    
+    Write-Host "✅ Archivos organizados" -ForegroundColor Green
+}
+
 Write-Host "🧠 Inicializando Protocolo AI Git-Core..." -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
+
+# Run organize if requested
+if ($Organize) {
+    Invoke-OrganizeFiles
+}
 
 # 1. Validate environment
 Write-Host "`n📋 Validando entorno..." -ForegroundColor Yellow
@@ -45,7 +114,13 @@ if (-not (Test-Path ".git")) {
 
 # 4. Create GitHub repository
 Write-Host "`n☁️  Creando repositorio en GitHub..." -ForegroundColor Yellow
-$PRIVATE_CHOICE = Read-Host "¿Repositorio privado? (y/N)"
+
+if ($Auto) {
+    $PRIVATE_CHOICE = "N"  # Default to public in auto mode
+    Write-Host "  (Modo auto: creando repositorio público)" -ForegroundColor Cyan
+} else {
+    $PRIVATE_CHOICE = Read-Host "¿Repositorio privado? (y/N)"
+}
 
 if ($PRIVATE_CHOICE -match "^[Yy]$") {
     gh repo create $PROJECT_NAME --private --source=. --remote=origin --push
