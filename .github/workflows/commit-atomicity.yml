@@ -1,0 +1,324 @@
+# Commit Atomicity Check Workflow
+# 🔍 Validates that commits in PRs follow the atomic commit principle
+#
+# An atomic commit addresses a single concern (feature, bugfix, docs, etc.)
+# Mixing concerns makes history harder to understand and reverts more difficult.
+#
+# Configuration: .github/atomicity-config.yml
+
+name: 🔍 Commit Atomicity Check
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-atomicity:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 📋 Load configuration
+        id: config
+        run: |
+          CONFIG_FILE=".github/atomicity-config.yml"
+          
+          # Default values
+          ENABLED="true"
+          MODE="warning"
+          IGNORE_BOTS="true"
+          MAX_CONCERNS="1"
+          
+          if [ -f "$CONFIG_FILE" ]; then
+            echo "📄 Found configuration file"
+            
+            # Parse YAML manually (basic grep/sed for simple values)
+            ENABLED=$(grep -E "^enabled:" "$CONFIG_FILE" | sed 's/enabled:\s*//' | tr -d ' ' || echo "$ENABLED")
+            MODE=$(grep -E "^mode:" "$CONFIG_FILE" | sed 's/mode:\s*//' | tr -d ' ' || echo "$MODE")
+            IGNORE_BOTS=$(grep -E "^ignore_bots:" "$CONFIG_FILE" | sed 's/ignore_bots:\s*//' | tr -d ' ' || echo "$IGNORE_BOTS")
+            MAX_CONCERNS=$(grep -E "^max_concerns:" "$CONFIG_FILE" | sed 's/max_concerns:\s*//' | tr -d ' ' || echo "$MAX_CONCERNS")
+          else
+            echo "⚠️ No configuration file found, using defaults"
+          fi
+          
+          echo "enabled=$ENABLED" >> $GITHUB_OUTPUT
+          echo "mode=$MODE" >> $GITHUB_OUTPUT
+          echo "ignore_bots=$IGNORE_BOTS" >> $GITHUB_OUTPUT
+          echo "max_concerns=$MAX_CONCERNS" >> $GITHUB_OUTPUT
+          
+          echo "📋 Configuration:"
+          echo "   enabled: $ENABLED"
+          echo "   mode: $MODE"
+          echo "   ignore_bots: $IGNORE_BOTS"
+          echo "   max_concerns: $MAX_CONCERNS"
+      
+      - name: ⏭️ Skip if disabled
+        if: steps.config.outputs.enabled == 'false'
+        run: |
+          echo "⏭️ Atomicity check is disabled in configuration"
+          echo "## ⏭️ Atomicity Check Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "The atomicity check is disabled in \`.github/atomicity-config.yml\`" >> $GITHUB_STEP_SUMMARY
+      
+      - name: 🔍 Analyze commits
+        if: steps.config.outputs.enabled != 'false'
+        id: analyze
+        env:
+          MODE: ${{ steps.config.outputs.mode }}
+          IGNORE_BOTS: ${{ steps.config.outputs.ignore_bots }}
+          MAX_CONCERNS: ${{ steps.config.outputs.max_concerns }}
+        run: |
+          # Make script executable
+          chmod +x scripts/analyze-atomicity.sh
+          
+          # Initialize counters
+          TOTAL_COMMITS=0
+          ATOMIC_COMMITS=0
+          NON_ATOMIC_COMMITS=0
+          SKIPPED_BOTS=0
+          HAS_ISSUES="false"
+          REPORT=""
+          
+          # Bot patterns
+          BOT_PATTERNS="github-actions|dependabot|copilot|jules|renovate|\[bot\]"
+          
+          echo "🔍 Analyzing commits in PR..."
+          echo ""
+          
+          # Get commits from base to head
+          COMMITS=$(git log --format="%H %an" origin/${{ github.base_ref }}..HEAD 2>/dev/null || git log --format="%H %an" origin/main..HEAD 2>/dev/null || echo "")
+          
+          if [ -z "$COMMITS" ]; then
+            echo "✅ No commits to analyze"
+            echo "status=ok" >> $GITHUB_OUTPUT
+            echo "has_issues=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          while IFS=' ' read -r COMMIT AUTHOR; do
+            [ -z "$COMMIT" ] && continue
+            ((TOTAL_COMMITS++))
+            
+            # Check if bot author
+            if [ "$IGNORE_BOTS" = "true" ] && echo "$AUTHOR" | grep -qiE "$BOT_PATTERNS"; then
+              ((SKIPPED_BOTS++))
+              echo "○ ${COMMIT:0:8}: Skipped (bot: $AUTHOR)"
+              continue
+            fi
+            
+            # Get files changed in commit
+            FILES=$(git show --name-only --format="" "$COMMIT" 2>/dev/null || echo "")
+            
+            if [ -z "$FILES" ]; then
+              continue
+            fi
+            
+            # Categorize files and count concerns
+            declare -A CONCERNS
+            
+            while IFS= read -r FILE; do
+              [ -z "$FILE" ] && continue
+              
+              # Skip lock files and gitignore
+              case "$FILE" in
+                *.lock|package-lock.json|yarn.lock|Cargo.lock|.gitignore)
+                  continue
+                  ;;
+              esac
+              
+              # Categorize file
+              CONCERN="other"
+              
+              # Tests
+              if [[ "$FILE" =~ ^tests?/ ]] || [[ "$FILE" =~ \.test\. ]] || [[ "$FILE" =~ \.spec\. ]] || [[ "$FILE" =~ _test\. ]] || [[ "$FILE" =~ ^test_ ]]; then
+                CONCERN="tests"
+              # Documentation
+              elif [[ "$FILE" =~ ^docs/ ]] || [[ "$FILE" =~ \.md$ ]]; then
+                CONCERN="docs"
+              # CI/Infrastructure
+              elif [[ "$FILE" =~ ^\.github/workflows/ ]] || [[ "$FILE" =~ ^scripts/ ]]; then
+                CONCERN="infra"
+              # Config
+              elif [[ "$FILE" =~ \.(yml|yaml|json|toml)$ ]] || [[ "$FILE" =~ ^\. ]]; then
+                CONCERN="config"
+              # Source
+              elif [[ "$FILE" =~ ^src/ ]] || [[ "$FILE" =~ ^lib/ ]] || [[ "$FILE" =~ \.(py|js|ts|rs|go)$ ]]; then
+                CONCERN="source"
+              fi
+              
+              CONCERNS[$CONCERN]=1
+            done <<< "$FILES"
+            
+            CONCERN_COUNT=${#CONCERNS[@]}
+            CONCERN_LIST="${!CONCERNS[*]}"
+            COMMIT_MSG=$(git log -1 --format="%s" "$COMMIT" 2>/dev/null || echo "")
+            
+            if [ "$CONCERN_COUNT" -gt "$MAX_CONCERNS" ]; then
+              HAS_ISSUES="true"
+              ((NON_ATOMIC_COMMITS++))
+              echo "⚠️ ${COMMIT:0:8}: $COMMIT_MSG"
+              echo "   └─ Mixes $CONCERN_COUNT concerns: $CONCERN_LIST"
+              echo "::warning file=.github/workflows/commit-atomicity.yml::Commit ${COMMIT:0:8} mixes $CONCERN_COUNT concerns: $CONCERN_LIST"
+              REPORT="${REPORT}\n| \`${COMMIT:0:8}\` | $COMMIT_MSG | ⚠️ $CONCERN_LIST |"
+            else
+              ((ATOMIC_COMMITS++))
+              echo "✅ ${COMMIT:0:8}: $COMMIT_MSG ($CONCERN_LIST)"
+              REPORT="${REPORT}\n| \`${COMMIT:0:8}\` | $COMMIT_MSG | ✅ $CONCERN_LIST |"
+            fi
+            
+            # Reset concerns array for next iteration (required for associative arrays in bash)
+            unset CONCERNS
+          done <<< "$COMMITS"
+          
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 Summary"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "   Total commits: $TOTAL_COMMITS"
+          echo "   Atomic: $ATOMIC_COMMITS"
+          echo "   Non-atomic: $NON_ATOMIC_COMMITS"
+          echo "   Skipped (bots): $SKIPPED_BOTS"
+          
+          # Set outputs
+          echo "has_issues=$HAS_ISSUES" >> $GITHUB_OUTPUT
+          echo "total=$TOTAL_COMMITS" >> $GITHUB_OUTPUT
+          echo "atomic=$ATOMIC_COMMITS" >> $GITHUB_OUTPUT
+          echo "non_atomic=$NON_ATOMIC_COMMITS" >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED_BOTS" >> $GITHUB_OUTPUT
+          
+          # Encode report for multiline output
+          {
+            echo 'report<<EOF'
+            echo -e "$REPORT"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+          
+          # Determine exit status
+          if [ "$HAS_ISSUES" = "true" ] && [ "$MODE" = "error" ]; then
+            echo "status=error" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "status=ok" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 📋 Generate summary
+        if: steps.config.outputs.enabled != 'false'
+        run: |
+          echo "## 🔍 Commit Atomicity Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.analyze.outputs.has_issues }}" = "true" ]; then
+            echo "⚠️ **Some commits mix multiple concerns**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **All commits are atomic**" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Total commits | ${{ steps.analyze.outputs.total }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ✅ Atomic | ${{ steps.analyze.outputs.atomic }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚠️ Non-atomic | ${{ steps.analyze.outputs.non_atomic }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⏭️ Skipped (bots) | ${{ steps.analyze.outputs.skipped }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -n "${{ steps.analyze.outputs.report }}" ]; then
+            echo "### 📝 Commit Details" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Commit | Message | Concerns |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|---------|----------|" >> $GITHUB_STEP_SUMMARY
+            echo -e "${{ steps.analyze.outputs.report }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Mode:** \`${{ steps.config.outputs.mode }}\` | **Max concerns:** \`${{ steps.config.outputs.max_concerns }}\`" >> $GITHUB_STEP_SUMMARY
+      
+      - name: 💬 Comment on PR (with issues)
+        if: steps.config.outputs.enabled != 'false' && steps.analyze.outputs.has_issues == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const mode = '${{ steps.config.outputs.mode }}';
+            const nonAtomic = '${{ steps.analyze.outputs.non_atomic }}';
+            const total = '${{ steps.analyze.outputs.total }}';
+            
+            const emoji = mode === 'error' ? '❌' : '⚠️';
+            const title = mode === 'error' ? 'Atomicity Check Failed' : 'Atomicity Check Warning';
+            
+            const body = `${emoji} **${title}**
+
+            **${nonAtomic}** of **${total}** commits mix multiple concerns.
+
+            ### Why does this matter?
+
+            Atomic commits make your git history easier to:
+            - 📖 **Read** - Each commit tells a clear story
+            - 🔍 **Review** - Smaller, focused changes are easier to review
+            - ⏪ **Revert** - You can undo specific changes without side effects
+            - 🔬 **Bisect** - Finding bugs is faster with atomic commits
+
+            ### What to do?
+
+            Consider reorganizing your commits to address one concern per commit:
+            - **source** - Code changes
+            - **tests** - Test files
+            - **docs** - Documentation
+            - **config** - Configuration files
+            - **infra** - CI/CD, scripts, Docker
+
+            You can use interactive rebase to reorganize:
+            \`\`\`bash
+            git rebase -i origin/${{ github.base_ref }}
+            \`\`\`
+
+            ---
+            *This check is configured in \`.github/atomicity-config.yml\`*
+            *Mode: \`${mode}\` (${mode === 'error' ? 'blocks merge' : 'advisory only'})*`;
+
+            // Check if we already commented
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+
+            const botComment = comments.data.find(c => 
+              c.user.type === 'Bot' && 
+              c.body.includes('Atomicity Check')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+      
+      - name: ❌ Fail check (error mode)
+        if: steps.config.outputs.enabled != 'false' && steps.analyze.outputs.has_issues == 'true' && steps.config.outputs.mode == 'error'
+        run: |
+          echo "❌ Atomicity check failed in error mode"
+          echo "Some commits mix multiple concerns. Please reorganize your commits."
+          exit 1
