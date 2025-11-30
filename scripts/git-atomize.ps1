@@ -114,7 +114,7 @@ function Get-FileGroup {
         "*-handler*" { return "feat:services" }
         "*-service*" { return "feat:services" }
         "*-hook*" { return "feat:hooks" }
-        "use*.*" { return "feat:hooks" }
+        "use[A-Z]*" { return "feat:hooks" }
         ".gitignore" { return "chore:git" }
         ".gitattributes" { return "chore:git" }
         ".env*" { return "chore:env" }

@@ -222,7 +222,7 @@ get_file_group() {
             echo "feat:services"
             return
             ;;
-        *-hook*|use*.js|use*.ts|use*.jsx|use*.tsx)
+        *-hook*|use[A-Z]*)
             echo "feat:hooks"
             return
             ;;
