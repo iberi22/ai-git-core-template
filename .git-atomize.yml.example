@@ -1,0 +1,65 @@
+# .git-atomize.yml
+# 🧠 Git-Core Protocol - Atomic Commit Validation Configuration
+#
+# Modes:
+#   - solo:   Warnings only, always allows commits (default for personal projects)
+#   - team:   Blocks commits that violate rules (recommended for team projects)
+#   - strict: Like team, but bypass is disabled except with --no-verify
+
+mode: solo  # solo | team | strict
+
+rules:
+  max_files_per_commit: 10
+  max_concerns_per_commit: 1  # In team mode, enforces single-concern commits
+
+# Define what constitutes a "concern" based on file patterns
+# Each concern groups related files together
+concerns:
+  - pattern: ".github/workflows/*"
+    scope: ci
+  - pattern: ".github/actions/*"
+    scope: ci
+  - pattern: "docs/*"
+    scope: docs
+  - pattern: "*.md"
+    scope: docs
+  - pattern: "supabase/migrations/*"
+    scope: db
+  - pattern: "migrations/*"
+    scope: db
+  - pattern: "*.sql"
+    scope: db
+  - pattern: "src/components/*"
+    scope: ui
+  - pattern: "components/*"
+    scope: ui
+  - pattern: "*.test.*"
+    scope: test
+  - pattern: "*_test.*"
+    scope: test
+  - pattern: "test_*"
+    scope: test
+  - pattern: "*.spec.*"
+    scope: test
+  - pattern: "tests/*"
+    scope: test
+  - pattern: "src/*"
+    scope: core
+  - pattern: "lib/*"
+    scope: core
+  - pattern: "scripts/*"
+    scope: scripts
+  - pattern: "config/*"
+    scope: config
+  - pattern: "*.config.*"
+    scope: config
+
+# Commit message patterns that bypass atomicity checks
+# Useful for merge commits and initial setup
+bypass_patterns:
+  - "chore: initial commit"
+  - "chore: merge"
+  - "Merge branch"
+  - "Merge pull request"
+  - "chore(deps):"
+  - "revert:"

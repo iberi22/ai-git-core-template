@@ -335,7 +335,22 @@ Keep documentation concise and practical." \
     --label "ai-plan"
 fi
 
-# 8. Final message
+# 8. Install pre-commit hooks for atomic commit validation
+echo -e "\n🪝 Installing pre-commit hooks..."
+
+HOOKS_INSTALLER="$(dirname "$0")/hooks/install-hooks.sh"
+if [ -f "$HOOKS_INSTALLER" ]; then
+    chmod +x "$HOOKS_INSTALLER"
+    if bash "$HOOKS_INSTALLER" 2>/dev/null; then
+        echo -e "${GREEN}✓ Pre-commit hooks installed${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Could not install hooks (non-fatal)${NC}"
+    fi
+else
+    echo -e "${YELLOW}⚠️  Hook installer not found at $HOOKS_INSTALLER${NC}"
+fi
+
+# 9. Final message
 echo -e "\n=========================================="
 echo -e "${GREEN}✅ Project initialized successfully!${NC}"
 echo -e "=========================================="

@@ -309,7 +309,60 @@ Keep documentation concise and practical.
     --label "ai-plan"
 }
 
-# 8. Final message
+# 8. Install pre-commit hooks for atomic commit validation
+Write-Host "`n🪝 Installing pre-commit hooks..." -ForegroundColor Yellow
+
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$hooksInstaller = Join-Path $scriptDir "hooks/install-hooks.sh"
+$preCommitHook = Join-Path $scriptDir "hooks/pre-commit"
+
+# For PowerShell, we'll install the hooks directly
+$gitHooksDir = Join-Path (Get-Location) ".git/hooks"
+if (Test-Path ".git") {
+    if (-not (Test-Path $gitHooksDir)) {
+        New-Item -ItemType Directory -Force -Path $gitHooksDir | Out-Null
+    }
+    
+    # Create the pre-commit wrapper
+    $hookContent = @'
+#!/bin/bash
+# Git-Core Protocol pre-commit hook (git-core-protocol)
+# This hook validates atomic commits based on .git-atomize.yml configuration
+# Bypass with: git commit --no-verify
+
+# Get repository root
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+HOOK_SCRIPT="$REPO_ROOT/scripts/hooks/pre-commit"
+
+# Run the hook script if it exists
+if [ -f "$HOOK_SCRIPT" ] && [ -x "$HOOK_SCRIPT" ]; then
+    exec "$HOOK_SCRIPT"
+elif [ -f "$HOOK_SCRIPT" ]; then
+    exec bash "$HOOK_SCRIPT"
+else
+    # Hook script not found, skip validation
+    echo "Note: scripts/hooks/pre-commit not found, skipping atomicity check"
+    exit 0
+fi
+'@
+    
+    $preCommitPath = Join-Path $gitHooksDir "pre-commit"
+    Set-Content -Path $preCommitPath -Value $hookContent -Encoding UTF8 -NoNewline
+    
+    # Copy example config if .git-atomize.yml doesn't exist
+    $configExample = Join-Path (Get-Location) ".git-atomize.yml.example"
+    $configFile = Join-Path (Get-Location) ".git-atomize.yml"
+    if ((Test-Path $configExample) -and (-not (Test-Path $configFile))) {
+        Copy-Item $configExample $configFile
+        Write-Host "✓ Created .git-atomize.yml from example" -ForegroundColor Green
+    }
+    
+    Write-Host "✓ Pre-commit hooks installed" -ForegroundColor Green
+} else {
+    Write-Host "⚠️  Could not install hooks (no .git directory)" -ForegroundColor Yellow
+}
+
+# 9. Final message
 Write-Host "`n==========================================" -ForegroundColor Cyan
 Write-Host "✅ Project initialized successfully!" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Cyan
