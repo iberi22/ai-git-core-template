@@ -1,8 +1,24 @@
+---
+title: "Git-Core Protocol - README"
+type: DOCUMENTATION
+id: "doc-readme"
+created: 2025-12-01
+updated: 2025-12-01
+agent: copilot
+model: gemini-3-pro
+requested_by: system
+summary: |
+  Project overview, quick start guide, and core principles of the Git-Core Protocol.
+keywords: [git-core, protocol, ai-agent, template]
+tags: ["#documentation", "#readme", "#core"]
+project: Git-Core-Protocol
+---
+
 # 🧠 Git-Core Protocol
 
 > **AI-Driven Project Management Template** | Plantilla de Gestión de Proyectos con IA
 
-[![Use this template](https://img.shields.io/badge/Use%20this-template-blue?style=for-the-badge)](https://github.com/iberi22/ai-git-core-template/generate)
+[![Use this template](https://img.shields.io/badge/Use%20this-template-blue?style=for-the-badge)](https://github.com/iberi22/Git-Core-Protocol/generate)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![AI Code Review](https://img.shields.io/badge/AI%20Review-CodeRabbit%20%2B%20Gemini-purple?style=for-the-badge)](https://github.com/marketplace/coderabbit)
 
@@ -30,19 +46,40 @@
 
 ```
 Initialize this project with Git-Core Protocol. Run:
-$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 Then execute: .\scripts\init_project.ps1 -Auto
-After setup, read .ai/ARCHITECTURE.md and start with the first issue from: gh issue list
+After setup, read .✨/ARCHITECTURE.md and start with the first issue from: gh issue list
 ```
 
 For Linux/Mac:
 
 ```
 Initialize this project with Git-Core Protocol. Run:
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash -s -- --auto
 Then execute: ./scripts/init_project.sh
-After setup, read .ai/ARCHITECTURE.md and start with the first issue from: gh issue list
+After setup, read .✨/ARCHITECTURE.md and start with the first issue from: gh issue list
 ```
+
+---
+
+## 🤖 Agent "Dressing Room" (New!)
+
+This protocol now includes a dynamic system to "equip" your AI agent with specific roles (Backend Architect, UX Researcher, etc.) on demand.
+
+### How it works:
+1. **Index:** Check `.✨/AGENT_INDEX.md` to see available roles.
+2. **Equip:** Run the script to download and load the persona.
+3. **Act:** The agent reads the generated context and behaves like an expert.
+
+```powershell
+# Example: Load the Backend Architect persona
+./scripts/equip-agent.ps1 -Role "backend"
+```
+
+The system automatically:
+- ⬇️ Downloads the latest recipe from `agents-flows-recipes`.
+- 🛡️ Injects mandatory protocol skills (Atomic Commits, Architecture First).
+- 🧠 Generates a `.✨/CURRENT_CONTEXT.md` file for the agent.
 
 ---
 
@@ -63,20 +100,20 @@ After setup, read .ai/ARCHITECTURE.md and start with the first issue from: gh is
 
 ```powershell
 # In your project folder
-irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 
 # Auto mode (for AI Agents)
-$env:GIT_CORE_AUTO = "1"; $env:GIT_CORE_ORGANIZE = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+$env:GIT_CORE_AUTO = "1"; $env:GIT_CORE_ORGANIZE = "1"; irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 ```
 
 **Linux/Mac:**
 
 ```bash
 # In your project folder
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 
 # Auto mode (for AI Agents)
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto --organize
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash -s -- --auto --organize
 ```
 
 ### Option 2: Use as Template
@@ -89,7 +126,7 @@ curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/ins
 
 ```
 /
-├── .ai/
+├── .✨/
 │   ├── ARCHITECTURE.md       # 📖 System context
 │   └── CONTEXT_LOG.md        # 📝 Ephemeral session notes
 ├── .github/
@@ -109,7 +146,7 @@ curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/ins
 ┌─────────────────────────────────────────────────────────┐
 │                    THE LOOP                              │
 ├─────────────────────────────────────────────────────────┤
-│   1. READ: cat .ai/ARCHITECTURE.md                      │
+│   1. READ: cat .✨/ARCHITECTURE.md                      │
 │           gh issue list --assignee "@me"                │
 │   2. ACT:  gh issue edit <id> --add-assignee "@me"      │
 │           git checkout -b feat/issue-<id>               │
@@ -164,18 +201,18 @@ curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/ins
 
 ```
 Inicializa este proyecto con Git-Core Protocol. Ejecuta:
-$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 Luego ejecuta: .\scripts\init_project.ps1 -Auto
-Después del setup, lee .ai/ARCHITECTURE.md y empieza con el primer issue de: gh issue list
+Después del setup, lee .✨/ARCHITECTURE.md y empieza con el primer issue de: gh issue list
 ```
 
 Para Linux/Mac:
 
 ```
 Inicializa este proyecto con Git-Core Protocol. Ejecuta:
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash -s -- --auto
 Luego ejecuta: ./scripts/init_project.sh
-Después del setup, lee .ai/ARCHITECTURE.md y empieza con el primer issue de: gh issue list
+Después del setup, lee .✨/ARCHITECTURE.md y empieza con el primer issue de: gh issue list
 ```
 
 ---
@@ -197,20 +234,20 @@ Después del setup, lee .ai/ARCHITECTURE.md y empieza con el primer issue de: gh
 
 ```powershell
 # En tu carpeta de proyecto
-irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 
 # Modo automático (para AI Agents)
-$env:GIT_CORE_AUTO = "1"; $env:GIT_CORE_ORGANIZE = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+$env:GIT_CORE_AUTO = "1"; $env:GIT_CORE_ORGANIZE = "1"; irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 ```
 
 **Linux/Mac:**
 
 ```bash
 # En tu carpeta de proyecto
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 
 # Modo automático (para AI Agents)
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto --organize
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash -s -- --auto --organize
 ```
 
 ### Opción 2: Usar como Template
@@ -268,18 +305,18 @@ curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/ins
 
 ```
 Inicialize este projeto com Git-Core Protocol. Execute:
-$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 Depois execute: .\scripts\init_project.ps1 -Auto
-Após o setup, leia .ai/ARCHITECTURE.md e comece com a primeira issue de: gh issue list
+Após o setup, leia .✨/ARCHITECTURE.md e comece com a primeira issue de: gh issue list
 ```
 
 Para Linux/Mac:
 
 ```
 Inicialize este projeto com Git-Core Protocol. Execute:
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash -s -- --auto
 Depois execute: ./scripts/init_project.sh
-Após o setup, leia .ai/ARCHITECTURE.md e comece com a primeira issue de: gh issue list
+Após o setup, leia .✨/ARCHITECTURE.md e comece com a primeira issue de: gh issue list
 ```
 
 ---
@@ -300,13 +337,13 @@ Após o setup, leia .ai/ARCHITECTURE.md e comece com a primeira issue de: gh iss
 **Windows PowerShell:**
 
 ```powershell
-irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 ```
 
 **Linux/Mac:**
 
 ```bash
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 ```
 
 ## 🤖 Agentes IA Compatíveis
@@ -329,18 +366,18 @@ curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/ins
 
 ```
 Initialisiere dieses Projekt mit Git-Core Protocol. Führe aus:
-$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 Dann führe aus: .\scripts\init_project.ps1 -Auto
-Nach dem Setup, lies .ai/ARCHITECTURE.md und beginne mit dem ersten Issue von: gh issue list
+Nach dem Setup, lies .✨/ARCHITECTURE.md und beginne mit dem ersten Issue von: gh issue list
 ```
 
 Für Linux/Mac:
 
 ```
 Initialisiere dieses Projekt mit Git-Core Protocol. Führe aus:
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash -s -- --auto
 Dann führe aus: ./scripts/init_project.sh
-Nach dem Setup, lies .ai/ARCHITECTURE.md und beginne mit dem ersten Issue von: gh issue list
+Nach dem Setup, lies .✨/ARCHITECTURE.md und beginne mit dem ersten Issue von: gh issue list
 ```
 
 ---
@@ -359,13 +396,13 @@ Nach dem Setup, lies .ai/ARCHITECTURE.md und beginne mit dem ersten Issue von: g
 **Windows PowerShell:**
 
 ```powershell
-irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 ```
 
 **Linux/Mac:**
 
 ```bash
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 ```
 
 ## 🤖 Kompatible KI-Agenten
@@ -388,18 +425,18 @@ curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/ins
 
 ```
 Initialise ce projet avec Git-Core Protocol. Exécute:
-$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 Puis exécute: .\scripts\init_project.ps1 -Auto
-Après le setup, lis .ai/ARCHITECTURE.md et commence avec la première issue de: gh issue list
+Après le setup, lis .✨/ARCHITECTURE.md et commence avec la première issue de: gh issue list
 ```
 
 Pour Linux/Mac:
 
 ```
 Initialise ce projet avec Git-Core Protocol. Exécute:
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash -s -- --auto
 Puis exécute: ./scripts/init_project.sh
-Après le setup, lis .ai/ARCHITECTURE.md et commence avec la première issue de: gh issue list
+Après le setup, lis .✨/ARCHITECTURE.md et commence avec la première issue de: gh issue list
 ```
 
 ---
@@ -418,13 +455,13 @@ Après le setup, lis .ai/ARCHITECTURE.md et commence avec la première issue de:
 **Windows PowerShell:**
 
 ```powershell
-irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 ```
 
 **Linux/Mac:**
 
 ```bash
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 ```
 
 ## 🤖 Agents IA Compatibles
@@ -447,18 +484,18 @@ curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/ins
 
 ```
 Git-Core Protocolでこのプロジェクトを初期化してください。実行：
-$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 次に実行: .\scripts\init_project.ps1 -Auto
-セットアップ後、.ai/ARCHITECTURE.mdを読み、gh issue listから最初のissueを始めてください
+セットアップ後、.✨/ARCHITECTURE.mdを読み、gh issue listから最初のissueを始めてください
 ```
 
 Linux/Macの場合:
 
 ```
 Git-Core Protocolでこのプロジェクトを初期化してください。実行：
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash -s -- --auto
 次に実行: ./scripts/init_project.sh
-セットアップ後、.ai/ARCHITECTURE.mdを読み、gh issue listから最初のissueを始めてください
+セットアップ後、.✨/ARCHITECTURE.mdを読み、gh issue listから最初のissueを始めてください
 ```
 
 ---
@@ -477,13 +514,13 @@ curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/ins
 **Windows PowerShell:**
 
 ```powershell
-irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 ```
 
 **Linux/Mac:**
 
 ```bash
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 ```
 
 ## 🤖 対応AIエージェント
@@ -506,18 +543,18 @@ curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/ins
 
 ```
 使用Git-Core Protocol初始化此项目。执行：
-$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 然后执行: .\scripts\init_project.ps1 -Auto
-设置完成后，阅读.ai/ARCHITECTURE.md并从gh issue list开始第一个issue
+设置完成后，阅读.✨/ARCHITECTURE.md并从gh issue list开始第一个issue
 ```
 
 Linux/Mac:
 
 ```
 使用Git-Core Protocol初始化此项目。执行：
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash -s -- --auto
 然后执行: ./scripts/init_project.sh
-设置完成后，阅读.ai/ARCHITECTURE.md并从gh issue list开始第一个issue
+设置完成后，阅读.✨/ARCHITECTURE.md并从gh issue list开始第一个issue
 ```
 
 ---
@@ -536,13 +573,13 @@ curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/ins
 **Windows PowerShell:**
 
 ```powershell
-irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 ```
 
 **Linux/Mac:**
 
 ```bash
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 ```
 
 ## 🤖 兼容的AI助手
@@ -571,3 +608,5 @@ MIT - Use it however you want | Úsalo como quieras | Use como quiser | Verwende
 ---
 
 **Created with 🧠 by [@iberi22](https://github.com/iberi22)**
+
+
