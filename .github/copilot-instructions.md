@@ -86,6 +86,42 @@ When working with dependencies:
 - After 14 days → Auto-promoted to "ready-to-adopt"
 - On merge → Context Research Agent updates documentation
 
+### 3.1 Living Context Protocol (Context7 Replacement)
+
+This protocol replaces external tools like Context7 with a native, self-hosted solution.
+
+**How it works:**
+1. **Context Research Agent** analyzes dependencies and creates `RESEARCH_STACK_CONTEXT.md`
+2. **Living Context PR** is always open at `living-context/main` branch
+3. **AI Agents** (Gemini, CodeRabbit) automatically review the context for accuracy
+4. **Merge** updates the context, which all AI agents should read
+
+**Usage for AI Agents:**
+```bash
+# ALWAYS read this before working with dependencies
+cat docs/agent-docs/RESEARCH_STACK_CONTEXT.md
+
+# Check for the Living Context PR (latest updates)
+gh pr list --head "living-context/main"
+
+# If context seems outdated, trigger refresh
+gh workflow run living-context.yml
+```
+
+**What's in RESEARCH_STACK_CONTEXT.md:**
+- **Current Stack**: All dependencies with exact versions
+- **Known Anomalies**: Bugs, quirks, breaking changes
+- **Intelligent Patterns**: Recommended usage patterns
+- **Quarantine Status**: Dependencies awaiting community feedback
+
+**Why this beats Context7:**
+| Context7 | Living Context Protocol |
+|----------|------------------------|
+| Generic docs | Project-specific context |
+| External API | Self-hosted in repo |
+| Manual trigger | Automated via workflows |
+| No risk analysis | 14-day quarantine + AI review |
+
 ### 4. Architecture First Rule
 Before implementing ANY infrastructure feature:
 1. Run: `grep -A 20 'CRITICAL DECISIONS' .✨/ARCHITECTURE.md`
