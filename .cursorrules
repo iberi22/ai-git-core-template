@@ -28,7 +28,7 @@
 ### ✅ ONLY ALLOWED `.md` FILES:
 - ✅ `README.md` (project overview ONLY)
 - ✅ `AGENTS.md` (agent configuration ONLY)
-- ✅ `.ai/ARCHITECTURE.md` (system architecture ONLY)
+- ✅ `.✨/ARCHITECTURE.md` (system architecture ONLY)
 - ✅ `CONTRIBUTING.md`, `LICENSE.md` (standard repo files)
 - ✅ `docs/agent-docs/*.md` (**ONLY when user explicitly requests**)
 
@@ -48,9 +48,9 @@
 When starting any task, follow these steps strictly:
 
 1.  **READ (Context):**
-    - Read `.ai/ARCHITECTURE.md` to understand the system.
+    - Read `.✨/ARCHITECTURE.md` to understand the system.
     - Run: `gh issue list --assignee "@me"` to see your current task.
-    - If no task assigned, check backlog: `gh issue list --limit 5`.
+    - If no task, check backlog: `gh issue list --limit 5`.
 
 2.  **ACT (Development):**
     - If taking a new task: `gh issue edit <id> --add-assignee "@me"`.
@@ -90,7 +90,7 @@ When starting any task, follow these steps strictly:
 - ✅ Source code (.py, .js, .ts, etc.)
 - ✅ Tests (in tests/ folder)
 - ✅ Technical config (docker, CI/CD, linters)
-- ✅ `.ai/ARCHITECTURE.md` (ONLY this file for architecture)
+- ✅ `.✨/ARCHITECTURE.md` (ONLY this file for architecture)
 - ✅ `README.md` (project documentation)
 - ✅ `docs/agent-docs/*.md` (**ONLY when user explicitly requests**)
 - ✅ GitHub Issues for EVERYTHING ELSE

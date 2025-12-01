@@ -1,3 +1,19 @@
+---
+title: "Git-Core Protocol - Agent Configuration"
+type: CONFIGURATION
+id: "config-agents"
+created: 2025-12-01
+updated: 2025-12-01
+agent: copilot
+model: gemini-3-pro
+requested_by: system
+summary: |
+  Configuration rules, forbidden actions, and workflows for AI agents.
+keywords: [agents, rules, workflow, configuration]
+tags: ["#configuration", "#agents", "#rules"]
+project: Git-Core-Protocol
+---
+
 # 🤖 AGENTS.md - AI Agent Configuration
 
 ## Overview
@@ -44,7 +60,7 @@ This repository follows the **Git-Core Protocol** for AI-assisted development.
 ```
 ✅ README.md (project overview ONLY)
 ✅ AGENTS.md (agent configuration ONLY)
-✅ .ai/ARCHITECTURE.md (system architecture ONLY)
+✅ .✨/ARCHITECTURE.md (system architecture ONLY)
 ✅ CONTRIBUTING.md, LICENSE.md (standard repo files)
 ```
 
@@ -63,7 +79,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 ```
 
 ### 📖 Required Reading Before Any Task
-1. `.ai/ARCHITECTURE.md` - Understand the system
+1. `.✨/ARCHITECTURE.md` - Understand the system
 2. `gh issue list --assignee "@me"` - Your current task
 3. `gh issue list --limit 5` - Available backlog
 
@@ -73,7 +89,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 
 **BEFORE implementing ANY infrastructure/tooling:**
 
-1. Read `.ai/ARCHITECTURE.md` CRITICAL DECISIONS section
+1. Read `.✨/ARCHITECTURE.md` CRITICAL DECISIONS section
 2. Verify your implementation matches the decided stack
 3. If issue mentions alternatives, ARCHITECTURE.md decision wins
 
@@ -86,7 +102,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 **Why?** Architecture decisions are made after careful consideration of project constraints. Issues may present options for discussion, but once a decision is recorded in ARCHITECTURE.md, it is final.
 
 **Related Documentation:**
-- `.ai/ARCHITECTURE.md` - CRITICAL DECISIONS table
+- `.✨/ARCHITECTURE.md` - CRITICAL DECISIONS table
 - `.github/copilot-instructions.md` - Architecture First Rule
 
 ---
@@ -96,7 +112,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 ### Phase 1: READ (Context Loading)
 ```bash
 # Always start here
-cat .ai/ARCHITECTURE.md
+cat .✨/ARCHITECTURE.md
 gh issue list --assignee "@me" --state open
 ```
 
@@ -150,7 +166,7 @@ gh pr create --fill --base main
 | Source code (`.py`, `.js`, `.ts`, etc.) | The actual project |
 | Tests (in `tests/` folder) | Quality assurance |
 | Config files (docker, CI/CD, linters) | Infrastructure |
-| `.ai/ARCHITECTURE.md` | System architecture (ONLY this file) |
+| `.✨/ARCHITECTURE.md` | System architecture (ONLY this file) |
 | `README.md` | Project documentation |
 | `docs/agent-docs/*.md` | **ONLY when user explicitly requests** |
 | GitHub Issues | **EVERYTHING ELSE** |
@@ -680,3 +696,4 @@ gh pr merge <number>
 
 *Protocol Version: 1.4.0*
 *Last Updated: 2025*
+

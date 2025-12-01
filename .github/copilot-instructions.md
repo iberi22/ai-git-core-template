@@ -33,7 +33,8 @@ You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, 
 ### ✅ ONLY ALLOWED `.md` FILES:
 - ✅ `README.md` (project overview ONLY)
 - ✅ `AGENTS.md` (agent configuration ONLY)
-- ✅ `.ai/ARCHITECTURE.md` (system architecture ONLY)
+- ✅ `.✨/ARCHITECTURE.md` (system architecture ONLY)
+- ✅ `.✨/AGENT_INDEX.md` (agent routing ONLY)
 - ✅ `CONTRIBUTING.md`, `LICENSE.md` (standard repo files)
 
 ---
@@ -56,26 +57,31 @@ You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, 
 ### 2. Context Loading
 Before any task:
 ```bash
-# Read architecture
-cat .ai/ARCHITECTURE.md
+# 1. Check the Agent Index to see if you need a specific Role
+cat .✨/AGENT_INDEX.md
 
-# Check your assigned issues
+# 2. If a Role fits the task, EQUIP IT:
+# ./scripts/equip-agent.ps1 -Role "RoleName"
+# cat .✨/CURRENT_CONTEXT.md
+
+# 3. Read architecture
+cat .✨/ARCHITECTURE.md
+
+# 4. Check your assigned issues
 gh issue list --assignee "@me"
-
-# If no assignment, check backlog
-gh issue list --limit 5
 ```
 
 ### 3. Architecture First Rule
 Before implementing ANY infrastructure feature:
-1. Run: `grep -A 20 'CRITICAL DECISIONS' .ai/ARCHITECTURE.md`
+1. Run: `grep -A 20 'CRITICAL DECISIONS' .✨/ARCHITECTURE.md`
 2. Check CRITICAL DECISIONS table
 3. If conflict with issue, ARCHITECTURE wins
 
 **Why this matters:** A critical error occurred when Vercel was implemented despite ARCHITECTURE.md specifying GitHub Pages. Issues may mention multiple options, but architecture decisions are final.
 
 **Related Documentation:**
-- `.ai/ARCHITECTURE.md` - CRITICAL DECISIONS table
+- `.✨/ARCHITECTURE.md` - CRITICAL DECISIONS table
+- `.✨/AGENT_INDEX.md` - Agent roles and routing
 - `AGENTS.md` - Architecture Verification Rule
 
 ### 4. Development Flow
