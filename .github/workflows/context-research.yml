@@ -65,14 +65,19 @@ jobs:
       - name: 🔨 Build Agent
         run: cargo build --release --manifest-path tools/context-research-agent/Cargo.toml
 
+      - name: 📦 Install gh-models extension
+        run: gh extension install github/gh-models || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 🧠 Run Research Agent
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "🧠 Running Context Research Agent with Gemini 3 Pro..."
-          echo "📊 Free Tier Limits: 15 req/min, 1500 req/day"
-          echo "📊 Strategy: Batch 10 deps/call, 5s delay between calls"
+          echo "🧠 Running Context Research Agent with GitHub Models (GPT-4o-mini)..."
+          echo "📊 Using gh models run - FREE tier, no API key needed"
+          echo "📊 Strategy: 5 deps/batch, 2s delay between calls"
           ./tools/context-research-agent/target/release/context-research-agent \
             --output docs/agent-docs/RESEARCH_STACK_CONTEXT.md \
             --workspace .

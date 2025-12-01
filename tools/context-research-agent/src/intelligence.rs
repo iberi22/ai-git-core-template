@@ -1,8 +1,6 @@
 use anyhow::Result;
 use crate::search::SearchResult;
-use reqwest::Client;
-use serde::{Deserialize, Serialize};
-use std::env;
+use std::process::Command;
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -13,60 +11,27 @@ pub struct Insight {
     pub analysis: String,
 }
 
-// ============== GEMINI 3 PRO STRUCTS ==============
-#[derive(Serialize)]
-struct GeminiRequest {
-    contents: Vec<GeminiContent>,
-}
-
-#[derive(Serialize)]
-struct GeminiContent {
-    parts: Vec<GeminiPart>,
-}
-
-#[derive(Serialize)]
-struct GeminiPart {
-    text: String,
-}
-
-#[derive(Deserialize)]
-struct GeminiResponse {
-    candidates: Option<Vec<GeminiCandidate>>,
-}
-
-#[derive(Deserialize)]
-struct GeminiCandidate {
-    content: Option<GeminiContentResponse>,
-}
-
-#[derive(Deserialize)]
-struct GeminiContentResponse {
-    parts: Option<Vec<GeminiPartResponse>>,
-}
-
-#[derive(Deserialize)]
-struct GeminiPartResponse {
-    text: String,
-}
-
-// ============== RATE LIMITER CONFIG ==============
-// Gemini Free Tier: 15 requests/min, 1500 requests/day
-// Strategy:
-//   - Batch 10 deps per call (reduces 50 deps → 5 calls)
-//   - 5 seconds between requests (12 req/min, safe margin)
-//   - Max ~100 calls/workflow = well under 1500/day limit
-const RATE_LIMIT_DELAY_MS: u64 = 5000;
-const BATCH_SIZE: usize = 10;
+// ============== CONFIGURATION ==============
+// Using GitHub Models via `gh models run` - FREE tier
+// Model options:
+//   - openai/gpt-4o-mini (fast, good quality)
+//   - deepseek/deepseek-r1 (excellent reasoning)
+//   - openai/o3-mini (reasoning focused)
+const MODEL: &str = "openai/gpt-4o-mini";
+const RATE_LIMIT_DELAY_MS: u64 = 2000; // 2 seconds between calls
+const BATCH_SIZE: usize = 5; // Smaller batches for better analysis
 
 pub async fn analyze_findings(results: Vec<SearchResult>) -> Result<Vec<Insight>> {
-    let gemini_key = env::var("GEMINI_API_KEY").unwrap_or_default();
-
-    if gemini_key.is_empty() {
-        println!("⚠️ GEMINI_API_KEY not found. Skipping intelligence analysis.");
+    // Check if gh CLI is available
+    let gh_check = Command::new("gh")
+        .arg("--version")
+        .output();
+    
+    if gh_check.is_err() {
+        println!("⚠️ GitHub CLI (gh) not found. Skipping intelligence analysis.");
         return Ok(Vec::new());
     }
 
-    let client = Client::new();
     let mut insights = Vec::new();
 
     // Filter only dependencies with issues (save API calls)
@@ -78,14 +43,13 @@ pub async fn analyze_findings(results: Vec<SearchResult>) -> Result<Vec<Insight>
         return Ok(Vec::new());
     }
 
-    println!("🧠 Analyzing {} dependencies with issues using Gemini 3 Pro...", total);
+    println!("🧠 Analyzing {} dependencies with issues using GitHub Models ({})...", total, MODEL);
 
-    // AGGRESSIVE BATCHING: 10 deps per call to minimize API usage
+    // Batch dependencies for analysis
     let batches: Vec<Vec<&SearchResult>> = relevant.chunks(BATCH_SIZE).map(|c| c.iter().collect()).collect();
     let total_batches = batches.len();
 
     println!("📊 Strategy: {} batches of up to {} deps each", total_batches, BATCH_SIZE);
-    println!("📊 Estimated API calls: {} (Free tier: 1500/day)", total_batches);
 
     for (batch_idx, batch) in batches.iter().enumerate() {
         println!("\n📦 Batch {}/{} ({} deps)...", batch_idx + 1, total_batches, batch.len());
@@ -93,12 +57,14 @@ pub async fn analyze_findings(results: Vec<SearchResult>) -> Result<Vec<Insight>
         // Build combined prompt for the batch
         let batch_prompt = build_batch_prompt(&batch);
 
-        // Call Gemini 3 Pro
-        println!("  🔷 Calling Gemini 3 Pro...");
-        let result = call_gemini(&client, &gemini_key, &batch_prompt).await;
+        // Call GitHub Models via gh CLI
+        println!("  🔷 Calling GitHub Models ({})...", MODEL);
+        let result = call_gh_models(&batch_prompt).await;
 
         match &result {
-            Ok(_) => println!("  ✅ Success!"),
+            Ok(text) => {
+                println!("  ✅ Success! ({} chars)", text.len());
+            }
             Err(e) => println!("  ⚠️ Error: {}", e),
         }
 
@@ -126,65 +92,47 @@ pub async fn analyze_findings(results: Vec<SearchResult>) -> Result<Vec<Insight>
 
 fn build_batch_prompt(batch: &[&SearchResult]) -> String {
     let mut prompt = String::from(
-        "You are a Senior Software Engineer analyzing GitHub issues for multiple libraries.\n\
-        For EACH library below, provide:\n\
-        1. **Known Anomalies**: Bugs or quirks in THIS SPECIFIC version\n\
-        2. **Anti-patterns to Avoid**: Common mistakes found in issues\n\
-        3. **Intelligent Pattern**: The recommended way to use this version safely\n\n\
-        Be concise but specific. Focus on actionable insights.\n\n"
+        "You are a Senior Software Engineer analyzing GitHub issues for multiple libraries. \
+        For EACH library below, provide: \
+        1. Known Anomalies: Bugs or quirks in THIS SPECIFIC version. \
+        2. Anti-patterns to Avoid: Common mistakes found in issues. \
+        3. Intelligent Pattern: The recommended way to use this version safely. \
+        Be concise but specific. Focus on actionable insights. "
     );
 
     for (i, res) in batch.iter().enumerate() {
         prompt.push_str(&format!(
-            "---\n## Library {}: {} (version {})\n### Issues Found:\n",
+            "--- Library {}: {} (version {}) Issues Found: ",
             i + 1, res.dependency.name, res.dependency.version
         ));
         for issue in &res.issues {
-            prompt.push_str(&format!("- [{}] {}\n", issue.state, issue.title));
+            prompt.push_str(&format!("[{}] {}. ", issue.state, issue.title));
         }
-        prompt.push('\n');
     }
 
     prompt
 }
 
-async fn call_gemini(client: &Client, api_key: &str, prompt: &str) -> Result<String> {
-    let request_body = GeminiRequest {
-        contents: vec![GeminiContent {
-            parts: vec![GeminiPart { text: prompt.to_string() }],
-        }],
-    };
+async fn call_gh_models(prompt: &str) -> Result<String> {
+    // Use gh models run with the prompt
+    let output = Command::new("gh")
+        .args([
+            "models",
+            "run",
+            MODEL,
+            prompt,
+            "--max-tokens", "2048",
+        ])
+        .output()?;
 
-    // Use Gemini 2.5 Flash - Best free tier limits (1500 req/day, 15 req/min)
-    // gemini-3-pro-preview has more restrictive quotas in free tier
-    let url = format!(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={}",
-        api_key
-    );
-
-    let resp = client.post(&url)
-        .json(&request_body)
-        .timeout(Duration::from_secs(120)) // Longer timeout for complex analysis
-        .send()
-        .await?;
-
-    if resp.status().is_success() {
-        let gemini_resp: GeminiResponse = resp.json().await?;
-        if let Some(candidates) = gemini_resp.candidates {
-            if let Some(first) = candidates.first() {
-                if let Some(content) = &first.content {
-                    if let Some(parts) = &content.parts {
-                        if let Some(text_part) = parts.first() {
-                            return Ok(text_part.text.clone());
-                        }
-                    }
-                }
-            }
+    if output.status.success() {
+        let response = String::from_utf8_lossy(&output.stdout).to_string();
+        if response.trim().is_empty() {
+            return Err(anyhow::anyhow!("Empty response from GitHub Models"));
         }
+        Ok(response)
     } else {
-        let status = resp.status();
-        let body = resp.text().await.unwrap_or_default();
-        println!("  ⚠️ Gemini error {}: {}", status, body);
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        Err(anyhow::anyhow!("GitHub Models error: {}", stderr))
     }
-    Err(anyhow::anyhow!("Gemini API error"))
 }
