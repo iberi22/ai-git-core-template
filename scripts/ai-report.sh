@@ -53,11 +53,11 @@ done
 # Check dependencies
 check_deps() {
     command -v gh >/dev/null 2>&1 || error "gh (GitHub CLI) not found"
-    
+
     if [[ "$REPORT_TYPE" == "full" || "$REPORT_TYPE" == "gemini" ]]; then
         command -v gemini >/dev/null 2>&1 || error "gemini CLI not found"
     fi
-    
+
     if [[ "$REPORT_TYPE" == "full" || "$REPORT_TYPE" == "copilot" ]]; then
         command -v copilot >/dev/null 2>&1 || error "copilot CLI not found (npm install -g @github/copilot)"
     fi
@@ -73,9 +73,9 @@ generate_gemini_report() {
     local diff="$1"
     local title="$2"
     local body="$3"
-    
+
     info "Generating Gemini analysis..."
-    
+
     local prompt="Analiza este Pull Request y genera un reporte técnico conciso en español.
 
 ## PR: $title
@@ -111,16 +111,16 @@ generate_copilot_report() {
     local title="$2"
     local body="$3"
     local model="$4"
-    
+
     info "Generating Copilot analysis (model: $model)..."
-    
+
     # Truncate diff if too long
     local truncated_diff="${diff:0:6000}"
     if [[ ${#diff} -gt 6000 ]]; then
         truncated_diff="$truncated_diff
 ... [diff truncated]"
     fi
-    
+
     local prompt="Analiza este Pull Request y genera un reporte técnico conciso en español.
 
 ## PR: $title
@@ -197,13 +197,13 @@ if [[ "$DRY_RUN" == true ]]; then
     echo "$REPORT"
 else
     info "Posting report to PR #$PR_NUMBER..."
-    
+
     TEMP_FILE=$(mktemp)
     echo "$REPORT" > "$TEMP_FILE"
-    
+
     gh pr comment "$PR_NUMBER" --body-file "$TEMP_FILE"
     rm -f "$TEMP_FILE"
-    
+
     success "Report posted to PR #$PR_NUMBER"
 fi
 

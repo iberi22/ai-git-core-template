@@ -6,7 +6,7 @@
     Este script genera análisis automáticos de PRs usando:
     - Gemini CLI: Análisis técnico del diff
     - GitHub Copilot CLI: Análisis con Claude Sonnet 4.5
-    
+
     Los reportes se agregan como comentarios al PR.
 
 .PARAMETER PrNumber
@@ -49,23 +49,23 @@ function Write-Err { Write-Host "❌ $args" -ForegroundColor Red }
 # Verificar dependencias
 function Test-Dependencies {
     $missing = @()
-    
+
     if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
         $missing += "gh (GitHub CLI)"
     }
-    
+
     if ($ReportType -in @('full', 'gemini')) {
         if (-not (Get-Command gemini -ErrorAction SilentlyContinue)) {
             $missing += "gemini (Gemini CLI)"
         }
     }
-    
+
     if ($ReportType -in @('full', 'copilot')) {
         if (-not (Get-Command copilot -ErrorAction SilentlyContinue)) {
             $missing += "copilot (@github/copilot - npm install -g @github/copilot)"
         }
     }
-    
+
     if ($missing.Count -gt 0) {
         Write-Err "Dependencias faltantes: $($missing -join ', ')"
         exit 1
@@ -85,9 +85,9 @@ function Get-CurrentPrNumber {
 # Generar reporte con Gemini
 function Get-GeminiReport {
     param([string]$Diff, [string]$Title, [string]$Body)
-    
+
     Write-Info "Generando análisis con Gemini CLI..."
-    
+
     $prompt = @"
 Analiza este Pull Request y genera un reporte técnico conciso en español.
 
@@ -131,9 +131,9 @@ $Diff
 # Generar reporte con Copilot CLI (nuevo agentic CLI)
 function Get-CopilotReport {
     param([string]$Diff, [string]$Title, [string]$Body, [string]$Model)
-    
+
     Write-Info "Generando análisis con GitHub Copilot CLI (modelo: $Model)..."
-    
+
     # Truncar diff si es muy largo (límite ~8000 chars para el prompt)
     $maxDiffLength = 6000
     $truncatedDiff = if ($Diff.Length -gt $maxDiffLength) {
@@ -141,7 +141,7 @@ function Get-CopilotReport {
     } else {
         $Diff
     }
-    
+
     $prompt = @"
 Analiza este Pull Request y genera un reporte técnico conciso en español.
 
@@ -238,10 +238,10 @@ if ($DryRun) {
 } else {
     # Agregar comentario al PR
     Write-Info "Agregando reporte al PR #$PrNumber..."
-    
+
     $tempReportFile = [System.IO.Path]::GetTempFileName()
     $fullReport | Out-File -FilePath $tempReportFile -Encoding UTF8
-    
+
     try {
         gh pr comment $PrNumber --body-file $tempReportFile
         Write-Success "Reporte agregado al PR #$PrNumber"
