@@ -1,14 +1,14 @@
 <#
 .SYNOPSIS
     Migrates existing IDE rules to Git-Core Protocol without overwriting.
-    
+
 .DESCRIPTION
     Detects and parses rules from:
     - Antigravity IDE (.agent/rules/)
     - Cursor IDE (.cursorrules)
     - Windsurf (.windsurfrules)
     - GitHub Copilot (.github/copilot-instructions.md)
-    
+
     Extracts content and merges into Git-Core Protocol structure.
 
 .PARAMETER ProjectPath
@@ -28,7 +28,7 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]$ProjectPath,
-    
+
     [switch]$DryRun,
     [switch]$Force
 )
@@ -113,13 +113,13 @@ function Write-Status {
 
 function Get-DetectedIDEs {
     param([string]$Path)
-    
+
     $detected = @()
-    
+
     foreach ($ide in $IDE_SOURCES.Keys) {
         $config = $IDE_SOURCES[$ide]
         $idePath = Join-Path $Path $config.Path
-        
+
         if (Test-Path $idePath) {
             foreach ($filePattern in $config.Files) {
                 $files = Get-ChildItem -Path $idePath -Filter $filePattern -ErrorAction SilentlyContinue
@@ -134,16 +134,16 @@ function Get-DetectedIDEs {
             }
         }
     }
-    
+
     return $detected
 }
 
 function Get-SectionClassification {
     param([string]$Content)
-    
+
     $contentLower = $Content.ToLower()
     $scores = @{}
-    
+
     foreach ($category in $PATTERNS.Keys) {
         $score = 0
         foreach ($pattern in $PATTERNS[$category]) {
@@ -153,37 +153,37 @@ function Get-SectionClassification {
         }
         $scores[$category] = $score
     }
-    
+
     # Return category with highest score
     $maxCategory = ($scores.GetEnumerator() | Sort-Object Value -Descending | Select-Object -First 1).Key
     $maxScore = $scores[$maxCategory]
-    
+
     if ($maxScore -eq 0) {
         return "General"
     }
-    
+
     return $maxCategory
 }
 
 function Split-MarkdownSections {
     param([string]$Content)
-    
+
     $sections = @()
     $currentSection = @{
         Title = "Header"
         Content = ""
         Level = 0
     }
-    
+
     $lines = $Content -split "`n"
-    
+
     foreach ($line in $lines) {
         if ($line -match "^(#{1,6})\s+(.+)$") {
             # Save previous section
             if ($currentSection.Content.Trim()) {
                 $sections += $currentSection
             }
-            
+
             # Start new section
             $currentSection = @{
                 Title = $Matches[2].Trim()
@@ -195,25 +195,25 @@ function Split-MarkdownSections {
             $currentSection.Content += "$line`n"
         }
     }
-    
+
     # Don't forget last section
     if ($currentSection.Content.Trim()) {
         $sections += $currentSection
     }
-    
+
     return $sections
 }
 
 function ConvertTo-ArchitectureSection {
     param([array]$Sections)
-    
+
     $archContent = @"
 ## Project-Specific Decisions (Migrated from IDE Rules)
 
 > These decisions were extracted from existing IDE configuration.
 
 "@
-    
+
     foreach ($section in $Sections) {
         $archContent += @"
 
@@ -222,13 +222,13 @@ $($section.Content.Trim())
 
 "@
     }
-    
+
     return $archContent
 }
 
 function ConvertTo-AgentRulesSection {
     param([array]$Sections, [string]$IdeName)
-    
+
     $rulesContent = @"
 
 ## Project-Specific Rules (from $IdeName)
@@ -236,7 +236,7 @@ function ConvertTo-AgentRulesSection {
 > Migrated from existing $IdeName configuration.
 
 "@
-    
+
     foreach ($section in $Sections) {
         $rulesContent += @"
 
@@ -245,13 +245,13 @@ $($section.Content.Trim())
 
 "@
     }
-    
+
     return $rulesContent
 }
 
 function Remove-SecretsFromContent {
     param([string]$Content)
-    
+
     # Patterns to redact
     $redactPatterns = @(
         '(ssh\s+-i\s+)[^\s]+',
@@ -262,23 +262,23 @@ function Remove-SecretsFromContent {
         '(sk-)[a-zA-Z0-9]+',
         '([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'
     )
-    
+
     $cleaned = $Content
     foreach ($pattern in $redactPatterns) {
         $cleaned = $cleaned -replace $pattern, '$1[REDACTED]'
     }
-    
+
     return $cleaned
 }
 
 function New-ProtocolStructure {
     param([string]$Path)
-    
+
     $dirs = @(
         ".✨",
         ".github/issues"
     )
-    
+
     foreach ($dir in $dirs) {
         $fullPath = Join-Path $Path $dir
         if (-not (Test-Path $fullPath)) {
@@ -298,7 +298,7 @@ function Update-AntigravityRules {
         [string]$Path,
         [string]$RuleFile
     )
-    
+
     $protocolImport = @"
 
 ---
@@ -319,15 +319,15 @@ function Update-AntigravityRules {
 4. Commits reference issues: `feat(scope): description #123`
 
 "@
-    
+
     $content = Get-Content $RuleFile -Raw
-    
+
     # Check if already integrated
     if ($content -match "Git-Core Protocol Integration") {
         Write-Status "Antigravity rules already integrated with protocol" -Type "Warning"
         return
     }
-    
+
     if ($DryRun) {
         Write-Status "Would append protocol integration to: $RuleFile" -Type "DryRun"
     }
@@ -383,16 +383,16 @@ $commandSections = @()
 
 foreach ($ide in $detectedIDEs) {
     Write-Status "Processing $($ide.IDE) configuration..." -Type "Info"
-    
+
     foreach ($file in $ide.Files) {
         $content = Get-Content $file.FullName -Raw
         $sections = Split-MarkdownSections -Content $content
-        
+
         foreach ($section in $sections) {
             $classification = Get-SectionClassification -Content $section.Content
-            
+
             Write-Host "    [$classification] $($section.Title)" -ForegroundColor DarkGray
-            
+
             switch ($classification) {
                 "Architecture" {
                     $archSections += $section
@@ -441,11 +441,11 @@ New-ProtocolStructure -Path $ProjectPath
 # Generate ARCHITECTURE.md content
 if ($archSections.Count -gt 0) {
     $archPath = Join-Path $ProjectPath ".✨\ARCHITECTURE.md"
-    
+
     if ((Test-Path $archPath) -and -not $Force) {
         # Append to existing
         $appendContent = ConvertTo-ArchitectureSection -Sections $archSections
-        
+
         if ($DryRun) {
             Write-Status "Would append to ARCHITECTURE.md:" -Type "DryRun"
             Write-Host $appendContent.Substring(0, [Math]::Min(200, $appendContent.Length)) -ForegroundColor DarkGray

@@ -311,7 +311,7 @@ foreach ($file in $protocolFiles) {
 if (Test-Path ".agent/rules") {
     Write-Host ""
     Write-Host "🔮 Detected Antigravity IDE configuration" -ForegroundColor Magenta
-    
+
     # Check if already integrated
     $ruleFile = Get-ChildItem ".agent/rules/rule-*.md" -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($ruleFile) {
@@ -344,7 +344,7 @@ if (Test-Path ".agent/rules") {
             Write-Host "  ~ $($ruleFile.Name) already integrated" -ForegroundColor Yellow
         }
     }
-    
+
     # Run migration script if available
     if (Test-Path "scripts/migrate-ide-rules.ps1") {
         Write-Host "  ℹ️  Run './scripts/migrate-ide-rules.ps1 -DryRun' to migrate rules" -ForegroundColor Cyan
