@@ -61,21 +61,21 @@ function Save-IssueMapping {
 # Parsear frontmatter YAML del archivo .md
 function Get-IssueFrontmatter {
     param([string]$FilePath)
-    
+
     $content = Get-Content $FilePath -Raw -Encoding UTF8
-    
+
     # Extraer frontmatter entre ---
     if ($content -match "(?s)^---\r?\n(.+?)\r?\n---\r?\n(.*)$") {
         $frontmatter = $matches[1]
         $body = $matches[2].Trim()
-        
+
         $data = @{
             title = ""
             labels = @()
             assignees = @()
             body = $body
         }
-        
+
         # Parsear YAML simple
         foreach ($line in $frontmatter -split "`n") {
             $line = $line.Trim()
@@ -94,17 +94,17 @@ function Get-IssueFrontmatter {
                     $data.assignees += $item
                 }
             }
-            
+
             # Detectar inicio de listas
             if ($line -match '^labels:') { $data._parsing = "labels" }
             elseif ($line -match '^assignees:') { $data._parsing = "assignees" }
             elseif ($line -match '^\w+:' -and $line -notmatch '^\s*-') { $data._parsing = $null }
         }
-        
+
         $data.Remove("_parsing")
         return $data
     }
-    
+
     # Sin frontmatter, usar nombre de archivo como título
     $fileName = [System.IO.Path]::GetFileNameWithoutExtension($FilePath)
     return @{
@@ -118,55 +118,55 @@ function Get-IssueFrontmatter {
 # Crear issue en GitHub desde archivo .md
 function New-GitHubIssueFromFile {
     param([string]$FilePath)
-    
+
     $data = Get-IssueFrontmatter -FilePath $FilePath
     $fileName = [System.IO.Path]::GetFileName($FilePath)
-    
+
     if ([string]::IsNullOrWhiteSpace($data.title)) {
         Write-Warn "Archivo $fileName sin título, saltando..."
         return $null
     }
-    
+
     Write-Info "Creando issue: $($data.title)"
-    
+
     if ($DryRun) {
         Write-Warn "[DRY-RUN] Se crearía: $($data.title)"
         return @{ number = 0; url = "dry-run" }
     }
-    
+
     # Construir comando
     $args = @("issue", "create", "--title", $data.title)
-    
+
     # Agregar body desde archivo temporal
     $tempBody = [System.IO.Path]::GetTempFileName()
     $data.body | Set-Content $tempBody -Encoding UTF8
     $args += "--body-file", $tempBody
-    
+
     # Labels
     foreach ($label in $data.labels) {
         if ($label -and $label -ne "") {
             $args += "--label", $label
         }
     }
-    
+
     # Assignees
     foreach ($assignee in $data.assignees) {
         if ($assignee -and $assignee -ne "" -and $assignee -ne "@me") {
             $args += "--assignee", $assignee
         }
     }
-    
+
     try {
         $result = & gh @args 2>&1
         Remove-Item $tempBody -ErrorAction SilentlyContinue
-        
+
         # Extraer número del issue de la URL
         if ($result -match "/issues/(\d+)") {
             $issueNumber = [int]$matches[1]
             Write-Success "Issue #$issueNumber creado: $result"
             return @{ number = $issueNumber; url = $result }
         }
-        
+
         Write-Err "No se pudo crear el issue: $result"
         return $null
     } catch {
@@ -179,7 +179,7 @@ function New-GitHubIssueFromFile {
 # Obtener issues cerrados de GitHub
 function Get-ClosedIssues {
     param([int[]]$IssueNumbers)
-    
+
     $closed = @()
     foreach ($num in $IssueNumbers) {
         try {
@@ -198,27 +198,27 @@ function Get-ClosedIssues {
 # Push: Crear issues desde archivos .md
 function Invoke-Push {
     Write-Info "🔄 Sincronizando archivos .md → GitHub Issues..."
-    
+
     $mapping = Get-IssueMapping
-    $files = Get-ChildItem -Path $IssuesDir -Filter "*.md" -ErrorAction SilentlyContinue | 
+    $files = Get-ChildItem -Path $IssuesDir -Filter "*.md" -ErrorAction SilentlyContinue |
              Where-Object { $_.Name -notmatch "^_" -and $_.Name -ne ".gitkeep" }
-    
+
     $created = 0
     foreach ($file in $files) {
         $relativePath = $file.Name
-        
+
         # Verificar si ya existe en el mapeo
         if ($mapping.ContainsKey($relativePath)) {
             if ($Verbose) { Write-Info "  ⏭️  $relativePath ya mapeado a #$($mapping[$relativePath])" }
             continue
         }
-        
+
         # Crear issue
         $result = New-GitHubIssueFromFile -FilePath $file.FullName
         if ($result -and $result.number -gt 0) {
             $mapping[$relativePath] = $result.number
             $created++
-            
+
             # Agregar comentario al archivo indicando el número
             $content = Get-Content $file.FullName -Raw -Encoding UTF8
             if ($content -notmatch "github_issue:") {
@@ -227,7 +227,7 @@ function Invoke-Push {
             }
         }
     }
-    
+
     Save-IssueMapping $mapping
     Write-Success "Push completado: $created issues creados"
 }
@@ -235,24 +235,24 @@ function Invoke-Push {
 # Pull: Eliminar archivos de issues cerrados
 function Invoke-Pull {
     Write-Info "🔄 Limpiando archivos de issues cerrados..."
-    
+
     $mapping = Get-IssueMapping
     if ($mapping.Count -eq 0) {
         Write-Info "No hay issues mapeados"
         return
     }
-    
+
     $issueNumbers = @($mapping.Values | ForEach-Object { [int]$_ })
     $closedIssues = Get-ClosedIssues -IssueNumbers $issueNumbers
-    
+
     $deleted = 0
     foreach ($kvp in @($mapping.GetEnumerator())) {
         $fileName = $kvp.Key
         $issueNum = [int]$kvp.Value
-        
+
         if ($closedIssues -contains $issueNum) {
             $filePath = Join-Path $IssuesDir $fileName
-            
+
             if ($DryRun) {
                 Write-Warn "[DRY-RUN] Se eliminaría: $fileName (issue #$issueNum cerrado)"
             } else {
@@ -265,7 +265,7 @@ function Invoke-Pull {
             $deleted++
         }
     }
-    
+
     if (-not $DryRun) {
         Save-IssueMapping $mapping
     }
@@ -275,7 +275,7 @@ function Invoke-Pull {
 # Modo Watch
 function Invoke-Watch {
     Write-Info "👁️  Modo watch activado (Ctrl+C para salir)..."
-    
+
     while ($true) {
         Invoke-Push
         Invoke-Pull

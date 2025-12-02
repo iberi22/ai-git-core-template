@@ -32,7 +32,7 @@ check_deps() {
         info "Instala con: brew install gh (macOS) o apt install gh (Linux)"
         exit 1
     fi
-    
+
     if ! command -v jq &> /dev/null; then
         err "jq no está instalado"
         info "Instala con: brew install jq (macOS) o apt install jq (Linux)"
@@ -73,16 +73,16 @@ del_mapping() {
 parse_frontmatter() {
     local file="$1"
     local content=$(cat "$file")
-    
+
     # Extraer título
     TITLE=$(echo "$content" | sed -n '/^---$/,/^---$/p' | grep -E '^title:' | sed 's/title:[[:space:]]*"\?\([^"]*\)"\?/\1/' | head -1)
-    
+
     # Extraer labels
     LABELS=$(echo "$content" | sed -n '/^---$/,/^---$/p' | sed -n '/^labels:/,/^[a-z]/p' | grep -E '^\s*-' | sed 's/.*-[[:space:]]*"\?\([^"]*\)"\?/\1/' | tr '\n' ',' | sed 's/,$//')
-    
+
     # Extraer body (todo después del segundo ---)
     BODY=$(echo "$content" | sed '1,/^---$/d' | sed '1,/^---$/d')
-    
+
     # Si no hay título, usar nombre del archivo
     if [[ -z "$TITLE" ]]; then
         TITLE=$(basename "$file" .md | tr '_' ':' | tr '-' ' ')
@@ -93,24 +93,24 @@ parse_frontmatter() {
 create_issue_from_file() {
     local file="$1"
     local filename=$(basename "$file")
-    
+
     parse_frontmatter "$file"
-    
+
     if [[ -z "$TITLE" ]]; then
         warn "Archivo $filename sin título, saltando..."
         return 1
     fi
-    
+
     info "Creando issue: $TITLE"
-    
+
     if [[ "$DRY_RUN" == "true" ]]; then
         warn "[DRY-RUN] Se crearía: $TITLE"
         return 0
     fi
-    
+
     # Construir comando
     local cmd="gh issue create --title \"$TITLE\""
-    
+
     # Agregar labels
     if [[ -n "$LABELS" ]]; then
         IFS=',' read -ra LABEL_ARRAY <<< "$LABELS"
@@ -121,23 +121,23 @@ create_issue_from_file() {
             fi
         done
     fi
-    
+
     # Crear archivo temporal para body
     local tmp_body=$(mktemp)
     echo "$BODY" > "$tmp_body"
     cmd="$cmd --body-file \"$tmp_body\""
-    
+
     # Ejecutar
     local result=$(eval $cmd 2>&1)
     rm -f "$tmp_body"
-    
+
     # Extraer número del issue
     local issue_num=$(echo "$result" | grep -oE '/issues/[0-9]+' | grep -oE '[0-9]+')
-    
+
     if [[ -n "$issue_num" ]]; then
         success "Issue #$issue_num creado: $result"
         set_mapping "$filename" "$issue_num"
-        
+
         # Agregar número al archivo
         if ! grep -q "github_issue:" "$file"; then
             sed -i "s/^---$/---\ngithub_issue: $issue_num/" "$file"
@@ -152,49 +152,49 @@ create_issue_from_file() {
 # Push: Crear issues desde archivos .md
 do_push() {
     info "🔄 Sincronizando archivos .md → GitHub Issues..."
-    
+
     local created=0
-    
+
     for file in "$ISSUES_DIR"/*.md; do
         [[ -f "$file" ]] || continue
-        
+
         local filename=$(basename "$file")
-        
+
         # Saltar templates y archivos especiales
         [[ "$filename" == _* ]] && continue
         [[ "$filename" == ".gitkeep" ]] && continue
-        
+
         # Verificar si ya existe en el mapeo
         local existing=$(get_mapping "$filename")
         if [[ -n "$existing" ]]; then
             [[ "$VERBOSE" == "true" ]] && info "  ⏭️  $filename ya mapeado a #$existing"
             continue
         fi
-        
+
         if create_issue_from_file "$file"; then
             ((created++)) || true
         fi
     done
-    
+
     success "Push completado: $created issues creados"
 }
 
 # Pull: Eliminar archivos de issues cerrados
 do_pull() {
     info "🔄 Limpiando archivos de issues cerrados..."
-    
+
     local deleted=0
     local keys=$(jq -r 'keys[]' "$MAPPING_FILE" 2>/dev/null)
-    
+
     for filename in $keys; do
         local issue_num=$(get_mapping "$filename")
-        
+
         # Verificar estado del issue
         local state=$(gh issue view "$issue_num" --json state --jq '.state' 2>/dev/null || echo "CLOSED")
-        
+
         if [[ "$state" == "CLOSED" ]]; then
             local filepath="$ISSUES_DIR/$filename"
-            
+
             if [[ "$DRY_RUN" == "true" ]]; then
                 warn "[DRY-RUN] Se eliminaría: $filename (issue #$issue_num cerrado)"
             else
@@ -207,14 +207,14 @@ do_pull() {
             ((deleted++)) || true
         fi
     done
-    
+
     success "Pull completado: $deleted archivos eliminados"
 }
 
 # Modo watch
 do_watch() {
     info "👁️  Modo watch activado (Ctrl+C para salir)..."
-    
+
     while true; do
         do_push
         do_pull
@@ -227,7 +227,7 @@ do_watch() {
 show_mapping() {
     echo -e "\n${CYAN}📋 Mapeo actual:${NC}"
     local keys=$(jq -r 'keys[]' "$MAPPING_FILE" 2>/dev/null)
-    
+
     if [[ -z "$keys" ]]; then
         info "  (vacío)"
     else
@@ -245,7 +245,7 @@ main() {
     local WATCH=false
     DRY_RUN=false
     VERBOSE=false
-    
+
     while [[ $# -gt 0 ]]; do
         case $1 in
             --push) PUSH=true; shift ;;
@@ -256,10 +256,10 @@ main() {
             *) shift ;;
         esac
     done
-    
+
     check_deps
     init_mapping
-    
+
     if [[ "$WATCH" == "true" ]]; then
         do_watch
     elif [[ "$PUSH" == "true" && "$PULL" != "true" ]]; then
@@ -270,7 +270,7 @@ main() {
         do_push
         do_pull
     fi
-    
+
     show_mapping
 }
 
