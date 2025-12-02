@@ -865,6 +865,84 @@ gh pr merge <number>
 
 ---
 
+## 🧠 Model-Specific Agents (NEW in v1.4.0)
+
+Git-Core Protocol includes specialized agents optimized for different LLM models. Each agent leverages the unique strengths of its target model.
+
+### Available Agents
+
+| Agent | Model | Best For | Location |
+|-------|-------|----------|----------|
+| `protocol-claude` | Claude Sonnet 4 | General tasks, reasoning | `.github/agents/` |
+| `architect` | Claude Opus 4.5 | Architecture decisions | `.github/agents/` |
+| `quick` | Claude Haiku 4.5 | Fast responses | `.github/agents/` |
+| `protocol-gemini` | Gemini 3 Pro | Large context, multi-modal | `.github/agents/` |
+| `protocol-codex` | GPT-5.1 Codex | Implementation, coding | `.github/agents/` |
+| `protocol-grok` | Grok Code Fast 1 | 2M context, large codebases | `.github/agents/` |
+| `router` | Auto | Agent selection help | `.github/agents/` |
+
+### Model Capabilities Comparison
+
+| Feature | Claude 4.5 | Gemini 3 Pro | GPT Codex | Grok Fast |
+|---------|------------|--------------|-----------|-----------|
+| **Context** | 200K | 1M+ | - | **2M** |
+| **Tool Format** | input_schema | parameters | OpenAI | OpenAI |
+| **Strength** | Reasoning | Multi-modal | Agentic | Speed |
+| **Cost** | $3/$15 MTok | $1.25/$5 MTok | Variable | Variable |
+
+### Selecting an Agent
+
+Use the **router agent** or choose manually:
+
+```
+📊 Task Complexity:
+- Simple questions → quick (Haiku)
+- Standard tasks → protocol-claude (Sonnet)
+- Architecture → architect (Opus)
+
+📚 Context Size:
+- Small (<50K) → Any model
+- Medium (50K-200K) → Claude or Gemini
+- Large (200K-1M) → Gemini
+- Massive (1M+) → Grok
+
+💻 Task Type:
+- Analysis → architect
+- Implementation → protocol-codex
+- Large codebase → protocol-grok
+```
+
+### Agent Handoffs
+
+Agents can hand off to each other for workflow continuity:
+
+```mermaid
+graph LR
+    A[router] --> B[quick]
+    A --> C[protocol-claude]
+    A --> D[architect]
+    C --> E[protocol-codex]
+    D --> E
+    D --> F[protocol-grok]
+```
+
+### Using Custom Agents in VS Code
+
+1. Select agent from dropdown in Chat view
+2. Or reference with `@agent-name` in chat
+3. Or create prompt file with `agent: protocol-claude`
+
+### Model-Specific Instructions
+
+Located in `.github/instructions/`:
+
+- `claude-tools.instructions.md` - Claude tool calling patterns
+- `gemini-tools.instructions.md` - Gemini tool calling patterns
+- `codex-tools.instructions.md` - GPT Codex patterns
+- `grok-tools.instructions.md` - Grok patterns
+
+---
+
 ## 🖥️ Multi-IDE Support
 
 Git-Core Protocol supports multiple IDEs. Each IDE has its own rules file format, but all follow the same protocol.
