@@ -39,7 +39,7 @@ This document explains everything about the Git-Core CLI: what it does, how it w
 
 ## 🤔 What is Git-Core CLI?
 
-Git-Core CLI (`git-core`) is a command-line tool that helps you install and manage the Git-Core Protocol in your projects. 
+Git-Core CLI (`git-core`) is a command-line tool that helps you install and manage the Git-Core Protocol in your projects.
 
 **Think of it like:**
 - `npm init` for Node.js projects
@@ -273,7 +273,7 @@ If you're not technical, you can ask an AI to explain the code:
 ### Option 2: ChatGPT / Claude
 Copy-paste the code and ask:
 ```
-Explain this Rust code in simple terms. 
+Explain this Rust code in simple terms.
 Is it safe? Does it do anything suspicious?
 
 [paste code here]
@@ -321,11 +321,11 @@ But the scripts still work if you prefer them.
 The CLI is just a convenience tool.
 
 ### Q: Who built this?
-**A:** The Git-Core Protocol is maintained by [@iberi22](https://github.com/iberi22). 
+**A:** The Git-Core Protocol is maintained by [@iberi22](https://github.com/iberi22).
 All contributions are visible in the repository's commit history.
 
 ### Q: Can I contribute or report issues?
-**A:** Yes! 
+**A:** Yes!
 - Issues: https://github.com/iberi22/Git-Core-Protocol/issues
 - Pull Requests welcome
 

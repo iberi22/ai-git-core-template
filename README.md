@@ -45,7 +45,7 @@ project: Git-Core-Protocol
 > **Copy this prompt to your AI coding agent (Copilot, Cursor, Claude, etc.) to auto-setup:**
 
 ```
-Initialize this project with Git-Core Protocol. 
+Initialize this project with Git-Core Protocol.
 
 # Method 1: Shell Scripts (transparent, visible code)
 # Linux/macOS
