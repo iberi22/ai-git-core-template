@@ -865,6 +865,62 @@ gh pr merge <number>
 
 ---
 
+## 🖥️ Multi-IDE Support
+
+Git-Core Protocol supports multiple IDEs. Each IDE has its own rules file format, but all follow the same protocol.
+
+### Supported IDEs
+
+| IDE | Rules Location | Format |
+|-----|----------------|--------|
+| **VS Code + Copilot** | `.github/copilot-instructions.md` | Markdown |
+| **Cursor** | `.cursorrules` | Markdown |
+| **Windsurf** | `.windsurfrules` | Markdown |
+| **Antigravity** | `.agent/rules/rule-*.md` | Markdown + JSON |
+
+### Antigravity IDE Integration
+
+Antigravity stores rules in `.agent/rules/`. When installing Git-Core Protocol:
+
+1. **Existing rules are NOT overwritten**
+2. Protocol integration is **appended** to existing rules
+3. Project-specific logic stays in `rule-0.md`
+4. Architecture decisions move to `.✨/ARCHITECTURE.md`
+
+**Rule Content Classification:**
+
+| Content Type | Where It Goes |
+|--------------|---------------|
+| Stack/Architecture decisions | `.✨/ARCHITECTURE.md` |
+| Agent behavior rules | `AGENTS.md` |
+| Project-specific patterns | `.agent/rules/rule-0.md` (keep) |
+| Commands/Scripts | `README.md` or `package.json` |
+| Secrets/Credentials | **NEVER in repo** → `.env.local` |
+
+**Migration Script:**
+```powershell
+# Analyze what would be migrated (dry run)
+./scripts/migrate-ide-rules.ps1 -ProjectPath "." -DryRun
+
+# Apply migration
+./scripts/migrate-ide-rules.ps1 -ProjectPath "."
+```
+
+### Best Practice: Layered Rules
+
+```
+.agent/rules/rule-0.md     → Project-specific context (Next.js, Supabase, etc.)
+AGENTS.md                  → Protocol rules (all projects)
+.✨/ARCHITECTURE.md        → Critical decisions (hosting, DB, etc.)
+```
+
+**The agent reads ALL files**, so:
+- Keep project-specific patterns in IDE rules
+- Keep protocol rules in AGENTS.md
+- Keep decisions in ARCHITECTURE.md
+
+---
+
 ## 📁 Project Structure Awareness
 
 ```text
