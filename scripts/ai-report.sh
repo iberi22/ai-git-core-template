@@ -5,13 +5,18 @@
 #   ./scripts/ai-report.sh [PR_NUMBER] [OPTIONS]
 #
 # Options:
-#   --gemini     Only Gemini report
-#   --copilot    Only Copilot report
-#   --dry-run    Show report without posting
+#   --gemini       Only Gemini report
+#   --copilot      Only Copilot report
+#   --model MODEL  Copilot model (default: claude-sonnet-4.5)
+#   --dry-run      Show report without posting
+#
+# Models available:
+#   claude-sonnet-4.5, claude-opus-4.5, claude-haiku-4.5, gpt-5.1, gpt-5.1-codex
 #
 # Examples:
 #   ./scripts/ai-report.sh              # Current branch PR, full report
 #   ./scripts/ai-report.sh 42           # Specific PR
+#   ./scripts/ai-report.sh --copilot --model claude-opus-4.5
 #   ./scripts/ai-report.sh --dry-run    # Preview only
 
 set -e
@@ -31,12 +36,14 @@ error() { echo -e "${RED}❌ $*${NC}"; exit 1; }
 # Parse arguments
 PR_NUMBER=""
 REPORT_TYPE="full"
+MODEL="claude-sonnet-4.5"
 DRY_RUN=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
         --gemini) REPORT_TYPE="gemini"; shift ;;
         --copilot) REPORT_TYPE="copilot"; shift ;;
+        --model) MODEL="$2"; shift 2 ;;
         --dry-run) DRY_RUN=true; shift ;;
         [0-9]*) PR_NUMBER="$1"; shift ;;
         *) shift ;;
@@ -49,6 +56,10 @@ check_deps() {
     
     if [[ "$REPORT_TYPE" == "full" || "$REPORT_TYPE" == "gemini" ]]; then
         command -v gemini >/dev/null 2>&1 || error "gemini CLI not found"
+    fi
+    
+    if [[ "$REPORT_TYPE" == "full" || "$REPORT_TYPE" == "copilot" ]]; then
+        command -v copilot >/dev/null 2>&1 || error "copilot CLI not found (npm install -g @github/copilot)"
     fi
 }
 
@@ -94,14 +105,42 @@ ${diff:0:8000}
     gemini -p "$prompt" -o text 2>/dev/null || echo "Error generating Gemini report"
 }
 
-# Generate Copilot report
+# Generate Copilot report (new agentic CLI with Claude Sonnet 4.5)
 generate_copilot_report() {
     local diff="$1"
+    local title="$2"
+    local body="$3"
+    local model="$4"
     
-    info "Generating Copilot explanation..."
+    info "Generating Copilot analysis (model: $model)..."
     
-    # Copilot explain works better with shorter context
-    gh copilot explain "git diff showing: ${diff:0:500}" 2>/dev/null || echo "Error generating Copilot report"
+    # Truncate diff if too long
+    local truncated_diff="${diff:0:6000}"
+    if [[ ${#diff} -gt 6000 ]]; then
+        truncated_diff="$truncated_diff
+... [diff truncated]"
+    fi
+    
+    local prompt="Analiza este Pull Request y genera un reporte técnico conciso en español.
+
+## PR: $title
+
+### Descripción
+$body
+
+### Cambios (Diff)
+$truncated_diff
+
+## Genera un reporte con:
+1. **Resumen de Cambios** (bullets concisos)
+2. **Análisis de Impacto** (Alto/Medio/Bajo con justificación)
+3. **Posibles Riesgos** (o 'Ninguno identificado')
+4. **Recomendaciones** para el reviewer
+5. **Etiquetas Sugeridas** (bug, enhancement, breaking-change, etc.)
+
+Sé directo y técnico. No uses markdown headers con #."
+
+    copilot -p "$prompt" --model "$model" -s --allow-all-tools 2>/dev/null || echo "Error generating Copilot report"
 }
 
 # Main
@@ -141,8 +180,8 @@ $GEMINI_REPORT
 fi
 
 if [[ "$REPORT_TYPE" == "full" || "$REPORT_TYPE" == "copilot" ]]; then
-    COPILOT_REPORT=$(generate_copilot_report "$PR_DIFF")
-    REPORT+="### 🤖 Copilot Explanation
+    COPILOT_REPORT=$(generate_copilot_report "$PR_DIFF" "$PR_TITLE" "$PR_BODY" "$MODEL")
+    REPORT+="### 🤖 Copilot Analysis ($MODEL)
 
 $COPILOT_REPORT
 

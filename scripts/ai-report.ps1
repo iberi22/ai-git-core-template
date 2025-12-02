@@ -5,7 +5,7 @@
 .DESCRIPTION
     Este script genera análisis automáticos de PRs usando:
     - Gemini CLI: Análisis técnico del diff
-    - GitHub Copilot CLI: Explicación de cambios
+    - GitHub Copilot CLI: Análisis con Claude Sonnet 4.5
     
     Los reportes se agregan como comentarios al PR.
 
@@ -15,12 +15,17 @@
 .PARAMETER ReportType
     Tipo de reporte: 'full' (ambos), 'gemini', 'copilot'. Default: 'full'
 
+.PARAMETER Model
+    Modelo para Copilot CLI. Default: 'claude-sonnet-4.5'
+    Opciones: claude-sonnet-4.5, claude-opus-4.5, claude-haiku-4.5, gpt-5.1, gpt-5.1-codex
+
 .PARAMETER DryRun
     Muestra el reporte sin agregarlo al PR.
 
 .EXAMPLE
     .\scripts\ai-report.ps1
     .\scripts\ai-report.ps1 -PrNumber 42
+    .\scripts\ai-report.ps1 -ReportType copilot -Model claude-opus-4.5
     .\scripts\ai-report.ps1 -ReportType gemini -DryRun
 #>
 
@@ -28,6 +33,8 @@ param(
     [int]$PrNumber,
     [ValidateSet('full', 'gemini', 'copilot')]
     [string]$ReportType = 'full',
+    [ValidateSet('claude-sonnet-4.5', 'claude-opus-4.5', 'claude-haiku-4.5', 'gpt-5.1', 'gpt-5.1-codex')]
+    [string]$Model = 'claude-sonnet-4.5',
     [switch]$DryRun
 )
 
@@ -50,6 +57,12 @@ function Test-Dependencies {
     if ($ReportType -in @('full', 'gemini')) {
         if (-not (Get-Command gemini -ErrorAction SilentlyContinue)) {
             $missing += "gemini (Gemini CLI)"
+        }
+    }
+    
+    if ($ReportType -in @('full', 'copilot')) {
+        if (-not (Get-Command copilot -ErrorAction SilentlyContinue)) {
+            $missing += "copilot (@github/copilot - npm install -g @github/copilot)"
         }
     }
     
@@ -115,25 +128,48 @@ $Diff
     }
 }
 
-# Generar reporte con Copilot
+# Generar reporte con Copilot CLI (nuevo agentic CLI)
 function Get-CopilotReport {
-    param([string]$Diff)
+    param([string]$Diff, [string]$Title, [string]$Body, [string]$Model)
     
-    Write-Info "Generando explicación con GitHub Copilot CLI..."
+    Write-Info "Generando análisis con GitHub Copilot CLI (modelo: $Model)..."
     
-    # Copilot explain funciona mejor con comandos
-    $tempFile = [System.IO.Path]::GetTempFileName()
-    $Diff | Out-File -FilePath $tempFile -Encoding UTF8
+    # Truncar diff si es muy largo (límite ~8000 chars para el prompt)
+    $maxDiffLength = 6000
+    $truncatedDiff = if ($Diff.Length -gt $maxDiffLength) {
+        $Diff.Substring(0, $maxDiffLength) + "`n... [diff truncado por longitud]"
+    } else {
+        $Diff
+    }
     
+    $prompt = @"
+Analiza este Pull Request y genera un reporte técnico conciso en español.
+
+## PR: $Title
+
+### Descripción
+$Body
+
+### Cambios (Diff)
+$truncatedDiff
+
+## Genera un reporte con:
+1. **Resumen de Cambios** (bullets concisos)
+2. **Análisis de Impacto** (Alto/Medio/Bajo con justificación)
+3. **Posibles Riesgos** (o "Ninguno identificado")
+4. **Recomendaciones** para el reviewer
+5. **Etiquetas Sugeridas** (bug, enhancement, breaking-change, etc.)
+
+Sé directo y técnico. No uses markdown headers con #.
+"@
+
     try {
-        # Copilot es interactivo, usamos explain para el diff
-        $explanation = gh copilot explain "git diff output showing: $($Diff.Substring(0, [Math]::Min(500, $Diff.Length)))" 2>&1
-        return $explanation
+        # Usar copilot en modo prompt (-p) con modelo especificado y modo silencioso (-s)
+        $report = copilot -p $prompt --model $Model -s --allow-all-tools 2>&1
+        return $report
     } catch {
-        Write-Warn "Error ejecutando Copilot: $_"
+        Write-Warn "Error ejecutando Copilot CLI: $_"
         return $null
-    } finally {
-        Remove-Item $tempFile -ErrorAction SilentlyContinue
     }
 }
 
@@ -181,9 +217,9 @@ if ($ReportType -in @('full', 'gemini')) {
 }
 
 if ($ReportType -in @('full', 'copilot')) {
-    $copilotReport = Get-CopilotReport -Diff $diff
+    $copilotReport = Get-CopilotReport -Diff $diff -Title $prData.title -Body $prData.body -Model $Model
     if ($copilotReport) {
-        $report += "### 🤖 Copilot Explanation"
+        $report += "### 🤖 Copilot Analysis ($Model)"
         $report += ""
         $report += $copilotReport
         $report += ""
