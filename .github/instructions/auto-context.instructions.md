@@ -33,7 +33,7 @@ gh issue list --assignee "@me" --state open --limit 5
 
 ```
 📊 main | 2 modified | 0 ahead
-📋 #33 ModelProvider, #34 SurrealDB
+📋 #33 ModelProvider, #35 ResearchAgent
 🎯 Continuar: #33 (más antiguo)
 ```
 
