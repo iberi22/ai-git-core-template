@@ -159,6 +159,24 @@ gh issue create --title "TASK: Description" --body "Details..." --label "ai-plan
 **❌ WRONG:** Creating a `PLAN.md` or `ROADMAP.md` file
 **✅ RIGHT:** Running multiple `gh issue create` commands
 
+**ALTERNATIVE (RECOMMENDED):** Create issue files in `.github/issues/`:
+```bash
+# Create a file instead of running gh issue create
+# File: .github/issues/FEAT_mi-feature.md
+
+---
+title: "My Feature Description"
+labels:
+  - ai-plan
+  - enhancement
+---
+
+## Description
+Details here...
+```
+
+The workflow `sync-issues.yml` will automatically create the GitHub Issue.
+
 ### 6. Progress Updates
 When you need to document progress:
 ```bash
@@ -403,4 +421,116 @@ git commit -m "docs: add authentication guide"
 git-atomize --analyze    # Ver sugerencias de separación
 git-atomize --interactive  # Separar interactivamente
 ```
+
+---
+
+## 🛠️ Git-Core CLI (RECOMMENDED)
+
+### Overview
+
+`git-core` es el CLI oficial para gestionar el Git-Core Protocol. **SIEMPRE usa el CLI** como método principal para instalar, actualizar y verificar el protocolo.
+
+### Installation
+
+**🔐 Trust & Transparency:** Before installing, read [docs/CLI_TRUST.md](../docs/CLI_TRUST.md) to understand exactly what the CLI does and verify the source code.
+
+```bash
+# 🚀 OPTION 1: Shell Scripts (código visible, puedes leerlo antes)
+# Linux/macOS
+curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
+
+# Windows (PowerShell)
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
+
+# 🦀 OPTION 2: Cargo (compila desde código fuente en TU máquina)
+# Antes de instalar, lee: docs/CLI_TRUST.md
+# Código fuente: https://github.com/iberi22/Git-Core-Protocol/tree/main/tools/git-core-cli
+cargo install git-core-cli
+
+# 🔨 OPTION 3: Build from source (máxima confianza)
+git clone https://github.com/iberi22/Git-Core-Protocol
+cd Git-Core-Protocol/tools/git-core-cli
+cargo build --release
+./target/release/git-core install
+```
+
+### Commands Reference
+
+| Command | Description | When to Use |
+|---------|-------------|-------------|
+| `git-core install` | Install protocol in current directory | New projects |
+| `git-core install --force` | Force reinstall, overwrite all | Reset corrupted installation |
+| `git-core upgrade` | Upgrade protocol (preserves ARCHITECTURE.md) | Update to latest version |
+| `git-core upgrade --force` | Upgrade everything (overwrites ARCHITECTURE.md) | Full reset |
+| `git-core migrate` | Migrate `.ai/` → `.✨/` | Legacy projects |
+| `git-core migrate --remove-old` | Migrate and delete `.ai/` | Clean migration |
+| `git-core check` | Verify protocol integrity | Troubleshooting |
+| `git-core check --fix` | Auto-fix issues | Repair installation |
+| `git-core status` | Show current protocol status | Quick overview |
+| `git-core init [name]` | Initialize new project with protocol | New projects |
+| `git-core version` | Show/bump version | Version management |
+| `git-core self-update` | Update the CLI itself | Keep CLI updated |
+
+### AI Agent Usage
+
+**When bootstrapping a new project:**
+```bash
+# Step 1: Install protocol (scripts are visible and auditable)
+curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
+
+# Or if CLI is available:
+git-core init my-project
+
+# Step 2: Verify installation
+git-core check
+```
+
+**When upgrading existing project:**
+```bash
+# Safe upgrade (preserves your ARCHITECTURE.md)
+git-core upgrade
+
+# Check what changed
+git-core status
+```
+
+**When troubleshooting:**
+```bash
+# Check integrity
+git-core check
+
+# Auto-fix issues
+git-core check --fix
+
+# Full status report
+git-core status
+```
+
+### Legacy Scripts (Alternative)
+
+Los scripts shell son **código visible** que puedes leer antes de ejecutar:
+
+```bash
+# Ver el código ANTES de ejecutar:
+curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh
+
+# Si confías, entonces ejecuta:
+curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
+
+# Windows - ver código primero:
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1" | Select-Object -ExpandProperty Content
+
+# Luego ejecutar:
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
+```
+
+**Comparación de métodos:**
+| Método | Confianza | Velocidad | Funcionalidades |
+|--------|-----------|-----------|-----------------|
+| Shell Scripts | ⭐⭐⭐⭐⭐ (código visible) | Rápido | Básico |
+| Cargo install | ⭐⭐⭐⭐ (compila local) | Medio | Completo |
+| Build from source | ⭐⭐⭐⭐⭐ (máximo control) | Lento | Completo |
+| Pre-built binary | ⭐⭐⭐ (verificar checksum) | Muy rápido | Completo |
+
+
 

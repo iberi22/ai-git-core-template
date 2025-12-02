@@ -143,6 +143,89 @@ gh pr create --fill --base main
 
 ---
 
+## 📁 File-Based Issue Management (RECOMMENDED)
+
+**Alternativa a `gh issue create`: Crea issues usando archivos .md**
+
+### Ubicación
+```
+.github/issues/
+├── _TEMPLATE.md              # Template para nuevos issues
+├── .issue-mapping.json       # Mapeo automático archivo↔issue
+├── FEAT_mi-feature.md        # Issue de feature
+├── BUG_fix-login.md          # Issue de bug
+└── TASK_update-deps.md       # Issue de tarea
+```
+
+### Formato de Archivo
+
+```markdown
+---
+title: "Título del Issue"
+labels:
+  - ai-plan
+  - enhancement
+assignees: []
+---
+
+## Descripción
+
+Contenido del issue...
+```
+
+### Workflow
+
+```bash
+# 1. Crear archivo en .github/issues/
+# Usa el formato: TYPE_descripcion.md
+# Types: FEAT, BUG, TASK, DOCS, REFACTOR, TEST, CHORE
+
+# 2. Sincronizar con GitHub (local)
+./scripts/sync-issues.ps1      # Windows
+./scripts/sync-issues.sh       # Linux/macOS
+
+# 3. O dejar que el workflow lo haga automáticamente
+# El workflow sync-issues.yml se ejecuta en cada push
+```
+
+### Comandos del Script
+
+```bash
+# Sync completo (crear + limpiar)
+./scripts/sync-issues.ps1
+
+# Solo crear issues desde .md
+./scripts/sync-issues.ps1 -Push
+
+# Solo eliminar archivos de issues cerrados
+./scripts/sync-issues.ps1 -Pull
+
+# Modo watch (sincroniza cada 60s)
+./scripts/sync-issues.ps1 -Watch
+
+# Dry run (ver qué haría sin ejecutar)
+./scripts/sync-issues.ps1 -DryRun
+```
+
+### Ventajas
+
+| Método | Ventaja |
+|--------|---------|
+| **Archivos .md** | Versionados en Git, fácil edición en IDE |
+| **gh issue create** | Rápido para issues simples |
+| **GitHub UI** | Visual, templates automáticos |
+
+### Auto-Limpieza
+
+Cuando un issue se **cierra** en GitHub:
+1. El workflow detecta el cierre
+2. Elimina el archivo `.md` correspondiente
+3. Actualiza el mapeo
+
+**Resultado:** Solo existen archivos para issues **abiertos**.
+
+---
+
 ## 🚫 Anti-Patterns (NEVER DO THIS)
 
 | ❌ Don't | ✅ Do Instead |
@@ -300,6 +383,116 @@ git commit -m "docs: add authentication guide"
 git-atomize --analyze    # Ver sugerencias de separación
 git-atomize --interactive  # Separar interactivamente
 ```
+
+---
+
+## 🛠️ Git-Core CLI (RECOMMENDED)
+
+### Overview
+
+`git-core` es el CLI oficial para gestionar el Git-Core Protocol. **SIEMPRE usa el CLI** como método principal para instalar, actualizar y verificar el protocolo.
+
+### Installation
+
+**🔐 Trust & Transparency:** Before installing, read [docs/CLI_TRUST.md](docs/CLI_TRUST.md) to understand exactly what the CLI does and verify the source code.
+
+```bash
+# 🚀 OPTION 1: Shell Scripts (código visible, puedes leerlo antes)
+# Linux/macOS
+curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
+
+# Windows (PowerShell)
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
+
+# 🦀 OPTION 2: Cargo (compila desde código fuente en TU máquina)
+# Antes de instalar, lee: docs/CLI_TRUST.md
+# Código fuente: https://github.com/iberi22/Git-Core-Protocol/tree/main/tools/git-core-cli
+cargo install git-core-cli
+
+# 🔨 OPTION 3: Build from source (máxima confianza)
+git clone https://github.com/iberi22/Git-Core-Protocol
+cd Git-Core-Protocol/tools/git-core-cli
+cargo build --release
+./target/release/git-core install
+```
+
+### Commands Reference
+
+| Command | Description | When to Use |
+|---------|-------------|-------------|
+| `git-core install` | Install protocol in current directory | New projects |
+| `git-core install --force` | Force reinstall, overwrite all | Reset corrupted installation |
+| `git-core upgrade` | Upgrade protocol (preserves ARCHITECTURE.md) | Update to latest version |
+| `git-core upgrade --force` | Upgrade everything (overwrites ARCHITECTURE.md) | Full reset |
+| `git-core migrate` | Migrate `.ai/` → `.✨/` | Legacy projects |
+| `git-core migrate --remove-old` | Migrate and delete `.ai/` | Clean migration |
+| `git-core check` | Verify protocol integrity | Troubleshooting |
+| `git-core check --fix` | Auto-fix issues | Repair installation |
+| `git-core status` | Show current protocol status | Quick overview |
+| `git-core init [name]` | Initialize new project with protocol | New projects |
+| `git-core version` | Show/bump version | Version management |
+| `git-core self-update` | Update the CLI itself | Keep CLI updated |
+
+### AI Agent Usage
+
+**When bootstrapping a new project:**
+```bash
+# Step 1: Install protocol (scripts are visible and auditable)
+curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
+
+# Or if CLI is available:
+git-core init my-project
+
+# Step 2: Verify installation
+git-core check
+```
+
+**When upgrading existing project:**
+```bash
+# Safe upgrade (preserves your ARCHITECTURE.md)
+git-core upgrade
+
+# Check what changed
+git-core status
+```
+
+**When troubleshooting:**
+```bash
+# Check integrity
+git-core check
+
+# Auto-fix issues
+git-core check --fix
+
+# Full status report
+git-core status
+```
+
+### Legacy Scripts (Alternative)
+
+Los scripts shell son **código visible** que puedes leer antes de ejecutar:
+
+```bash
+# Ver el código ANTES de ejecutar:
+curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh
+
+# Si confías, entonces ejecuta:
+curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
+
+# Windows - ver código primero:
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1" | Select-Object -ExpandProperty Content
+
+# Luego ejecutar:
+irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
+```
+
+**Comparación de métodos:**
+| Método | Confianza | Velocidad | Funcionalidades |
+|--------|-----------|-----------|-----------------|
+| Shell Scripts | ⭐⭐⭐⭐⭐ (código visible) | Rápido | Básico |
+| Cargo install | ⭐⭐⭐⭐ (compila local) | Medio | Completo |
+| Build from source | ⭐⭐⭐⭐⭐ (máximo control) | Lento | Completo |
+| Pre-built binary | ⭐⭐⭐ (verificar checksum) | Muy rápido | Completo |
 
 ---
 
@@ -676,8 +869,9 @@ gh pr merge <number>
 
 ```text
 /
-├── .ai/
+├── .✨/
 │   ├── ARCHITECTURE.md    # 📖 READ THIS FIRST
+│   ├── AGENT_INDEX.md     # 🎭 Agent roles and routing
 │   └── CONTEXT_LOG.md     # 📝 Session notes only
 ├── .github/
 │   ├── copilot-instructions.md
@@ -687,7 +881,11 @@ gh pr merge <number>
 │   ├── agent-docs/        # 📄 User-requested documents ONLY
 │   └── COMMIT_STANDARD.md # 📝 Commit message standard
 ├── scripts/
-│   └── init_project.sh    # 🚀 Bootstrap script
+│   ├── init_project.sh    # 🚀 Bootstrap script
+│   ├── install-cli.sh     # 🛠️ CLI installer (Linux/macOS)
+│   └── install-cli.ps1    # 🛠️ CLI installer (Windows)
+├── tools/
+│   └── git-core-cli/      # 🦀 Official Rust CLI
 ├── AGENTS.md              # 📋 YOU ARE HERE
 └── .cursorrules           # 🎯 Editor rules
 ```
