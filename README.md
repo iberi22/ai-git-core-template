@@ -17,7 +17,9 @@ project: Git-Core-Protocol
 
 # 🧠 Git-Core Protocol
 
-> **AI-Driven Project Management Template** — *By Devs, For Devs*
+> **"Inteligente, sofisticada pero minimalista en complejidad"**
+>
+> *AI-Driven Project Management Template — By Devs, For Devs*
 
 [![Use this template](https://img.shields.io/badge/Use%20this-template-blue?style=for-the-badge)](https://github.com/iberi22/Git-Core-Protocol/generate)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg?style=for-the-badge)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
