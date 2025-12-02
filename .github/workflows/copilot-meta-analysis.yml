@@ -7,11 +7,11 @@ on:
   # React to PR comments (bot reviews)
   issue_comment:
     types: [created]
-  
+
   # Scheduled check for pending analyses
   schedule:
     - cron: '*/30 * * * *'  # Every 30 minutes
-  
+
   # Manual trigger
   workflow_dispatch:
     inputs:
@@ -35,12 +35,12 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'schedule' ||
-      (github.event_name == 'issue_comment' && 
+      (github.event_name == 'issue_comment' &&
        contains(fromJson('["coderabbitai", "gemini-code-assist", "github-actions"]'), github.event.comment.user.login))
     outputs:
       ready_prs: ${{ steps.check.outputs.ready_prs }}
       has_ready: ${{ steps.check.outputs.has_ready }}
-    
+
     steps:
       - name: Check for Ready PRs
         id: check
@@ -53,35 +53,35 @@ jobs:
             echo "has_ready=true" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           # Find PRs with validation label awaiting Copilot
           VALIDATION_PRS=$(gh pr list \
             --label "validation,ai-review-requested" \
             --state open \
             --json number,comments,createdAt \
             --jq '.')
-          
+
           READY_PRS="[]"
-          
+
           echo "$VALIDATION_PRS" | jq -c '.[]' | while read -r pr; do
             PR_NUM=$(echo "$pr" | jq -r '.number')
-            
+
             # Check if both bots have commented
             COMMENTS=$(gh pr view "$PR_NUM" --json comments --jq '.comments[].author.login')
-            
+
             HAS_CODERABBIT=$(echo "$COMMENTS" | grep -c "coderabbitai" || echo "0")
             HAS_GEMINI=$(echo "$COMMENTS" | grep -c "gemini-code-assist" || echo "0")
-            
+
             # Check if already processed by Copilot
             HAS_COPILOT_META=$(gh pr view "$PR_NUM" --json comments \
               --jq '.comments[] | select(.body | contains("Meta-Analysis Complete"))' | wc -l)
-            
+
             if [ "$HAS_CODERABBIT" -gt 0 ] && [ "$HAS_GEMINI" -gt 0 ] && [ "$HAS_COPILOT_META" -eq 0 ]; then
               echo "✅ PR #$PR_NUM ready for Copilot meta-analysis"
               READY_PRS=$(echo "$READY_PRS" | jq ". + [{\"number\": $PR_NUM}]")
             fi
           done
-          
+
           if [ "$(echo "$READY_PRS" | jq 'length')" -gt 0 ]; then
             echo "ready_prs=$READY_PRS" >> $GITHUB_OUTPUT
             echo "has_ready=true" >> $GITHUB_OUTPUT
@@ -100,7 +100,7 @@ jobs:
     if: needs.detect-completion.outputs.has_ready == 'true'
     outputs:
       analysis_data: ${{ steps.collect.outputs.data }}
-    
+
     steps:
       - name: Collect All Bot Comments
         id: collect
@@ -108,26 +108,26 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           READY_PRS='${{ needs.detect-completion.outputs.ready_prs }}'
-          
+
           ALL_DATA="[]"
-          
+
           echo "$READY_PRS" | jq -c '.[]' | while read -r pr; do
             PR_NUM=$(echo "$pr" | jq -r '.number')
-            
+
             echo "📚 Collecting reviews for PR #$PR_NUM..."
-            
+
             # Get all comments
             COMMENTS=$(gh pr view "$PR_NUM" --json comments --jq '.comments')
-            
+
             # Extract CodeRabbit reviews
             CODERABBIT_REVIEWS=$(echo "$COMMENTS" | jq '[.[] | select(.author.login == "coderabbitai") | .body]')
-            
+
             # Extract Gemini reviews
             GEMINI_REVIEWS=$(echo "$COMMENTS" | jq '[.[] | select(.author.login == "gemini-code-assist") | .body]')
-            
+
             # Get PR details
             PR_DETAILS=$(gh pr view "$PR_NUM" --json title,body,files)
-            
+
             # Combine data
             PR_DATA=$(jq -n \
               --argjson pr_num "$PR_NUM" \
@@ -140,14 +140,14 @@ jobs:
                 gemini_reviews: $gemini,
                 pr_details: $details
               }')
-            
+
             ALL_DATA=$(echo "$ALL_DATA" | jq ". + [$PR_DATA]")
           done
-          
+
           # Save to file for next job
           echo "$ALL_DATA" > /tmp/analysis_data.json
           echo "data=$(cat /tmp/analysis_data.json | jq -c .)" >> $GITHUB_OUTPUT
-      
+
       - name: Upload Analysis Data
         uses: actions/upload-artifact@v4
         with:
@@ -166,86 +166,86 @@ jobs:
       matrix:
         pr: ${{ fromJson(needs.detect-completion.outputs.ready_prs) }}
       max-parallel: 1
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Download Analysis Data
         uses: actions/download-artifact@v4
         with:
           name: ai-reviews-data
           path: ./data
-      
+
       - name: Generate Meta-Analysis Prompt
         id: prompt
         run: |
           PR_NUM="${{ matrix.pr.number }}"
-          
+
           # Extract data for this PR
           PR_DATA=$(cat ./data/analysis_data.json | jq ".[] | select(.pr_number == $PR_NUM)")
-          
+
           # Build comprehensive prompt
           cat > meta_prompt.md << 'PROMPT_EOF'
           # Copilot Meta-Analysis Task
-          
+
           You are performing a meta-analysis of AI code reviews. Your task is to:
-          
+
           1. **Synthesize** feedback from CodeRabbit and Gemini
           2. **Validate** their recommendations
           3. **Identify** conflicts or gaps
           4. **Prioritize** actions by impact
           5. **Generate** implementation plan
-          
+
           ## AI Reviews to Analyze
-          
+
           ### CodeRabbit Feedback
           PROMPT_EOF
-          
+
           echo "$PR_DATA" | jq -r '.coderabbit_reviews[]' >> meta_prompt.md
-          
+
           cat >> meta_prompt.md << 'PROMPT_EOF'
-          
+
           ### Gemini Code Assist Feedback
           PROMPT_EOF
-          
+
           echo "$PR_DATA" | jq -r '.gemini_reviews[]' >> meta_prompt.md
-          
+
           cat >> meta_prompt.md << 'PROMPT_EOF'
-          
+
           ## Your Analysis Should Include
-          
+
           1. **Summary of AI Feedback**
              - Key points from CodeRabbit
              - Key points from Gemini
              - Areas of agreement
              - Areas of disagreement
-          
+
           2. **Validated Recommendations**
              - Which suggestions should be implemented?
              - Which need more investigation?
              - Which should be rejected and why?
-          
+
           3. **Priority Matrix**
              | Priority | Issue | Impact | Effort |
              |----------|-------|--------|--------|
              | ... | ... | ... | ... |
-          
+
           4. **Implementation Roadmap**
              - Immediate fixes (this PR)
              - Follow-up issues to create
              - Long-term improvements
-          
+
           5. **Metrics Improvement Estimate**
              - Performance impact
              - Security improvements
              - Reliability gains
-          
+
           Please provide your analysis in a structured format.
           PROMPT_EOF
-          
+
           echo "prompt_file=meta_prompt.md" >> $GITHUB_OUTPUT
-      
+
       - name: Create Copilot Analysis Issue
         id: copilot-issue
         env:
@@ -253,7 +253,7 @@ jobs:
         run: |
           PR_NUM="${{ matrix.pr.number }}"
           PROMPT_CONTENT=$(cat meta_prompt.md)
-          
+
           ISSUE_BODY="## 🧠 Meta-Analysis Request for PR #$PR_NUM
 
           This issue requests Copilot to perform meta-analysis of AI code reviews.
@@ -287,32 +287,32 @@ jobs:
             --title "🧠 Copilot: Meta-analyze PR #$PR_NUM" \
             --body "$ISSUE_BODY" \
             --label "copilot,meta-analysis,validation")
-          
+
           ISSUE_NUM=$(echo "$ISSUE_URL" | grep -oP '\d+$')
           echo "issue_number=$ISSUE_NUM" >> $GITHUB_OUTPUT
-      
+
       - name: Assign Copilot
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ISSUE_NUM="${{ steps.copilot-issue.outputs.issue_number }}"
-          
+
           # Add copilot label to trigger assignment
           gh issue edit "$ISSUE_NUM" --add-label "copilot"
-          
+
           # Add trigger comment
           gh issue comment "$ISSUE_NUM" --body "@copilot Please perform the meta-analysis described above.
 
           Use Claude Sonnet 4.5 for comprehensive analysis.
 
           After analysis, post your findings to PR #${{ matrix.pr.number }}."
-      
+
       - name: Update PR Status
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUM="${{ matrix.pr.number }}"
-          
+
           gh pr comment "$PR_NUM" --body "## 🧠 Copilot Meta-Analysis Initiated
 
           **Status:** Copilot has been assigned for meta-analysis
@@ -333,7 +333,7 @@ jobs:
           Copilot will post the final analysis here when complete.
 
           *Git-Core Protocol - Continuous Improvement*"
-          
+
           # Update labels
           gh pr edit "$PR_NUM" \
             --remove-label "ai-review-requested" \
@@ -347,7 +347,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect-completion, copilot-analysis]
     if: always()
-    
+
     steps:
       - name: Generate Summary
         run: |
