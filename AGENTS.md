@@ -16,7 +16,10 @@ project: Git-Core-Protocol
 
 # 🤖 AGENTS.md - AI Agent Configuration
 
+> **"Inteligente, sofisticada pero minimalista en complejidad"**
+
 ## Overview
+
 This repository follows the **Git-Core Protocol** for AI-assisted development.
 
 ---
@@ -138,8 +141,66 @@ git commit -m "feat(scope): description (closes #<ISSUE_NUMBER>)"
 git push -u origin HEAD
 gh pr create --fill --base main
 
+# Generate AI Report (NUEVO)
+./scripts/ai-report.ps1  # Windows
+./scripts/ai-report.sh   # Linux/macOS
+
 # DO NOT manually close issues - let Git do it via commit message
 ```
+
+---
+
+## 🚀 Proactive Execution Protocol (NUEVO)
+
+> **"No sugerir, HACER"**
+
+El agente debe **EJECUTAR** el ciclo de vida completo, no solo sugerirlo.
+
+### Ciclo de Vida Automático
+
+```mermaid
+graph LR
+    A[Detectar Intent] --> B[Crear Issue]
+    B --> C[Implementar]
+    C --> D[Test/Verify]
+    D --> E[Commit Atómico]
+    E --> F[PR + AI Report]
+    F --> G[Verificar Cierre]
+```
+
+### Reglas de Ejecución Proactiva
+
+| Situación | Acción (NO sugerir) |
+|-----------|---------------------|
+| Usuario describe problema | → Crear issue + branch + fix |
+| Usuario pide feature | → Crear issue + implementar + PR |
+| Usuario menciona bug | → Crear BUG issue + hotfix |
+| Test falla | → Analizar + fix + re-run |
+| PR creado | → Ejecutar AI report |
+
+### AI Report al Final de Tarea
+
+Al completar un PR, ejecutar automáticamente:
+
+```powershell
+# Generar análisis con Gemini y Copilot
+./scripts/ai-report.ps1 -PrNumber <N>
+
+# Solo Gemini
+./scripts/ai-report.ps1 -ReportType gemini
+
+# Preview sin publicar
+./scripts/ai-report.ps1 -DryRun
+```
+
+### Anti-Patterns de Ejecución
+
+| ❌ NO hacer | ✅ SÍ hacer |
+|-------------|-------------|
+| "¿Quieres que cree un issue?" | → Crear el issue directamente |
+| "Deberías ejecutar los tests" | → Ejecutar los tests |
+| "Puedes crear un PR con..." | → Crear el PR |
+| "Te sugiero agregar..." | → Agregar el código |
 
 ---
 

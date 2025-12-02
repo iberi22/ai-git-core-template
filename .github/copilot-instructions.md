@@ -1,5 +1,7 @@
 # 🧠 GitHub Copilot Instructions
 
+> **"Inteligente, sofisticada pero minimalista en complejidad"**
+
 ## Prime Directive
 You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, not internal memory.
 
@@ -11,6 +13,7 @@ You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, 
 
 | Prompt | Descripción |
 |--------|-------------|
+| `#prompt:context` | 🆕 **Cargar contexto al inicio de sesión** |
 | `#prompt:help` | Guía rápida del protocolo |
 | `#prompt:issue` | Crear un nuevo issue |
 | `#prompt:update` | Actualizar el protocolo |
@@ -257,9 +260,51 @@ git commit -m "feat: description (closes #<id>)"
 
 # Create PR
 gh pr create --fill
+
+# Generate AI Report (NUEVO)
+./scripts/ai-report.ps1  # Windows
+./scripts/ai-report.sh   # Linux/macOS
 ```
 
-### 5. Planning Mode
+### 5.1 Proactive Execution Protocol (NUEVO)
+
+> **"No sugerir, HACER"**
+
+El agente debe **EJECUTAR** el ciclo de vida completo, no solo sugerirlo:
+
+```mermaid
+graph LR
+    A[Detectar Intent] --> B[Crear Issue]
+    B --> C[Implementar]
+    C --> D[Test/Verify]
+    D --> E[Commit Atómico]
+    E --> F[PR + AI Report]
+    F --> G[Verificar Cierre]
+```
+
+**Reglas de Ejecución Proactiva:**
+
+| Situación | Acción (NO sugerir) |
+|-----------|---------------------|
+| Usuario describe problema | → Crear issue + branch + fix |
+| Usuario pide feature | → Crear issue + implementar + PR |
+| Usuario menciona bug | → Crear BUG issue + hotfix |
+| Test falla | → Analizar + fix + re-run |
+| PR creado | → Ejecutar AI report |
+
+**AI Report al completar tarea:**
+```powershell
+# Generar análisis automático del PR
+./scripts/ai-report.ps1 -PrNumber $prNumber
+
+# Solo Gemini
+./scripts/ai-report.ps1 -ReportType gemini
+
+# Preview sin publicar
+./scripts/ai-report.ps1 -DryRun
+```
+
+### 5.2 Planning Mode
 When asked to plan, generate `gh issue create` commands instead of documents:
 ```bash
 gh issue create --title "TASK: Description" --body "Details..." --label "ai-plan"
