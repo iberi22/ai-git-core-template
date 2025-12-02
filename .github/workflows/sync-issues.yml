@@ -11,11 +11,11 @@ on:
       - '.github/issues/*.md'
     branches:
       - main
-  
+
   # Cuando se cierra un issue
   issues:
     types: [closed, deleted]
-  
+
   # Manual trigger
   workflow_dispatch:
     inputs:
@@ -28,7 +28,7 @@ on:
           - sync
           - push-only
           - pull-only
-  
+
   # Periódicamente para limpiar issues cerrados
   schedule:
     - cron: '0 */6 * * *'  # Cada 6 horas
@@ -40,23 +40,23 @@ permissions:
 jobs:
   sync-issues:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Setup jq
         run: sudo apt-get install -y jq
-      
+
       - name: Initialize mapping file
         run: |
           mkdir -p .github/issues
           if [[ ! -f .github/issues/.issue-mapping.json ]]; then
             echo "{}" > .github/issues/.issue-mapping.json
           fi
-      
+
       # ========== PUSH: Crear issues desde archivos .md ==========
       - name: Create issues from .md files
         if: github.event_name != 'issues' && (github.event.inputs.action != 'pull-only' || github.event.inputs.action == '')
@@ -64,47 +64,47 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "🔄 Sincronizando archivos .md → GitHub Issues..."
-          
+
           MAPPING_FILE=".github/issues/.issue-mapping.json"
-          
+
           for file in .github/issues/*.md; do
             [[ -f "$file" ]] || continue
-            
+
             filename=$(basename "$file")
-            
+
             # Saltar templates y archivos especiales
             [[ "$filename" == _* ]] && continue
             [[ "$filename" == ".gitkeep" ]] && continue
-            
+
             # Verificar si ya existe en el mapeo
             existing=$(jq -r ".[\"$filename\"] // empty" "$MAPPING_FILE")
             if [[ -n "$existing" ]]; then
               echo "  ⏭️  $filename ya mapeado a #$existing"
               continue
             fi
-            
+
             # Parsear frontmatter
             content=$(cat "$file")
-            
+
             # Extraer título
             TITLE=$(echo "$content" | sed -n '/^---$/,/^---$/p' | grep -E '^title:' | sed 's/title:[[:space:]]*"\?\([^"]*\)"\?/\1/' | head -1)
-            
+
             # Si no hay título, usar nombre del archivo
             if [[ -z "$TITLE" ]]; then
               TITLE=$(echo "$filename" | sed 's/.md$//' | tr '_' ':' | tr '-' ' ')
             fi
-            
+
             # Extraer labels
             LABELS=$(echo "$content" | sed -n '/^---$/,/^---$/p' | sed -n '/^labels:/,/^[a-z]/p' | grep -E '^\s*-' | sed 's/.*-[[:space:]]*"\?\([^"]*\)"\?/\1/' | tr '\n' ',' | sed 's/,$//')
-            
+
             # Extraer body (todo después del segundo ---)
             BODY=$(echo "$content" | sed '1,/^---$/d' | sed '1,/^---$/d')
-            
+
             echo "📝 Creando issue: $TITLE"
-            
+
             # Construir comando
             CMD="gh issue create --title \"$TITLE\""
-            
+
             # Agregar labels
             if [[ -n "$LABELS" ]]; then
               IFS=',' read -ra LABEL_ARRAY <<< "$LABELS"
@@ -115,24 +115,24 @@ jobs:
                 fi
               done
             fi
-            
+
             # Crear archivo temporal para body
             echo "$BODY" > /tmp/issue_body.md
             CMD="$CMD --body-file /tmp/issue_body.md"
-            
+
             # Ejecutar
             result=$(eval $CMD 2>&1) || true
-            
+
             # Extraer número del issue
             issue_num=$(echo "$result" | grep -oE '/issues/[0-9]+' | grep -oE '[0-9]+')
-            
+
             if [[ -n "$issue_num" ]]; then
               echo "✅ Issue #$issue_num creado"
-              
+
               # Actualizar mapping
               tmp=$(mktemp)
               jq ".[\"$filename\"] = $issue_num" "$MAPPING_FILE" > "$tmp" && mv "$tmp" "$MAPPING_FILE"
-              
+
               # Agregar número al archivo
               if ! grep -q "github_issue:" "$file"; then
                 sed -i "s/^---$/---\ngithub_issue: $issue_num/" "$file"
@@ -141,7 +141,7 @@ jobs:
               echo "❌ Error creando issue: $result"
             fi
           done
-      
+
       # ========== PULL: Eliminar archivos de issues cerrados ==========
       - name: Clean closed issues
         if: github.event.inputs.action != 'push-only' || github.event.inputs.action == ''
@@ -149,24 +149,24 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "🔄 Limpiando archivos de issues cerrados..."
-          
+
           MAPPING_FILE=".github/issues/.issue-mapping.json"
-          
+
           # Si el trigger es un issue cerrado específico
           if [[ "${{ github.event_name }}" == "issues" && "${{ github.event.action }}" == "closed" ]]; then
             closed_num="${{ github.event.issue.number }}"
             echo "Issue #$closed_num fue cerrado"
-            
+
             # Buscar archivo correspondiente
             filename=$(jq -r "to_entries[] | select(.value == $closed_num) | .key" "$MAPPING_FILE")
-            
+
             if [[ -n "$filename" ]]; then
               filepath=".github/issues/$filename"
               if [[ -f "$filepath" ]]; then
                 rm -f "$filepath"
                 echo "✅ Eliminado: $filename"
               fi
-              
+
               # Actualizar mapping
               tmp=$(mktemp)
               jq "del(.[\"$filename\"])" "$MAPPING_FILE" > "$tmp" && mv "$tmp" "$MAPPING_FILE"
@@ -174,36 +174,36 @@ jobs:
           else
             # Verificar todos los issues en el mapping
             keys=$(jq -r 'keys[]' "$MAPPING_FILE" 2>/dev/null || true)
-            
+
             for filename in $keys; do
               issue_num=$(jq -r ".[\"$filename\"]" "$MAPPING_FILE")
-              
+
               # Verificar estado del issue
               state=$(gh issue view "$issue_num" --json state --jq '.state' 2>/dev/null || echo "CLOSED")
-              
+
               if [[ "$state" == "CLOSED" ]]; then
                 filepath=".github/issues/$filename"
-                
+
                 if [[ -f "$filepath" ]]; then
                   rm -f "$filepath"
                   echo "✅ Eliminado: $filename (issue #$issue_num cerrado)"
                 fi
-                
+
                 # Actualizar mapping
                 tmp=$(mktemp)
                 jq "del(.[\"$filename\"])" "$MAPPING_FILE" > "$tmp" && mv "$tmp" "$MAPPING_FILE"
               fi
             done
           fi
-      
+
       # ========== Commit cambios ==========
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           git add .github/issues/
-          
+
           if git diff --staged --quiet; then
             echo "No hay cambios que commitear"
           else
