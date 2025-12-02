@@ -75,11 +75,11 @@ graph TD
     B -->|Quick| C[claude-quick]
     B -->|Standard| D[protocol-claude]
     B -->|Complex| E[architect]
-    
+
     D --> F{Implementation?}
     F -->|Yes| G[codex-protocol]
     F -->|No| H[Done]
-    
+
     E --> I{Large codebase?}
     I -->|Yes| J[grok-protocol]
     I -->|No| G

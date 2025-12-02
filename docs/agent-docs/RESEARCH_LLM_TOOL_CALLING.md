@@ -8,8 +8,8 @@ agent: copilot
 model: claude-opus-4.5
 requested_by: user
 summary: |
-  Comprehensive research on tool calling capabilities, best practices, 
-  token limits, and context windows for major LLM providers including 
+  Comprehensive research on tool calling capabilities, best practices,
+  token limits, and context windows for major LLM providers including
   Anthropic Claude, Google Gemini, OpenAI GPT/Codex, and xAI Grok.
 keywords: [tool-calling, function-calling, llm, claude, gemini, gpt, grok, codex, mcp]
 tags: ["#ai-agents", "#tool-calling", "#research", "#git-core-protocol"]
@@ -27,7 +27,7 @@ complexity: high
 
 # 🔧 LLM Tool Calling Capabilities Research
 
-> **Research Date:** December 2, 2025  
+> **Research Date:** December 2, 2025
 > **Purpose:** Compare tool/function calling capabilities across major LLM providers for Git-Core Protocol agent integration
 
 ---

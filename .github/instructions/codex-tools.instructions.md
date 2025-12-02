@@ -119,7 +119,7 @@ git commit -m "test(auth): add login tests #42"
 tools = ["search", "read_file"]
 # Understand codebase structure
 
-# Step 2: Implement  
+# Step 2: Implement
 tools = ["edit_file", "create_file"]
 # Make changes atomically
 
