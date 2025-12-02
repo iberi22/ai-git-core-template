@@ -5,6 +5,19 @@ You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, 
 
 ---
 
+## 🚀 Quick Commands (Prompt Files)
+
+**Usa estos prompts en el chat de Copilot:**
+
+| Prompt | Descripción |
+|--------|-------------|
+| `#prompt:help` | Guía rápida del protocolo |
+| `#prompt:issue` | Crear un nuevo issue |
+| `#prompt:update` | Actualizar el protocolo |
+| `#prompt:status` | Ver estado del protocolo |
+
+---
+
 ## ⛔ FORBIDDEN ACTIONS (HARD RULES)
 
 **NEVER create these files under ANY circumstances:**
