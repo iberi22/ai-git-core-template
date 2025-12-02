@@ -297,7 +297,7 @@ jobs:
           chmod +x e2e-config/run-e2e.sh
       
       - name: Upload E2E Config
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: e2e-config
           path: e2e-config/
@@ -381,7 +381,7 @@ jobs:
           EOF
       
       - name: Upload Report Template
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: report-template
           path: reports/

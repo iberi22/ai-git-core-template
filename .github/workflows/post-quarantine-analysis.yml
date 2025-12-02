@@ -231,7 +231,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
       
       - name: Upload Analysis Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: post-quarantine-report
           path: docs/agent-docs/POST_QUARANTINE_REPORT.md
