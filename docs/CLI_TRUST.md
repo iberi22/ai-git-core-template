@@ -19,6 +19,8 @@ project: Git-Core-Protocol
 
 # 🔐 Git-Core CLI - Transparency & Trust
 
+> **⚠️ DEPRECATED: The Rust CLI is no longer the recommended way to use Git-Core Protocol. Please use the shell scripts instead.**
+
 > **Before you install anything, you deserve to know exactly what it does.**
 
 This document explains everything about the Git-Core CLI: what it does, how it was built, and where you can verify every line of code.

@@ -68,16 +68,14 @@ project: Git-Core-Protocol
 ```
 Initialize this project with Git-Core Protocol.
 
-# Method 1: Shell Scripts (transparent, visible code)
+# Method 1: Shell Scripts (Recommended)
 # Linux/macOS
 curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 
 # Windows
 irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 
-# Method 2: CLI (if available)
-git-core init
-git-core check
+# Note: The Rust CLI (git-core) is deprecated. Please use the scripts above.
 
 After setup, read .✨/ARCHITECTURE.md and start with: gh issue list
 ```
@@ -446,6 +444,16 @@ git-core migrate
 
 ✅ GitHub Copilot | ✅ Cursor | ✅ Windsurf | ✅ Claude | ✅ ChatGPT | ✅ Any LLM with terminal access
 
+## 🤝 Credits & Inspiration
+
+This protocol is inspired by and builds upon the excellent work of:
+
+- **[HumanLayer](https://github.com/humanlayer/humanlayer)**: For their pioneering work on "12-Factor Agents" and "Context Engineering".
+- **[CodeLayer](https://humanlayer.dev/code)**: For demonstrating advanced agent orchestration.
+- **Context7**: For the initial concepts of context management.
+
+We acknowledge their contributions to the field of AI-assisted development.
+
 ---
 
 # 🇪🇸 Español
@@ -597,6 +605,16 @@ El reporte AI incluye:
 - 🏷️ **Etiquetas Sugeridas**
 
 Los reportes se publican automáticamente como comentarios en el PR.
+
+## 🤝 Créditos e Inspiración
+
+Este protocolo está inspirado y se basa en el excelente trabajo de:
+
+- **[HumanLayer](https://github.com/humanlayer/humanlayer)**: Por su trabajo pionero en "12-Factor Agents" y "Context Engineering".
+- **[CodeLayer](https://humanlayer.dev/code)**: Por demostrar una orquestación avanzada de agentes.
+- **Context7**: Por los conceptos iniciales de gestión de contexto.
+
+Agradecemos sus contribuciones al campo del desarrollo asistido por IA.
 
 ---
 

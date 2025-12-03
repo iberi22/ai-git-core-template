@@ -24,6 +24,27 @@ This repository follows the **Git-Core Protocol** for AI-assisted development.
 
 ---
 
+## 🚀 Git-Core v2.0 Enhancements (NEW)
+
+**Implementación de lógicas "12-Factor Agents" y "HumanLayer":**
+
+### 1. Context Protocol (Stateless Reducer)
+
+Los agentes deben persistir su estado en los Issues usando bloques XML `<agent-state>`.
+👉 **Ver especificación:** `docs/agent-docs/CONTEXT_PROTOCOL.md`
+
+### 2. Micro-Agents (Personas)
+
+Los agentes deben adoptar roles específicos basados en las etiquetas (Labels) del Issue.
+👉 **Ver especificación:** `docs/agent-docs/MICRO_AGENTS.md`
+
+### 3. High Stakes Operations (Human-in-the-Loop)
+
+Para operaciones críticas (borrar datos, deploys, cambios de auth), el agente **DEBE PAUSAR** y solicitar confirmación explícita:
+> "⚠️ Esta es una operación de alto riesgo. Responde **'Proceder'** para continuar."
+
+---
+
 ## ⛔ FORBIDDEN FILES (HARD RULES)
 
 **NEVER create these files under ANY circumstances:**
@@ -85,6 +106,7 @@ When you need to export context for a new chat session:
 | **CANNOT** be manually created | Script enforces structure |
 
 **Workflow:**
+
 ```bash
 # Generate continuation prompt
 ./scripts/export-session.ps1 -Topic "feature-name" -Summary "Current progress..."
@@ -482,52 +504,25 @@ git-atomize --interactive  # Separar interactivamente
 
 ---
 
-## 🛠️ Git-Core CLI (RECOMMENDED)
+## 🛠️ Git-Core CLI (DEPRECATED)
 
 ### Overview
 
-`git-core` es el CLI oficial para gestionar el Git-Core Protocol. **SIEMPRE usa el CLI** como método principal para instalar, actualizar y verificar el protocolo.
+The Rust-based `git-core` CLI is **DEPRECATED**. Please use the shell scripts (`install.sh` / `install.ps1`) for all operations.
 
-### Installation
-
-**🔐 Trust & Transparency:** Before installing, read [docs/CLI_TRUST.md](docs/CLI_TRUST.md) to understand exactly what the CLI does and verify the source code.
+### Installation (Scripts - Recommended)
 
 ```bash
-# 🚀 OPTION 1: Shell Scripts (código visible, puedes leerlo antes)
-# Linux/macOS
+# 🚀 Linux/macOS
 curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 
-# Windows (PowerShell)
+# 🚀 Windows (PowerShell)
 irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
-
-# 🦀 OPTION 2: Cargo (compila desde código fuente en TU máquina)
-# Antes de instalar, lee: docs/CLI_TRUST.md
-# Código fuente: https://github.com/iberi22/Git-Core-Protocol/tree/main/tools/git-core-cli
-cargo install git-core-cli
-
-# 🔨 OPTION 3: Build from source (máxima confianza)
-git clone https://github.com/iberi22/Git-Core-Protocol
-cd Git-Core-Protocol/tools/git-core-cli
-cargo build --release
-./target/release/git-core install
 ```
 
-### Commands Reference
+### Legacy CLI (Not Recommended)
 
-| Command | Description | When to Use |
-|---------|-------------|-------------|
-| `git-core install` | Install protocol in current directory | New projects |
-| `git-core install --force` | Force reinstall, overwrite all | Reset corrupted installation |
-| `git-core upgrade` | Upgrade protocol (preserves ARCHITECTURE.md) | Update to latest version |
-| `git-core upgrade --force` | Upgrade everything (overwrites ARCHITECTURE.md) | Full reset |
-| `git-core migrate` | Migrate `.ai/` → `.✨/` | Legacy projects |
-| `git-core migrate --remove-old` | Migrate and delete `.ai/` | Clean migration |
-| `git-core check` | Verify protocol integrity | Troubleshooting |
-| `git-core check --fix` | Auto-fix issues | Repair installation |
-| `git-core status` | Show current protocol status | Quick overview |
-| `git-core init [name]` | Initialize new project with protocol | New projects |
-| `git-core version` | Show/bump version | Version management |
-| `git-core self-update` | Update the CLI itself | Keep CLI updated |
+The Rust CLI source code has been moved to `tools/deprecated/git-core-cli`. It is no longer maintained.
 
 ### AI Agent Usage
 
@@ -536,35 +531,6 @@ cargo build --release
 ```bash
 # Step 1: Install protocol (scripts are visible and auditable)
 curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
-
-# Or if CLI is available:
-git-core init my-project
-
-# Step 2: Verify installation
-git-core check
-```
-
-**When upgrading existing project:**
-
-```bash
-# Safe upgrade (preserves your ARCHITECTURE.md)
-git-core upgrade
-
-# Check what changed
-git-core status
-```
-
-**When troubleshooting:**
-
-```bash
-# Check integrity
-git-core check
-
-# Auto-fix issues
-git-core check --fix
-
-# Full status report
-git-core status
 ```
 
 ### Legacy Scripts (Alternative)
