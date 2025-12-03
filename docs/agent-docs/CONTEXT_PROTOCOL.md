@@ -10,12 +10,13 @@ requested_by: system
 summary: |
   Standardized protocol for agents to persist state and context in GitHub Issues,
   enabling stateless, pausable, and resumable workflows (12-Factor Agents).
-keywords: [context, protocol, state, xml, 12-factor]
+  v2.1: Adds Dynamic Planning, Human-as-Tool, and Metrics.
+keywords: [context, protocol, state, xml, 12-factor, acp]
 tags: ["#protocol", "#context", "#state"]
 project: Git-Core-Protocol
 ---
 
-# 🧠 Context Protocol (Git-Core v2.0)
+# 🧠 Context Protocol v2.1 (Git-Core)
 
 > **"Own Your Context Window & Unify State"**
 
@@ -32,30 +33,49 @@ No debe existir "memoria" oculta en el chat. Todo el estado necesario para conti
 
 Cada vez que un agente realiza una acción significativa o pausa su trabajo, DEBE dejar un comentario en el Issue con un bloque `<agent-state>`.
 
-### Formato XML
+### Formato XML (v2.1)
 
 ```xml
 <agent-state>
-  <!-- Intención actual del agente -->
-  <intent>implement_feature</intent>
+  <!-- 1. INTENCIÓN Y ESTADO -->
+  <intent>implement_auth_flow</intent>
+  <step>waiting_for_input</step>
+  <progress>45</progress>
 
-  <!-- Paso actual en el plan -->
-  <step>waiting_for_review</step>
+  <!-- 2. PLANIFICACIÓN DINÁMICA (Dynamic Workflow) -->
+  <plan>
+    <item status="done">Analizar requisitos de OAuth</item>
+    <item status="done">Crear estructura de base de datos</item>
+    <item status="in_progress">Implementar endpoints de API</item>
+    <item status="pending">Crear frontend de login</item>
+    <item status="pending">Tests de integración</item>
+  </plan>
 
-  <!-- Progreso (0-100) -->
-  <progress>60</progress>
+  <!-- 3. HUMAN AS A TOOL (Input Request) -->
+  <!-- Usar cuando se necesita información específica, no solo aprobación -->
+  <input_request>
+    <status>waiting</status> <!-- waiting | received | none -->
+    <question>¿Cuál es el Client ID de Google para el entorno de staging?</question>
+  </input_request>
 
-  <!-- Memoria a corto plazo (JSON) -->
+  <!-- 4. OBSERVABILIDAD (Metrics) -->
+  <!-- Para detectar bucles o consumo excesivo -->
+  <metrics>
+    <tool_calls>12</tool_calls>
+    <errors>0</errors>
+    <cost_estimate>0.15</cost_estimate>
+  </metrics>
+
+  <!-- 5. MEMORIA TÉCNICA -->
   <memory>
     {
-      "last_file_edited": "src/auth.ts",
-      "test_status": "failed",
-      "attempt_count": 2
+      "last_file_edited": "src/auth/router.ts",
+      "db_migration_applied": "20251203_init_users",
+      "blockers": []
     }
   </memory>
 
-  <!-- Siguiente acción recomendada -->
-  <next_action>run_tests_again</next_action>
+  <next_action>check_user_response</next_action>
 </agent-state>
 ```
 
@@ -64,10 +84,12 @@ Cada vez que un agente realiza una acción significativa o pausa su trabajo, DEB
 | Campo | Descripción | Valores Ejemplo |
 |-------|-------------|-----------------|
 | `<intent>` | Objetivo de alto nivel | `fix_bug`, `refactor`, `deploy` |
-| `<step>` | Estado actual del flujo | `planning`, `coding`, `testing`, `blocked` |
-| `<progress>` | Porcentaje estimado | `0` a `100` |
+| `<step>` | Estado actual del flujo | `planning`, `coding`, `waiting_for_input` |
+| `<plan>` | Lista de tareas viva | Items con status `done`, `in_progress`, `pending` |
+| `<input_request>` | Solicitud de datos al humano | Pregunta específica + estado |
+| `<metrics>` | Telemetría de la sesión | Contadores de uso y errores |
 | `<memory>` | Datos clave para retomar | JSON string |
-| `<next_action>` | Sugerencia para el siguiente agente | `review_pr`, `merge`, `ask_user` |
+| `<next_action>` | Sugerencia siguiente paso | `review_pr`, `merge`, `ask_user` |
 
 ## 3. Flujo de Lectura/Escritura
 
@@ -81,32 +103,46 @@ Cada vez que un agente realiza una acción significativa o pausa su trabajo, DEB
 ### Al Finalizar/Pausar (Escritura)
 
 1. El agente determina su nuevo estado.
-2. Publica un comentario en el Issue con el bloque `<agent-state>` actualizado.
-3. (Opcional) Añade un resumen legible para humanos antes del bloque XML.
+2. Actualiza el `<plan>` (marca items como done/in_progress).
+3. Si necesita info, llena `<input_request>`.
+4. Incrementa `<metrics>`.
+5. Publica un comentario en el Issue con el bloque `<agent-state>` actualizado.
 
-## 4. Ejemplo de Interacción
+## 4. Ejemplo de Interacción "Human-as-a-Tool"
 
-**Agente 1 (Claude):**
-> He implementado la autenticación básica. Los tests unitarios pasan, pero falta integración.
+**Agente:**
+> Necesito credenciales para continuar.
 >
 > ```xml
 > <agent-state>
->   <intent>add_auth</intent>
->   <step>testing</step>
->   <progress>70</progress>
->   <memory>{"files_changed": ["auth.ts"], "pending": "integration_tests"}</memory>
+>   <step>waiting_for_input</step>
+>   <input_request>
+>     <status>waiting</status>
+>     <question>Por favor proporciona la API Key de SendGrid.</question>
+>   </input_request>
 > </agent-state>
 > ```
 
-*(Pasa el tiempo...)*
+**Humano:**
+> Aquí tienes: `SG.12345...`
 
-**Agente 2 (Gemini):**
-*(Lee el último estado)*
-> Veo que falta la integración. Voy a ejecutar los tests de integración ahora.
+**Agente (siguiente ejecución):**
+> Gracias. Continuando con la configuración.
+>
+> ```xml
+> <agent-state>
+>   <step>coding</step>
+>   <input_request>
+>     <status>received</status>
+>   </input_request>
+>   <plan>
+>     <item status="in_progress">Configurar servicio de email</item>
+>   </plan>
+> </agent-state>
+> ```
 
-## 5. Beneficios (12-Factor Alignment)
+## 5. Beneficios (ACP Alignment)
 
-- **Factor 3 (Own Context):** Estructura determinística para el LLM.
-- **Factor 5 (Unified State):** Ejecución y negocio unidos en el Issue.
-- **Factor 6 (Pausable):** Cualquier agente puede retomar el trabajo.
-- **Factor 12 (Stateless):** El agente no necesita memoria de sesión.
+- **Dynamic Planning:** El plan evoluciona con la realidad, no es estático.
+- **Human-as-a-Tool:** Formaliza la interacción humano-agente como un intercambio de datos estructurado.
+- **Observability:** Permite detectar agentes "atascados" (high tool calls) automáticamente.
