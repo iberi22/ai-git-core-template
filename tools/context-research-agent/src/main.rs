@@ -7,6 +7,7 @@ mod context;
 mod search;
 mod intelligence;
 mod report;
+mod registry;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -52,14 +53,15 @@ async fn main() -> Result<()> {
     println!("📊 AI Provider: {} ({})", ai_provider.name, ai_provider.model);
 
     // 5. Check Quarantine Status
-    println!("🚧 Checking quarantine status...");
-    let quarantine_deps: Vec<report::QuarantineStatus> = dependencies.iter()
-        .map(|dep| {
-            // For now, we assume all dependencies are stable (release date unknown)
-            // In production, this would fetch from crates.io/npm/pypi APIs
-            report::check_quarantine_status(&dep.name, &dep.version, None)
-        })
-        .collect();
+    println!("🚧 Checking quarantine status (fetching release dates)...");
+    let client = reqwest::Client::new();
+    let mut quarantine_deps = Vec::new();
+
+    for dep in &dependencies {
+        let release_date = registry::get_release_date(&client, &dep.ecosystem, &dep.name, &dep.version).await.unwrap_or(None);
+        let status = report::check_quarantine_status(&dep.name, &dep.version, release_date);
+        quarantine_deps.push(status);
+    }
 
     let quarantined_count = quarantine_deps.iter().filter(|q| q.is_quarantined).count();
     println!("✅ Quarantine check complete. {} in quarantine.", quarantined_count);

@@ -86,8 +86,8 @@ pub async fn generate_report(
         }
     }
 
-    // 3. Quarantine Status Section
     content.push_str("## 🚧 Quarantine Status\n\n");
+    content.push_str("> **Why 14 days?** Research indicates that most malicious package takeovers (typosquatting, account hijacking) are detected and removed within 3-7 days. A 14-day buffer provides a 2x safety margin against supply chain attacks.\n\n");
     content.push_str(&format!(
         "Dependencies currently in quarantine (<{} days since release):\n\n",
         QUARANTINE_DAYS
