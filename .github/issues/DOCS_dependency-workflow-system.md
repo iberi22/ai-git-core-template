@@ -3,7 +3,7 @@ title: "Documentar sistema de workflows de dependencias"
 labels:
   - documentation
   - enhancement
-  - protocol
+  - workflow
 ---
 
 ## 📋 Descripción

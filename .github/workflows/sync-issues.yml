@@ -70,6 +70,10 @@ jobs:
             ["bug"]="Something isn't working:#D73A4A"
             ["documentation"]="Improvements or additions to documentation:#0075CA"
             ["feature"]="New feature request:#A2EEEF"
+            ["enhancement"]="New feature or improvement:#A2EEEF"
+            ["protocol"]="Git-Core Protocol related:#1D76DB"
+            ["dependencies"]="Dependency updates:#0366D6"
+            ["copilot"]="Assigned to GitHub Copilot:#6F42C1"
           )
 
           for label in "${!LABELS[@]}"; do
@@ -81,6 +85,7 @@ jobs:
       # ========== PUSH: Crear issues desde archivos .md ==========
       - name: Create issues from .md files
         if: github.event_name != 'issues' && (github.event.inputs.action != 'pull-only' || github.event.inputs.action == '')
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
