@@ -68,18 +68,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Linux Artifacts
+      - name: Download All Artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: "*-x86_64-unknown-linux-gnu"
           path: downloaded-artifacts
-          merge-multiple: true
 
       - name: Update bin/ folder
         run: |
           mkdir -p bin
-          cp downloaded-artifacts/context-research-agent bin/context-research-agent-linux
-          cp downloaded-artifacts/workflow-orchestrator bin/workflow-orchestrator-linux
+          
+          # Linux
+          cp downloaded-artifacts/context-research-agent-x86_64-unknown-linux-gnu/context-research-agent bin/context-research-agent-linux
+          cp downloaded-artifacts/workflow-orchestrator-x86_64-unknown-linux-gnu/workflow-orchestrator bin/workflow-orchestrator-linux
+          
+          # Windows
+          cp downloaded-artifacts/context-research-agent-x86_64-pc-windows-msvc/context-research-agent.exe bin/context-research-agent.exe
+          
           chmod +x bin/*
 
           # Commit if changed
