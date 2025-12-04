@@ -27,13 +27,19 @@ project: Git-Core-Protocol
 
 <div style="flex: 1; min-width: 500px;">
 
+### 🚀 Active Automated Evolution
+**Git-Core Protocol** is a living standard for AI-assisted development. It provides a structured workflow where **Human ↔ AI Agent ↔ GitHub** communicate seamlessly.
+
+- **How it helps:** Eliminates context loss, enforces architectural consistency, and automates documentation.
+- **Workflow:** Issues are state, Commits are atomic, and PRs are auto-analyzed.
+- **Status:** In active automated update and continuous improvement.
+
 | Git-Core Protocol | Compliance | Detail                                      |
-|--------------------------------|------------|---------------------------------------------|
-| Defined rules                  | ✅          | AGENTS.md, copilot-instructions.md           |
-| Syntax                         | ✅          | Issue format, conventional commits           |
-| Semantics                      | ✅          | Labels, states, workflows                    |
-| Synchronization                 | ✅          | GitHub Issues as state, workflows            |
-| Entities communicating          | ✅          | Human ↔ AI Agent ↔ GitHub                    |
+|-------------------|------------|---------------------------------------------|
+| Defined rules     | ✅          | AGENTS.md, copilot-instructions.md           |
+| Syntax            | ✅          | Issue format, conventional commits           |
+| Semantics         | ✅          | Labels, states, workflows                    |
+| Synchronization   | ✅          | GitHub Issues as state, workflows            |
 
 </div>
 
@@ -100,17 +106,27 @@ Then execute: ./scripts/init_project.sh
 
 ## 🤖 Context Injector (New!)
 
-This protocol now includes a dynamic system to "equip" your AI agent with specific roles (Backend Architect, UX Researcher, etc.) on demand.
+This protocol now includes a dynamic system to "equip" your AI agent with specific roles on demand. **Agents can now self-inject these roles** when they detect the need.
+
+### Available Recipes (Auto-Downloaded)
+The system automatically downloads the latest "recipes" for:
+- 🏗️ **Software Engineering** (Patterns, Clean Code)
+- 🔬 **Research** (Academic, Technical)
+- 🛡️ **Cybersecurity** (Auditing, Hardening)
+- 🎨 **UI/UX Design** (Accessibility, Systems)
+- ⛓️ **Blockchain** (Smart Contracts, Web3)
+- 🤖 **AI Research** (Papers, State of the Art)
+- 🎓 **AI Training** (Fine-tuning, Datasets)
 
 ### How it works
 
 1. **Index:** Check `.✨/AGENT_INDEX.md` to see available roles.
-2. **Equip:** Run the script to download and load the persona.
+2. **Equip:** Run the script (or let the agent run it) to download and load the persona.
 3. **Act:** The agent reads the generated context and behaves like an expert.
 
 ```powershell
-# Example: Load the Backend Architect persona
-./scripts/equip-agent.ps1 -Role "backend"
+# Example: Load the Cybersecurity Auditor persona
+./scripts/equip-agent.ps1 -Role "security"
 ```
 
 The system automatically:
@@ -264,6 +280,26 @@ Continue your work in a new chat window **without losing context**.
 ```
 
 📖 **Full documentation:** [docs/SESSION_EXPORT.md](docs/SESSION_EXPORT.md)
+
+---
+
+## 🗺️ Roadmap & Feedback
+
+We are building the standard for AI-Human collaboration. **Your feedback shapes this protocol.**
+
+### 🛣️ Upcoming Milestones
+- [ ] **v2.1**: Full "Context Injector" automation (Agent self-diagnosis)
+- [ ] **v2.2**: "Memory Core" - Persistent semantic memory across sessions
+- [ ] **v2.3**: Multi-Agent Swarm Protocol (Coordinator + Workers)
+- [ ] **v3.0**: Native IDE Integration (VS Code Extension)
+
+### 🤝 We Need Your Feedback!
+This protocol is in **active automated evolution**. We need you to test it and report:
+1. **Friction points:** Where did the agent get stuck?
+2. **Missing recipes:** What role did you need that wasn't there?
+3. **Workflow bugs:** Did the state get out of sync?
+
+👉 **[Open a Discussion](https://github.com/iberi22/Git-Core-Protocol/discussions)** or create an Issue with the label `feedback`.
 
 ---
 
