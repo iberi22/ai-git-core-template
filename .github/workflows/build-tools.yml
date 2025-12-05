@@ -6,6 +6,7 @@ on:
     paths:
       - "tools/context-research-agent/**"
       - "tools/workflow-orchestrator/**"
+      - "tools/atomicity-checker/**"
       - ".github/workflows/build-tools.yml"
   workflow_dispatch:
 
@@ -31,11 +32,22 @@ jobs:
             tool: workflow-orchestrator
             path: tools/workflow-orchestrator
 
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            tool: atomicity-checker
+            path: tools/atomicity-checker
+
           # Windows (Optional, for local users)
           - target: x86_64-pc-windows-msvc
             os: windows-latest
             tool: context-research-agent
             path: tools/context-research-agent
+            ext: .exe
+
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            tool: atomicity-checker
+            path: tools/atomicity-checker
             ext: .exe
 
     steps:
@@ -76,14 +88,16 @@ jobs:
       - name: Update bin/ folder
         run: |
           mkdir -p bin
-          
+
           # Linux
           cp downloaded-artifacts/context-research-agent-x86_64-unknown-linux-gnu/context-research-agent bin/context-research-agent-linux
           cp downloaded-artifacts/workflow-orchestrator-x86_64-unknown-linux-gnu/workflow-orchestrator bin/workflow-orchestrator-linux
-          
+          cp downloaded-artifacts/atomicity-checker-x86_64-unknown-linux-gnu/atomicity-checker bin/atomicity-checker-linux
+
           # Windows
           cp downloaded-artifacts/context-research-agent-x86_64-pc-windows-msvc/context-research-agent.exe bin/context-research-agent.exe
-          
+          cp downloaded-artifacts/atomicity-checker-x86_64-pc-windows-msvc/atomicity-checker.exe bin/atomicity-checker.exe
+
           chmod +x bin/*
 
           # Commit if changed
