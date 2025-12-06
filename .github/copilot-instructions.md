@@ -187,7 +187,24 @@ Agregar autenticación OAuth al sistema.
 - **ALWAYS** use `gh issue` commands for task management
 - **ALWAYS** use `gh issue comment` for progress updates
 
-### 2. Context Loading
+### 2. Health Check (Anthropic Pattern - OBLIGATORIO)
+
+> ⚠️ **ANTES de cualquier feature nuevo:** Verificar que el proyecto funciona.
+
+```bash
+# 1. Estado del proyecto
+git log --oneline -10            # Ver trabajo reciente
+cat .✨/features.json            # Features con passes: true/false
+
+# 2. Ejecutar tests
+npm test  # o: cargo test, pytest, etc.
+# Si FALLAN → ARREGLAR PRIMERO
+# Si PASAN → Continuar
+```
+
+> **Anthropic:** "If the agent had started implementing a new feature [with existing bugs], it would likely make the problem worse."
+
+### 3. Context Loading
 Before any task:
 ```bash
 # 1. Check the Agent Index to see if you need a specific Role
@@ -203,11 +220,15 @@ cat docs/agent-docs/RESEARCH_STACK_CONTEXT.md
 # 4. Read architecture
 cat .✨/ARCHITECTURE.md
 
-# 5. Check your assigned issues
+# 5. Check your assigned issues + agent state
 gh issue list --assignee "@me"
+gh issue view <id> --comments | grep -A 50 '<agent-state>'
+
+# 6. Check features.json for next priority
+cat .✨/features.json | jq '.features[] | select(.passes == false)'
 ```
 
-### 3. Dependency Quarantine Rule (NEW)
+### 4. Dependency Quarantine Rule (NEW)
 When working with dependencies:
 1. **Check quarantine status**: `gh pr list --label "quarantine"`
 2. **Never use bleeding-edge**: Versions < 2 weeks old are in quarantine
@@ -219,7 +240,7 @@ When working with dependencies:
 - After 14 days → Auto-promoted to "ready-to-adopt"
 - On merge → Context Research Agent updates documentation
 
-### 3.1 Living Context Protocol (Context7 Replacement)
+### 4.1 Living Context Protocol (Context7 Replacement)
 
 This protocol replaces external tools like Context7 with a native, self-hosted solution.
 

@@ -13,7 +13,7 @@ summary: |
   logical adaptation of the orchestration system.
 keywords: [evolution, metrics, improvement, kaizen, feedback-loop]
 tags: ["#evolution", "#metrics", "#continuous-improvement"]
-protocol_version: 1.4.0
+protocol_version: 1.5.0
 project: Git-Core-Protocol
 ---
 

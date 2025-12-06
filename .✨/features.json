@@ -1,0 +1,34 @@
+{
+   "_comment": "Feature tracking file inspired by Anthropic's long-running agent research. JSON is used because LLMs are less likely to accidentally modify JSON compared to Markdown.",
+   "metadata": {
+      "project": "Git-Core Protocol",
+      "created": "2025-12-05",
+      "last_verified": null,
+      "total_features": 0,
+      "passing": 0,
+      "failing": 0
+   },
+   "features": [
+      {
+         "id": "feat-template",
+         "category": "example",
+         "description": "Template feature - replace with actual project features",
+         "steps": [
+            "Step 1: Describe what to do",
+            "Step 2: Describe expected outcome",
+            "Step 3: Describe verification method"
+         ],
+         "passes": false,
+         "verified_by": "manual | script-name | test-command",
+         "github_issue": null,
+         "last_tested": null,
+         "notes": "Delete this template when adding real features"
+      }
+   ],
+   "verification_commands": {
+      "all": "npm test",
+      "unit": "npm run test:unit",
+      "e2e": "npm run test:e2e",
+      "lint": "npm run lint"
+   }
+}

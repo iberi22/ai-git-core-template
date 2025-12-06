@@ -325,12 +325,69 @@ For critical operations (deletions, deploys, auth changes), agents **MUST PAUSE*
 
 ---
 
-## �🗺️ Roadmap & Feedback
+## 🆕 v1.5.0 Features: Evolution Protocol + Federated Telemetry
+
+### 🧬 Evolution Protocol (Weekly Improvement Cycle)
+
+The protocol now **self-improves** through automated weekly analysis:
+
+```
+MEDIR → ANALIZAR → PROPONER → IMPLEMENTAR → VALIDAR → ↺
+```
+
+**Features:**
+- **3-Order Metrics Taxonomy**: Operational (daily), Quality (weekly), Evolution (monthly)
+- **Automated Pattern Detection**: Identifies "death loops", low adoption, high friction
+- **Weekly Reports**: Auto-generated GitHub Issues with insights
+
+```powershell
+# Collect local metrics
+./scripts/evolution-metrics.ps1 -OutputFormat markdown
+
+# Trigger evolution cycle (runs every Monday automatically)
+gh workflow run evolution-cycle.yml
+```
+
+👉 **Full spec:** [docs/agent-docs/EVOLUTION_PROTOCOL.md](docs/agent-docs/EVOLUTION_PROTOCOL.md)
+
+### 📡 Federated Telemetry System
+
+Projects using Git-Core Protocol can **send anonymized metrics back** to the official repo for centralized analysis:
+
+```
+┌─────────────────┐    PR with metrics    ┌─────────────────────┐
+│  Your Project   │ ─────────────────────▶│ Official Git-Core   │
+│  (uses protocol)│                       │ Protocol Repo       │
+└─────────────────┘                       │   (analysis)        │
+                                          └─────────────────────┘
+```
+
+**Usage:**
+```powershell
+# Preview what would be sent
+./scripts/send-telemetry.ps1 -DryRun
+
+# Send anonymized metrics
+./scripts/send-telemetry.ps1
+```
+
+**Privacy:**
+- ✅ Anonymous by default (project names hashed)
+- ✅ Only numbers (no code, no content)
+- ✅ Opt-in only (you choose when to send)
+
+👉 **Full spec:** [telemetry/README.md](telemetry/README.md)
+
+---
+
+## 🗺️ Roadmap & Feedback
 
 We are building the standard for AI-Human collaboration. **Your feedback shapes this protocol.**
 
 ### 🛣️ Milestones
-- [x] **v2.1**: ✅ Context Protocol, Micro-Agents, HumanLayer (12-Factor Agents)
+- [x] **v1.4.0**: ✅ Model-Specific Agents, Session Export, AI Reports
+- [x] **v2.1 (Context Protocol)**: ✅ XML Agent State, Micro-Agents, HumanLayer
+- [x] **v1.5.0**: ✅ Evolution Protocol, Federated Telemetry
 - [ ] **v2.2**: "Memory Core" - Persistent semantic memory across sessions
 - [ ] **v2.3**: Multi-Agent Swarm Protocol (Coordinator + Workers)
 - [ ] **v3.0**: Native IDE Integration (VS Code Extension)
@@ -342,6 +399,7 @@ This protocol is in **active automated evolution**. We need you to test it and r
 3. **Workflow bugs:** Did the state get out of sync?
 
 👉 **[Open a Discussion](https://github.com/iberi22/Git-Core-Protocol/discussions)** or create an Issue with the label `feedback`.
+👉 **Help improve the protocol:** Run `./scripts/send-telemetry.ps1` to contribute metrics!
 
 ---
 
