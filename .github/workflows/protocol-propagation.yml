@@ -67,7 +67,7 @@ jobs:
 
       - name: Clone Target Repo
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.MULTI_REPO_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           gh repo clone ${{ matrix.repo }} target-repo || {
             echo "Cannot access ${{ matrix.repo }}, skipping..."
@@ -131,7 +131,7 @@ jobs:
       - name: Push Changes
         if: steps.package.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.MULTI_REPO_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           cd target-repo
           git push -u origin ${{ steps.package.outputs.branch }} --force
@@ -139,7 +139,7 @@ jobs:
       - name: Create PR
         if: steps.package.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.MULTI_REPO_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           cd target-repo
 
