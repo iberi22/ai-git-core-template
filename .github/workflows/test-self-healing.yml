@@ -1,0 +1,19 @@
+name: 🧪 Test Workflow for Self-Healing
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Simulate Failure
+        run: |
+          echo "Este workflow está diseñado para fallar y activar self-healing"
+          exit 1
