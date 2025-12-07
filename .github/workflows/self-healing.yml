@@ -125,6 +125,7 @@ Run: ${{ steps.info.outputs.run_url }}"
             git push origin "$branch_name"
             
             # Crear PR
+            ERROR_LOG=$(tail -n 30 failure_snippet.log | sed 's/"/\\"/g')
             gh pr create \
               --title "🤖 Auto-Fix: Dependency Issues" \
               --body "**Auto-generated fix for dependency errors**
@@ -137,9 +138,12 @@ Run: ${{ steps.info.outputs.run_url }}"
 - Resolved version conflicts
 
 ### Error Log Snippet
-\`\`\`
-$(tail -n 30 failure_snippet.log)
-\`\`\`
+<details>
+<summary>View Error Log</summary>
+
+${ERROR_LOG}
+
+</details>
 
 **Auto-Actions:**
 - [x] Analyzed error type
