@@ -42,33 +42,27 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "Checking ${{ matrix.repo }} for failures..."
-
-          # Obtener últimos 10 workflows runs
+          
+          # Obtener últimos 10 workflows runs con manejo de errores
           FAILURES=$(gh run list \
             --repo ${{ matrix.repo }} \
             --limit 10 \
-            --json conclusion,workflowName,databaseId,createdAt \
-            --jq '[.[] | select(.conclusion == "failure")] | length')
-
+            --json conclusion \
+            --jq '[.[] | select(.conclusion == "failure")] | length' 2>/dev/null || echo "0")
+          
           echo "failures=$FAILURES" >> $GITHUB_OUTPUT
-
-          if [ "$FAILURES" -gt 0 ]; then
+          
+          # Comparación numérica segura
+          if [ ! -z "$FAILURES" ] && [ "$FAILURES" != "0" ]; then
             echo "⚠️ Found $FAILURES failed runs"
-
-            # Obtener detalles del más reciente
-            LATEST=$(gh run list \
-              --repo ${{ matrix.repo }} \
-              --limit 1 \
-              --json conclusion,workflowName,databaseId,htmlUrl \
-              --jq '.[] | select(.conclusion == "failure")')
-
-            echo "latest_failure=$LATEST" >> $GITHUB_OUTPUT
+            echo "has_failures=true" >> $GITHUB_OUTPUT
           else
             echo "✅ No failures found"
+            echo "has_failures=false" >> $GITHUB_OUTPUT
           fi
-
+      
       - name: 🔬 Analyze Failure Type
-        if: steps.check.outputs.failures > 0
+        if: steps.check.outputs.has_failures == 'true'
         id: analyze
         env:
           GH_TOKEN: ${{ github.token }}
@@ -122,7 +116,7 @@ jobs:
             --failed || echo "⚠️ Could not rerun workflow"
 
       - name: 📋 Create Issue for Non-Transient Errors
-        if: steps.analyze.outputs.action == 'create_issue' && steps.check.outputs.failures > 0
+        if: steps.analyze.outputs.action == 'create_issue' && steps.check.outputs.has_failures == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
