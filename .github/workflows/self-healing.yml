@@ -4,8 +4,10 @@ on:
   workflow_run:
     types:
       - completed
-    branches:
-      - main
+    workflows:
+      - "🧪 Test Workflow for Self-Healing"
+      - "Sync Issues from Files"
+      - "Check Protocol Updates"
 
 permissions:
   actions: write      # Para re-ejecutar workflows
