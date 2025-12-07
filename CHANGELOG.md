@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2025-12-07 📚 "Diátaxis Documentation System"
+
+### Added
+
+- **📚 Diátaxis Framework Adoption**: Complete documentation reorganization
+  - `docs/tutorials/` - Learning-oriented guides (learn by doing)
+  - `docs/how-to/` - Task-oriented guides (solve problems)
+  - `docs/reference/` - Information-oriented docs (look up facts)
+  - `docs/explanation/` - Understanding-oriented content (understand "why")
+  - Each quadrant has README.md with clear principles and guidelines
+  - `docs/DOCUMENTATION_SYSTEM.md` - Complete explanation of the new system
+  - `docs/wiki/Home.md` - GitHub Wiki homepage ready for publication
+
+### Changed
+
+- **Documentation Structure Overhaul**:
+  - Migrated `ATOMIC_COMMITS.md` → `tutorials/` (learning-oriented)
+  - Migrated `SESSION_EXPORT.md` → `how-to/` (task-oriented)
+  - Migrated `COMMIT_STANDARD.md` → `reference/` (information-oriented)
+  - Migrated `CLI_TRUST.md` → `explanation/` (understanding-oriented)
+  - Updated `docs/README.md` with Diátaxis visual map and navigation
+  - Kept `agent-docs/` separate for AI agent technical specifications
+
+### Documentation
+
+- **Separation of Concerns**:
+  - Humans: Organized by learning needs (4 Diátaxis quadrants)
+  - AI Agents: Technical specs in `agent-docs/` unchanged
+  - Clear distinction between tutorials, how-tos, reference, and explanations
+  
+- **GitHub Wiki Ready**:
+  - `wiki/Home.md` with complete navigation structure
+  - Quick start guides by role (Developer, AI Agent, Architect, New User)
+  - Links to all documentation organized by type
+
+### Benefits
+
+- ✅ Clear navigation - Users know exactly where to look
+- ✅ No content confusion - Tutorials don't mix with reference
+- ✅ Scalable structure - Easy to add new docs without ambiguity
+- ✅ Industry standard - Diátaxis used by Google, Cloudflare, Gatsby
+- ✅ Wiki-ready - GitHub Wiki integration prepared
+
+### Migration Guide
+
+See `docs/explanation/DOCUMENTATION_MIGRATION.md` for how to handle existing project docs.
+
 ## [3.1.0] - 2025-12-07 🎯 "Adaptive Workflows"
 
 ### Added

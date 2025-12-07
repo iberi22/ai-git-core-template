@@ -13,6 +13,7 @@ Welcome to the Git-Core Protocol documentation. This wiki follows the **[Diátax
 **Start here if you're new** or want to build skills through practice.
 
 👉 **[Tutorials](./Tutorials)** - Learn by doing
+
 - [Your First Workflow](./Tutorial-First-Workflow)
 - [Atomic Commits](./Tutorial-Atomic-Commits)
 - [Setting Up a Project](./Tutorial-Setup-Project)
@@ -22,6 +23,7 @@ Welcome to the Git-Core Protocol documentation. This wiki follows the **[Diátax
 **Go here when you have a specific task** or problem to solve.
 
 👉 **[How-To Guides](./How-To-Guides)** - Solve problems
+
 - [Export a Session](./How-To-Session-Export)
 - [Set Up Automation](./How-To-Automation-Setup)
 - [Assign Work to AI Agents](./How-To-AI-Agents)
@@ -31,6 +33,7 @@ Welcome to the Git-Core Protocol documentation. This wiki follows the **[Diátax
 **Use this when you need factual information** or exact syntax.
 
 👉 **[Reference](./Reference)** - Look up facts
+
 - [Commit Standard](./Reference-Commit-Standard)
 - [CLI Commands](./Reference-CLI-Commands)
 - [Configuration](./Reference-Configuration)
@@ -40,6 +43,7 @@ Welcome to the Git-Core Protocol documentation. This wiki follows the **[Diátax
 **Read this to understand design decisions** and philosophy.
 
 👉 **[Explanation](./Explanation)** - Understand context
+
 - [Why GitHub Issues](./Explanation-Issues-Not-Files)
 - [Trust Model](./Explanation-CLI-Trust)
 - [Architecture Decisions](./Explanation-Architecture)
@@ -49,21 +53,25 @@ Welcome to the Git-Core Protocol documentation. This wiki follows the **[Diátax
 ## 🚀 Quick Start by Role
 
 ### 👨‍💻 Developer
+
 1. [Install Git-Core Protocol](./How-To-Installation)
 2. [Your First Issue Workflow](./Tutorial-First-Workflow)
 3. [Commit Standard Reference](./Reference-Commit-Standard)
 
 ### 🤖 AI Agent
+
 1. [Read AGENTS.md](https://github.com/iberi22/Git-Core-Protocol/blob/main/AGENTS.md)
 2. [Agent Documentation](https://github.com/iberi22/Git-Core-Protocol/tree/main/docs/agent-docs)
 3. [Protocol Specifications](https://github.com/iberi22/Git-Core-Protocol/tree/main/docs/agent-docs/specs)
 
 ### 🏗️ Architect
+
 1. [Core Philosophy](./Explanation-Core-Philosophy)
 2. [Architecture Decisions](./Explanation-Architecture)
 3. [Pattern Catalog](./Reference-Patterns)
 
 ### 🆕 New User
+
 1. [What is Git-Core Protocol?](./Explanation-What-Is)
 2. [Installation Guide](./How-To-Installation)
 3. [First Steps Tutorial](./Tutorial-First-Workflow)
@@ -102,12 +110,14 @@ Our documentation is organized around **four types of content**, each serving a 
 ## 📚 All Documentation
 
 ### Tutorials (Learning)
+
 - [Atomic Commits](./Tutorial-Atomic-Commits)
 - [First Workflow](./Tutorial-First-Workflow)
 - [Setting Up Projects](./Tutorial-Setup-Project)
 - [Custom Agents](./Tutorial-Custom-Agents)
 
 ### How-To Guides (Tasks)
+
 - [Session Export](./How-To-Session-Export)
 - [Automation Setup](./How-To-Automation-Setup)
 - [Issue Creation](./How-To-Create-Issues)
@@ -115,6 +125,7 @@ Our documentation is organized around **four types of content**, each serving a 
 - [Draft PR Merge](./How-To-Draft-PR-Merge)
 
 ### Reference (Information)
+
 - [Commit Standard](./Reference-Commit-Standard)
 - [CLI Commands](./Reference-CLI-Commands)
 - [Configuration Options](./Reference-Configuration)
@@ -122,6 +133,7 @@ Our documentation is organized around **four types of content**, each serving a 
 - [Agent YAML Schema](./Reference-Agent-Schema)
 
 ### Explanation (Understanding)
+
 - [CLI Trust Model](./Explanation-CLI-Trust)
 - [Why Issues Not Files](./Explanation-Issues-Not-Files)
 - [Stateless Agents](./Explanation-Stateless-Agents)

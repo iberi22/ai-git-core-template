@@ -93,7 +93,9 @@ Reference docs use these patterns:
 
 **Syntax:**
 ```
+
 command-name [OPTIONS] <ARGS>
+
 ```
 
 **Options:**
@@ -105,6 +107,7 @@ command-name --option value
 ```
 
 **See Also:** Links to related commands
+
 ```
 
 ### Configuration Fields
@@ -126,6 +129,7 @@ command-name --option value
 ```yaml
 field_name: value
 ```
+
 ```
 
 ---

@@ -26,36 +26,40 @@ Our documentation is organized into **four quadrants** based on user needs:
 
 ### 📖 [Tutorials](./tutorials/) - Learn by doing
 
-**When:** You're new to Git-Core Protocol  
-**Goal:** Learn through guided lessons  
+**When:** You're new to Git-Core Protocol
+**Goal:** Learn through guided lessons
 **Examples:**
+
 - Your first issue workflow
 - Setting up a project from scratch
 - Creating atomic commits
 
 ### 🎯 [How-To Guides](./how-to/) - Get things done
 
-**When:** You know what you want, need to know how  
-**Goal:** Solve specific problems  
+**When:** You know what you want, need to know how
+**Goal:** Solve specific problems
 **Examples:**
+
 - How to export a session
 - How to set up automation
 - How to create a custom agent
 
 ### 📚 [Reference](./reference/) - Look up facts
 
-**When:** You need precise information  
-**Goal:** Find accurate technical details  
+**When:** You need precise information
+**Goal:** Find accurate technical details
 **Examples:**
+
 - Commit message standard
 - CLI command reference
 - Configuration options
 
 ### 💡 [Explanation](./explanation/) - Understand context
 
-**When:** You want to understand "why"  
-**Goal:** Deepen your knowledge  
+**When:** You want to understand "why"
+**Goal:** Deepen your knowledge
 **Examples:**
+
 - Why GitHub Issues instead of files
 - The philosophy behind the protocol
 - Trust and transparency principles
@@ -78,18 +82,23 @@ Our documentation is organized into **four quadrants** based on user needs:
 ## 🚀 Quick Start (By Your Goal)
 
 ### "I want to learn Git-Core Protocol"
+
 👉 Start with **[tutorials/](./tutorials/)**
 
 ### "I need to do something specific"
+
 👉 Check **[how-to/](./how-to/)**
 
 ### "I need to look up a detail"
+
 👉 Search **[reference/](./reference/)**
 
 ### "I want to understand the design"
+
 👉 Read **[explanation/](./explanation/)**
 
 ### "I'm an AI agent"
+
 👉 See **[agent-docs/](./agent-docs/)**
 
 ---
@@ -136,12 +145,14 @@ The wiki is synchronized automatically from the `docs/wiki/` directory.
 ### When to Create Documentation
 
 ✅ **DO create** when:
+
 - User explicitly asks: "Create a guide for..."
 - New feature needs explanation
 - Common question needs answer
 - Tutorial would help onboarding
 
 ❌ **DON'T create** when:
+
 - Tracking tasks (use GitHub Issues instead)
 - Taking notes (use issue comments)
 - Planning (use issues with `ai-plan` label)

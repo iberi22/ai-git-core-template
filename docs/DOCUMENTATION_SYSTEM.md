@@ -16,6 +16,7 @@ docs/
 ```
 
 **Problemas:**
+
 - 🤔 No está claro dónde buscar
 - 😵 Mezcla tutoriales con referencia
 - 📚 Difícil crear una wiki navegable
@@ -66,19 +67,19 @@ docs/
 
 ```
          📚 ¿Qué hacer?                  🎯 Tengo un problema
-         
+
          TUTORIALS                       HOW-TO GUIDES
        (Learning)                        (Tasks)
-       
+
        "Enséñame"                        "Ayúdame a hacer X"
-       
+
 ────────────────────┼──────────────────────────────────────
-       
+
        EXPLANATION                       REFERENCE
        (Understanding)                   (Information)
-       
+
        "¿Por qué?"                       "¿Cómo se llama?"
-       
+
          💭 Entender                      📖 Buscar
 ```
 
@@ -140,6 +141,7 @@ Home
 ```
 
 **Ventajas:**
+
 - 🔗 URLs limpias: `/wiki/Tutorial-Atomic-Commits`
 - 🔍 Búsqueda integrada de GitHub
 - 📱 Mobile-friendly automático
