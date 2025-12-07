@@ -132,8 +132,8 @@ regex = "1"
 - [x] Escribir integration tests con mock API (8 tests - 100% pass)
 - [x] Crear benchmarks comparativos (5 benchmarks - <200ns vs 2-3s PowerShell)
 - [x] Actualizar workflow con fallback logic
-- [ ] Testing en staging branch
-- [ ] Documentar en README de workflow-orchestrator
+- [x] Documentar en README de workflow-orchestrator (comprehensive guide)
+- [ ] Testing en staging branch (deferred - stable in main)
 
 ## 🔗 Referencias
 
