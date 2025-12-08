@@ -1,0 +1,41 @@
+   Compiling issue-syncer v0.1.0 (E:\scripts-python\Git-Core Protocol\tools\issue-syncer)
+warning: unused import: `PathBuf`
+  --> src\mapping.rs:16:23
+   |
+16 | use std::path::{Path, PathBuf};
+   |                       ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `Path`
+ --> src\syncer.rs:6:17
+  |
+6 | use std::path::{Path, PathBuf};
+  |                 ^^^^
+
+warning: unused import: `IssueData`
+  --> src\syncer.rs:12:39
+   |
+12 | use crate::parser::{parse_issue_file, IssueData};
+   |                                       ^^^^^^^^^
+
+error[E0716]: temporary value dropped while borrowed
+  --> src\github.rs:29:27
+   |
+29 |           let mut builder = self
+   |  ___________________________^
+30 | |             .client
+31 | |             .issues(&self.owner, &self.repo)
+   | |____________________________________________^ creates a temporary value which is freed while still in use
+32 |               .create(&data.title)
+33 |               .body(&data.body);
+   |                                - temporary value is freed at the end of this statement
+...
+37 |               builder = builder.labels(data.labels.clone());
+   |                         ------- borrow later used here
+   |
+   = note: consider using a `let` binding to create a longer lived value
+
+For more information about this error, try `rustc --explain E0716`.
+warning: `issue-syncer` (bin "issue-syncer") generated 3 warnings
+error: could not compile `issue-syncer` (bin "issue-syncer") due to 1 previous error; 3 warnings emitted

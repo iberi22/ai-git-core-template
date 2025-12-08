@@ -1,0 +1,52 @@
+[package]
+name = "issue-syncer"
+version = "0.1.0"
+edition = "2021"
+authors = ["Git-Core Protocol Contributors"]
+description = "High-performance bidirectional sync between local .md files and GitHub Issues"
+license = "MIT"
+
+[dependencies]
+# GitHub API
+octocrab = "0.38"
+
+# Async runtime
+tokio = { version = "1.40", features = ["full", "parking_lot"] }
+
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# File system watching
+notify = "6.1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Path handling
+walkdir = "2.5"
+
+[dev-dependencies]
+# Testing
+criterion = { version = "0.5", features = ["async_tokio"] }
+tempfile = "3.10"
+mockito = "1.5"
+
+[[bin]]
+name = "issue-syncer"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
