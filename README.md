@@ -3,23 +3,23 @@ title: "Git-Core Protocol - README"
 type: DOCUMENTATION
 id: "doc-readme"
 created: 2025-12-01
-updated: 2025-12-08
+updated: 2025-12-13
 agent: copilot
 model: claude-sonnet-4
 requested_by: system
 summary: |
   Project overview, quick start guide, and core principles of the Git-Core Protocol.
-  Optimized with Rust-powered agents (10-30x speedup) and simplified architecture.
-keywords: [git-core, protocol, ai-agent, template, llm, copilot, claude, gemini, grok, rust, performance]
-tags: ["#documentation", "#readme", "#core", "#v3.2.1"]
+  Optimized with Rust-powered agents and simplified architecture.
+keywords: [git-core, protocol, ai-agent, template, llm, copilot, claude, gemini, grok, rust]
+tags: ["#documentation", "#readme", "#core", "#v3.3.0"]
 project: Git-Core-Protocol
-version: 3.2.1
+version: 3.3.0
 ---
 
 # 🧠 Git-Core Protocol
 
 [![Use this template](https://img.shields.io/badge/Use%20this-template-blue?style=for-the-badge)](https://github.com/iberi22/Git-Core-Protocol/generate)
-[![Version](https://img.shields.io/badge/Version-3.2.1-green?style=for-the-badge)](https://github.com/iberi22/Git-Core-Protocol/releases/tag/v3.2.1)
+[![Version](https://img.shields.io/badge/Version-3.3.0-green?style=for-the-badge)](https://github.com/iberi22/Git-Core-Protocol/releases/tag/v3.3.0)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg?style=for-the-badge)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![AI Code Review](https://img.shields.io/badge/AI%20Review-CodeRabbit%20%2B%20Gemini-purple?style=for-the-badge)](https://github.com/marketplace/coderabbit)
 
@@ -107,358 +107,135 @@ Then execute: ./scripts/init_project.sh
 
 ---
 
-## 🤖 Context Injector (New!)
+## ✨ Features
 
-This protocol now includes a dynamic system to "equip" your AI agent with specific roles on demand. **Agents can now self-inject these roles** when they detect the need.
+### 🤖 Context Injector
 
-### Available Recipes (Auto-Downloaded)
+Dynamic system to "equip" your AI agent with specialized roles on demand.
 
-The system automatically downloads the latest "recipes" for:
-
-- 🏗️ **Software Engineering** (Patterns, Clean Code)
-- 🔬 **Research** (Academic, Technical)
-- 🛡️ **Cybersecurity** (Auditing, Hardening)
-- 🎨 **UI/UX Design** (Accessibility, Systems)
-- ⛓️ **Blockchain** (Smart Contracts, Web3)
-- 🤖 **AI Research** (Papers, State of the Art)
-- 🎓 **AI Training** (Fine-tuning, Datasets)
-
-### How it works
-
-1. **Index:** Check `.✨/AGENT_INDEX.md` to see available roles.
-2. **Equip:** Run the script (or let the agent run it) to download and load the persona.
-3. **Act:** The agent reads the generated context and behaves like an expert.
+**Available Roles:**
+- 🏗️ Software Engineering | 🔬 Research | 🛡️ Cybersecurity
+- 🎨 UI/UX Design | ⛓️ Blockchain | 🤖 AI Research | 🎓 AI Training
 
 ```powershell
-# Example: Load the Cybersecurity Auditor persona
+# Load a specialized persona
 ./scripts/equip-agent.ps1 -Role "security"
 ```
 
-The system automatically:
+---
 
-- ⬇️ Downloads the latest recipe from `agents-flows-recipes`.
-- 🛡️ Injects mandatory protocol skills (Atomic Commits, Architecture First).
-- 🧠 Generates a `.✨/CURRENT_CONTEXT.md` file for the agent.
+### 🧠 Model-Specific Agents
+
+> ⚠️ **VS Code Only** - Requires GitHub Copilot Chat extension
+
+Custom Copilot agents optimized for different LLM models:
+
+| Agent | Model | Best For |
+|-------|-------|----------|
+| `@protocol-claude` | Claude Sonnet 4 | Standard tasks |
+| `@architect` | Claude Opus 4.5 | Architecture decisions |
+| `@quick` | Claude Haiku 4.5 | Fast responses |
+| `@protocol-gemini` | Gemini 3 Pro | Large context (1M+) |
+| `@protocol-grok` | Grok Code Fast 1 | Massive analysis (2M) |
 
 ---
 
-## 🧠 Model-Specific Agents (New in v1.4!)
+### 🔄 Workflow Agents
 
-Custom VS Code Copilot agents optimized for different LLM models:
+> ⚠️ **VS Code Only** - Requires GitHub Copilot Chat extension
 
-<div align="center">
-
-| Agent | Model | Best For | Context |
-|-------|-------|----------|---------|
-| `@protocol-claude` | Claude Sonnet 4 | Standard tasks, reasoning | 200K |
-| `@architect` | Claude Opus 4.5 | Architecture decisions | 200K |
-| `@quick` | Claude Haiku 4.5 | Fast responses | 200K |
-| `@protocol-gemini` | Gemini 3 Pro | Large context, multi-modal | 1M+ |
-| `@protocol-codex` | GPT-5.1 Codex | Implementation, coding | - |
-| `@protocol-grok` | Grok Code Fast 1 | Massive codebase analysis | **2M** |
-| `@router` | Auto | Agent selection helper | - |
-
-</div>
-
-### Usage in VS Code
-
-```
-# In Copilot Chat, select agent from dropdown
-# Or reference directly:
-@protocol-claude analyze this code
-@architect should we use microservices?
-@quick what's the syntax for...?
-```
-
-### Cross-Model Fallback System
-
-Agents include fallback mappings for cross-model compatibility. Use `@protocol-grok` instructions with Claude - it adapts automatically!
+| Agent | Purpose |
+|-------|---------|
+| `@context-loader` | Auto-discovers project state |
+| `@workflow-manager` | Orchestrates multi-step workflows |
+| `@commit-helper` | Fast atomic commits |
+| `@pr-creator` | Creates well-formatted PRs |
 
 ---
 
-## 🔄 Workflow Orchestration Agents (New in v1.4!)
-
-Intelligent workflow management that replaces static planning tools:
-
-| Agent | Purpose | Model |
-|-------|---------|-------|
-| `@context-loader` | Auto-discovers project state | Any |
-| `@workflow-manager` | Orchestrates multi-step workflows | Sonnet |
-| `@code-review` | Thorough code review | Opus |
-| `@commit-helper` | Fast atomic commits | Haiku |
-| `@pr-creator` | Creates well-formatted PRs | Sonnet |
-| `@recipe-loader` | Loads specialized roles | Any |
-
-### Workflow Panel Concept
-
-Instead of Excalidraw-style planning panels, use intelligent agents:
-
-```
-Starting fresh? → @context-loader (discovers what you were working on)
-Need guidance?  → @workflow-manager (suggests next steps)
-Ready to commit? → @commit-helper (ensures atomic commits)
-Need review?    → @code-review (thorough analysis)
-Creating PR?    → @pr-creator (formats everything)
-```
-
-### Agent Handoffs
-
-All agents can hand off to each other with context-aware prompts. Click the handoff buttons to switch seamlessly.
-
 ---
 
-## 🤖 AI Report Generation (New in v1.4!)
+### 📊 AI Report Generation
 
-Automated PR analysis using multiple AI models:
-
-| Tool | Model | Purpose |
-|------|-------|---------|
-| **Gemini CLI** | Gemini 3 Pro | Technical analysis, impact assessment |
-| **Copilot CLI** | Claude Sonnet 4.5 | Deep code review, recommendations |
-
-### Usage
+Automated PR analysis using Gemini or Copilot CLI:
 
 ```powershell
-# Full report (Gemini + Copilot)
-./scripts/ai-report.ps1 -PrNumber 42
-
-# Copilot only with Opus for deeper analysis
-./scripts/ai-report.ps1 -ReportType copilot -Model claude-opus-4.5
-
-# Gemini only
-./scripts/ai-report.ps1 -ReportType gemini
-
-# Preview without posting
-./scripts/ai-report.ps1 -DryRun
+./scripts/ai-report.ps1 -PrNumber 42          # Full report
+./scripts/ai-report.ps1 -ReportType gemini    # Gemini only
+./scripts/ai-report.ps1 -DryRun               # Preview
 ```
-
-### Available Models for Copilot CLI
-
-| Model | Best For |
-|-------|----------|
-| `claude-sonnet-4.5` | Balanced analysis (default) |
-| `claude-opus-4.5` | Deep technical review |
-| `claude-haiku-4.5` | Quick checks |
-| `gpt-5.1` / `gpt-5.1-codex` | Alternative perspectives |
-
-### Report Contents
-
-The AI report includes:
-
-- 🔍 **Summary of Changes** (bullet points)
-- 📊 **Impact Analysis** (High/Medium/Low with justification)
-- ⚠️ **Potential Risks**
-- ✅ **Recommendations** for reviewer
-- 🏷️ **Suggested Labels**
-
-Reports are automatically posted as PR comments.
 
 ---
 
-## 📤 Session Export (New in v1.4!)
+### 📤 Session Export
 
-Continue your work in a new chat window **without losing context**.
-
-### Quick Usage
-
-1. Click **📤 Export Session** button in any agent
-2. The agent asks for a brief summary
-3. It generates a file and **copies to clipboard automatically**
-4. In new chat: **Ctrl+V** → Enter → Continue!
-
-### What Gets Exported
-
-| Included | Not Included |
-|----------|--------------|
-| ✅ Git branch & status | ❌ Full conversation |
-| ✅ Recent commits | ❌ Sensitive data |
-| ✅ Open issues | ❌ Large code blocks |
-| ✅ What was completed | |
-| ✅ What's pending | |
-| ✅ Technical context | |
-
-### Script Usage
+Continue work in a new chat **without losing context**:
 
 ```powershell
 ./scripts/export-session.ps1 -Summary "OAuth implementation" -Topic "oauth"
-# Output: #file:docs/prompts/SESSION_2025-12-02_oauth.md (copied to clipboard!)
 ```
 
-📖 **Full documentation:** [docs/SESSION_EXPORT.md](docs/SESSION_EXPORT.md)
+Exports: Git status, recent commits, open issues, and pending tasks.
 
 ---
 
-## 🆕 v3.1.0 Features: Adaptive Workflows (Resource Optimization)
+---
 
-**New in version 3.1.0**: Intelligent system that automatically detects repository type and optimizes GitHub Actions consumption.
+### 🎯 Adaptive Workflows
 
-### 🎯 Adaptive Workflow System
+Automatic detection of repository type (public/private) to optimize GitHub Actions:
 
-The protocol now **automatically adapts** based on whether your repository is public or private:
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  DETECTOR  →  IS_PUBLIC?  →  SCHEDULE_MODE              │
-│     ↓              ↓              ↓                       │
-│  gh repo      true/false    aggressive/moderate/         │
-│  view                       conservative                 │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Three Modes:**
-
-| Mode | When | Schedules | Consumption | Cost |
-|------|------|-----------|-------------|------|
-| 🟢 **AGGRESSIVE** | Public repos | Every 30 min | ~18,000 min/month | $0 (unlimited) |
-| 🟡 **MODERATE** | Private main | Every 6 hours | ~3,000 min/month | Requires Pro |
-| 🔴 **CONSERVATIVE** | Other private | Event-based only | ~600 min/month | $0 (Free tier) |
-
-**Key Benefits:**
-
-- ✅ **Zero-configuration**: Automatic detection and adaptation
-- ✅ **97% savings** on private repositories
-- ✅ **100% functionality** maintained via event-based triggers
-- ✅ **Cross-platform**: PowerShell + Bash support
-
-**Usage:**
-
-```bash
-# Test detection locally
-./scripts/detect-repo-config.ps1  # Windows
-./scripts/detect-repo-config.sh   # Linux/macOS
-
-# Workflows automatically use the detection
-# No manual configuration needed!
-```
-
-📖 **Full documentation:** [docs/ADAPTIVE_WORKFLOWS.md](docs/ADAPTIVE_WORKFLOWS.md)
+| Mode | Schedules | Cost |
+|------|-----------|------|
+| 🟢 **Public** | Every 6 hours | $0 (unlimited) |
+| 🟡 **Private** | Event-based only | Free tier |
 
 ---
 
-## 🆕 v2.1 Features: 12-Factor Agents + ACP Patterns
+### 🧠 Agent State Protocol
 
-The latest version integrates advanced patterns from **[12-Factor Agents](https://github.com/humanlayer/12-factor-agents)** and **Agent Control Plane (ACP)**:
-
-### 🧠 Context Protocol (Stateless Reducer)
-
-Agents persist state in GitHub Issues using structured XML blocks. This enables:
-
-- **Pausable/Resumable workflows**: Any agent can pick up where another left off
-- **Dynamic Planning**: `<plan>` field with items marked `done`/`in_progress`/`pending`
-- **Human-as-Tool**: `<input_request>` for structured data requests (not just approvals)
-- **Observability**: `<metrics>` tracks tool calls, errors, and cost estimates
+Agents persist state in GitHub Issues using XML blocks for pausable/resumable workflows:
 
 ```bash
-# Helper script to read/write agent state
 ./scripts/agent-state.ps1 read -IssueNumber 42
-./scripts/agent-state.ps1 write -Intent "fix_bug" -Step "coding" -Progress 50
 ```
-
-👉 **Full spec:** [docs/agent-docs/CONTEXT_PROTOCOL.md](docs/agent-docs/CONTEXT_PROTOCOL.md)
-
-### 🎭 Micro-Agents (Label-Based Personas)
-
-Agents adopt specialized roles based on Issue labels:
-
-| Label | Persona | Focus |
-|-------|---------|-------|
-| `bug` | 🐛 The Fixer | Reproduce → Fix → Verify |
-| `enhancement` | ✨ Feature Dev | Architecture First |
-| `high-stakes` | 👮 The Approver | Requires "Proceder" |
-
-👉 **Full spec:** [docs/agent-docs/MICRO_AGENTS.md](docs/agent-docs/MICRO_AGENTS.md)
-
-### �️ High-Stakes Operations (Human-in-the-Loop)
-
-For critical operations (deletions, deploys, auth changes), agents **MUST PAUSE** and request explicit confirmation:
-
-> "⚠️ **HIGH STAKES ACTION DETECTED**. Respond 'Proceder' to continue."
-
-👉 **Full spec:** [docs/agent-docs/HUMAN_LAYER_PROTOCOL.md](docs/agent-docs/HUMAN_LAYER_PROTOCOL.md)
 
 ---
 
-## 🆕 v1.5.0 Features: Evolution Protocol + Federated Telemetry
+### 🛡️ High-Stakes Operations
 
-### 🧬 Evolution Protocol (Weekly Improvement Cycle)
+Critical operations (deletions, deploys) require explicit confirmation:
 
-The protocol now **self-improves** through automated weekly analysis:
-
-```
-MEDIR → ANALIZAR → PROPONER → IMPLEMENTAR → VALIDAR → ↺
-```
-
-**Features:**
-
-- **3-Order Metrics Taxonomy**: Operational (daily), Quality (weekly), Evolution (monthly)
-- **Automated Pattern Detection**: Identifies "death loops", low adoption, high friction
-- **Weekly Reports**: Auto-generated GitHub Issues with insights
-
-```powershell
-# Collect local metrics
-./scripts/evolution-metrics.ps1 -OutputFormat markdown
-
-# Trigger evolution cycle (runs every Monday automatically)
-gh workflow run evolution-cycle.yml
-```
-
-👉 **Full spec:** [docs/agent-docs/EVOLUTION_PROTOCOL.md](docs/agent-docs/EVOLUTION_PROTOCOL.md)
-
-### 📡 Federated Telemetry System
-
-Projects using Git-Core Protocol can **send anonymized metrics back** to the official repo for centralized analysis:
-
-```
-┌─────────────────┐    PR with metrics    ┌─────────────────────┐
-│  Your Project   │ ─────────────────────▶│ Official Git-Core   │
-│  (uses protocol)│                       │ Protocol Repo       │
-└─────────────────┘                       │   (analysis)        │
-                                          └─────────────────────┘
-```
-
-**Usage:**
-
-```powershell
-# Preview what would be sent
-./scripts/send-telemetry.ps1 -DryRun
-
-# Send anonymized metrics
-./scripts/send-telemetry.ps1
-```
-
-**Privacy:**
-
-- ✅ Anonymous by default (project names hashed)
-- ✅ Only numbers (no code, no content)
-- ✅ Opt-in only (you choose when to send)
-
-👉 **Full spec:** [telemetry/README.md](telemetry/README.md)
+> ⚠️ **HIGH STAKES ACTION DETECTED**. Respond 'Proceder' to continue.
 
 ---
 
-## 🗺️ Roadmap & Feedback
+### 🧬 Self-Healing CI/CD
 
-We are building the standard for AI-Human collaboration. **Your feedback shapes this protocol.**
+Automated error classification and retry for transient failures:
+- **Transient errors** (timeouts, rate limits): Auto-retry
+- **Dependency errors**: Creates issue for review
+- **Test failures**: Creates issue with diagnosis
 
-### 🛣️ Milestones
+---
 
-- [x] **v1.4.0**: ✅ Model-Specific Agents, Session Export, AI Reports
-- [x] **v2.1 (Context Protocol)**: ✅ XML Agent State, Micro-Agents, HumanLayer
-- [x] **v1.5.0**: ✅ Evolution Protocol, Federated Telemetry
-- [ ] **v2.2**: "Memory Core" - Persistent semantic memory across sessions
-- [ ] **v2.3**: Multi-Agent Swarm Protocol (Coordinator + Workers)
-- [ ] **v3.0**: Native IDE Integration (VS Code Extension)
+### 📦 Dependency Quarantine
 
-### 🤝 We Need Your Feedback
+14-day quarantine for new dependencies with AI analysis before adoption.
 
-This protocol is in **active automated evolution**. We need you to test it and report:
+📖 **Full changelog:** [CHANGELOG.md](CHANGELOG.md)
 
-1. **Friction points:** Where did the agent get stuck?
-2. **Missing recipes:** What role did you need that wasn't there?
-3. **Workflow bugs:** Did the state get out of sync?
+---
 
-👉 **[Open a Discussion](https://github.com/iberi22/Git-Core-Protocol/discussions)** or create an Issue with the label `feedback`.
-👉 **Help improve the protocol:** Run `./scripts/send-telemetry.ps1` to contribute metrics!
+## 🤝 Feedback
+
+This protocol evolves through user feedback. Report:
+
+- **Friction points**: Where did the agent get stuck?
+- **Missing recipes**: What role did you need?
+- **Workflow bugs**: Did state get out of sync?
+
+👉 **[Open a Discussion](https://github.com/iberi22/Git-Core-Protocol/discussions)** or create an Issue with `feedback` label.
 
 ---
 

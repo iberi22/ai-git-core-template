@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2025-12-13 🧹 "Workflow Cleanup & Documentation"
+
+### Changed
+
+- **📖 README Reorganized**:
+  - Removed version-scattered feature sections (v1.4, v1.5, v2.1, v3.1)
+  - Consolidated into clean "Features" section
+  - Added "VS Code Only" warnings for Copilot-specific agents
+  - Removed outdated roadmap (see CHANGELOG for history)
+
+### Removed
+
+- **🗑️ Broken Workflows Eliminated**:
+  - `codex-review.yml` - used non-existent `openai/codex-action`
+  - `agent-dispatcher.yml` - used deprecated `actions-rs/toolchain@v1`
+  - `check-protocol-update.yml` - duplicated `update-protocol.yml`
+
+- **🔄 Redundant Workflows Merged**:
+  - `self-healing.yml` → merged into `ci-health.yml`
+  - `dependency-quarantine.yml` → merged into `dependency-manager.yml`
+  - `post-quarantine-analysis.yml` → merged into `dependency-manager.yml`
+
+### Added
+
+- **🏥 CI Health Improvements** (`ci-health.yml`):
+  - Error classification: transient, dependency, lint, test, code
+  - Auto-retry for transient errors (timeouts, rate limits)
+  - Unified monitoring reducing workflow count
+
+### Metrics
+
+- **Workflow count**: 27 → 21 (22% reduction)
+- **README size**: 654 → 431 lines (34% reduction)
+- **Eliminated broken actions**: 2
+
 ## [3.2.1] - 2025-12-08 ⚡ "Performance & Simplification"
 
 ### Changed
