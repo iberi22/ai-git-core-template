@@ -686,18 +686,41 @@ cargo build --release
 
 | Command | Description | When to Use |
 |---------|-------------|-------------|
-| `git-core install` | Install protocol in current directory | New projects |
-| `git-core install --force` | Force reinstall, overwrite all | Reset corrupted installation |
-| `git-core upgrade` | Upgrade protocol (preserves ARCHITECTURE.md) | Update to latest version |
-| `git-core upgrade --force` | Upgrade everything (overwrites ARCHITECTURE.md) | Full reset |
-| `git-core migrate` | Migrate `.ai/` → `.✨/` | Legacy projects |
-| `git-core migrate --remove-old` | Migrate and delete `.ai/` | Clean migration |
-| `git-core check` | Verify protocol integrity | Troubleshooting |
-| `git-core check --fix` | Auto-fix issues | Repair installation |
-| `git-core status` | Show current protocol status | Quick overview |
-| `git-core init [name]` | Initialize new project with protocol | New projects |
-| `git-core version` | Show/bump version | Version management |
-| `git-core self-update` | Update the CLI itself | Keep CLI updated |
+| `gc init [name]` | Initialize new project + protocol | Start of project |
+| `gc context list` | List available agent roles | Discovery |
+| `gc context equip <role>`| Switch AI context (e.g. `security`) | Changing tasks |
+| `gc report` | Generate AI Pull Request Report | Before merging |
+| `gc validate` | Check CI workflows & integrity | Pre-push check |
+| `gc telemetry` | Send anonymous usage stats | Automated |
+| `gc ci-detect` | Detect environment (CI/Local) | Automated |
+
+### 🚀 Simplified AI Agent Workflow (Sofisticación Invisible)
+
+**Agents MUST use the CLI tools directly:**
+
+1. **Start a Task:**
+   ```bash
+   gc context equip <role>
+   # e.g., gc context equip security
+   ```
+
+2. **Validate Work:**
+   ```bash
+   gc validate
+   ```
+
+3. **Report & Finish:**
+   ```bash
+   gc report
+   ```
+
+**Legacy Script Mapping (DEPRECATED):**
+| Old Script | New Command |
+|------------|-------------|
+| `./scripts/init_project.ps1` | `gc init` |
+| `./scripts/equip-agent.ps1` | `gc context equip` |
+| `./scripts/ai-report.ps1` | `gc report` |
+| `./scripts/send-telemetry.ps1`| `gc telemetry` |
 
 ### AI Agent Usage
 
