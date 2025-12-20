@@ -1,4 +1,5 @@
 ---
+github_issue: 111
 title: "[CLI] Implement gc issue Command with GitHub Sync"
 labels:
   - enhancement
@@ -6,6 +7,7 @@ labels:
   - jules
 assignees: []
 ---
+github_issue: 111
 
 ## 🎯 Objective
 
@@ -147,6 +149,7 @@ labels:
 {}
 assignees: []
 ---
+github_issue: 111
 
 {}
 "#,
