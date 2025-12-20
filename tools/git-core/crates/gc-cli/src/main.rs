@@ -8,7 +8,7 @@ pub struct Cli {
 }
 
 mod commands;
-use commands::{InitArgs, ContextCmd, ReportCmd, ValidateCmd, TelemetryArgs, CiDetectArgs};
+use commands::{InitArgs, ContextCmd, ReportCmd, ValidateCmd, TelemetryArgs, CiDetectArgs, TaskArgs, FinishArgs};
 
 #[derive(Subcommand)]
 pub enum Commands {
@@ -35,9 +35,11 @@ pub enum Commands {
         #[arg(long)]
         name: Option<String>,
     },
+    /// Start a new Task (Simplicity)
+    Task(TaskArgs),
+    /// Finish current Task (Automation)
+    Finish(FinishArgs),
 }
-
-
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
@@ -75,6 +77,18 @@ async fn main() -> color_eyre::Result<()> {
         }
         Commands::Workflow { name } => {
             println!("Validating workflow: {:?}", name);
+        }
+        Commands::Task(args) => {
+            let fs = gc_adapter_fs::TokioFileSystem;
+            let system = gc_adapter_system::TokioSystem;
+            // Reusing context logic for auto-equip
+            let github = gc_adapter_github::OctocrabGitHub::new();
+            commands::task::execute(args, &fs, &system, &github).await?;
+        }
+        Commands::Finish(args) => {
+            let system = gc_adapter_system::TokioSystem;
+            let github = gc_adapter_github::OctocrabGitHub::new();
+            commands::finish::execute(args, &system, &github).await?;
         }
     }
 

@@ -546,17 +546,98 @@ gh issue edit <number> --add-assignee "Copilot"
 gh pr list --head "copilot/"
 ```
 
-### 14. Google Jules Agent
+### 14. Google Jules Agent (🔥 RECOMMENDED FOR DELEGATION)
 
-**⚠️ Jules has TWO methods: GitHub Label OR CLI. Tags like `@jules-google` do NOT work.**
+**Jules is the best choice for autonomous task delegation.**
 
-**Method 1: GitHub Label (requires Jules GitHub App)**
-```bash
-# Add label "jules" (case insensitive) - Jules auto-responds
-gh issue edit <number> --add-label "jules"
+#### How Jules Works
+
+1. **Label-based activation**: Add label `jules` to any issue
+2. **Jules auto-responds**: Starts working immediately
+3. **Creates PR**: When done, opens a Pull Request
+4. **Human reviews**: You approve or request changes
+
+#### Delegating to Jules - Best Practices
+
+**Step 1: Create a DETAILED issue**
+
+Jules needs explicit instructions. Include:
+
+```markdown
+## 🎯 Objective
+[Exactly what to accomplish]
+
+## 📁 Files to Modify/Create
+[List specific file paths with code snippets]
+
+### 1. File: `path/to/file.ts`
+```typescript
+// EXACT code to add or modify
 ```
 
-**Method 2: Jules CLI (Recommended for automation)**
+## ✅ Acceptance Criteria
+- [ ] Specific testable criteria
+- [ ] Compilation must pass
+- [ ] Tests must pass
+
+## 🧪 Testing Commands
+```bash
+npm test
+cargo check
+```
+
+## ⏱ Estimated Effort
+X-Y hours
+```
+
+**Step 2: Add the `jules` label**
+
+```bash
+# Via CLI
+gh issue edit <number> --add-label "jules"
+
+# Or in GitHub UI: Labels → jules
+```
+
+**Step 3: Monitor Jules**
+
+```bash
+# Check if Jules commented
+gh issue view <number> --comments
+
+# Check for PRs from Jules
+gh pr list --search "author:googlestaging"
+```
+
+**Step 4: Review & Merge**
+
+- Jules creates PR with all changes
+- Review the code
+- Request changes if needed (Jules will respond)
+- Approve and merge
+
+#### Issue Format for Jules (REQUIRED)
+
+For Jules to work effectively, issues MUST have:
+
+| Section | Required | Purpose |
+|---------|----------|---------|
+| 🎯 Objective | ✅ | What to accomplish |
+| 📁 Files to Modify | ✅ | Exact file paths |
+| Code Snippets | ✅ | Sample implementation |
+| ✅ Acceptance Criteria | ✅ | How to verify success |
+| 🧪 Testing | ⭐ | Commands to run |
+
+**❌ DON'T create vague issues like:**
+- "Implement VPN feature"
+- "Fix the auth bug"
+- "Make it work"
+
+**✅ DO create detailed issues like:**
+- "[MVP] VPN WireGuard Real Integration" with file paths, code, and tests
+
+#### Jules CLI (Alternative to Labels)
+
 ```bash
 # Install
 npm install -g @google/jules
