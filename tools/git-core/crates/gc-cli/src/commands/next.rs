@@ -135,6 +135,11 @@ pub async fn execute(
             println!("{} Agent: Copilot (Interactive)", style("💡").yellow());
             println!("   Command: gh copilot suggest \"{}\"", title);
         }
+    } else if agent == "gemini" {
+         if !args.json {
+            println!("{} Agent: Gemini (Context)", style("✨").cyan());
+            println!("   Initializing deep context analysis...");
+        }
     }
 
     if args.json {

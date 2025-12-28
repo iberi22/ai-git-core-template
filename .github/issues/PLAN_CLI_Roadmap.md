@@ -21,7 +21,8 @@ The current CLI is well-structured using a hexagonal/adapter pattern:
 
 ### 1. Feature Gaps
 - [ ] **`gc workflow`**: Currently a stub. Needs to integrate with `gc-validator` to lint/run workflows.
-- [ ] **`gc check`**: Add a "doctor" command to verify environment health (GH token, Git config, dependencies).
+- [x] **`gc check`**: Add a "doctor" command to verify environment health (GH token, Git config, dependencies).
+- [x] **`gc next`**: Automated agent dispatcher (Prioritization + Branching + Agent Selection).
 - [ ] **`gc context`**: Ensure it fully supports the new `.github/agents` structure (Agent v2).
 
 ### 2. Distribution
@@ -40,7 +41,8 @@ The current CLI is well-structured using a hexagonal/adapter pattern:
 - ✅ `gc finish`: PR automation.
 
 ### Phase 2: Refinement & Developer Experience
-- [ ] Implement `gc doctor` / `gc check`.
+- ✅ Implement `gc check` (Doctor).
+- ✅ Implement `gc next` (Dispatcher).
 - [ ] Polish error messages (use `color-eyre` everywhere).
 - [ ] Add `gc feedback` command to open GitHub issues with logs.
 
