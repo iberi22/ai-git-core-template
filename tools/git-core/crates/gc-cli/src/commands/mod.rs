@@ -12,6 +12,7 @@ pub mod git;
 pub mod info;
 pub mod check;
 pub mod next;
+pub mod update;
 pub mod workflow;
 
 pub use init::InitArgs;
@@ -28,6 +29,7 @@ pub use git::GitArgs;
 pub use info::InfoArgs;
 pub use check::CheckArgs;
 pub use next::NextArgs;
+pub use update::UpdateArgs;
 pub use workflow::WorkflowArgs;
 
 #[cfg(test)]

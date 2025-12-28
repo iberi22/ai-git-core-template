@@ -8,7 +8,7 @@ pub struct Cli {
 }
 
 mod commands;
-use commands::{InitArgs, ContextCmd, ReportCmd, ValidateCmd, TelemetryArgs, CiDetectArgs, TaskArgs, FinishArgs, IssueArgs, PrArgs, GitArgs, InfoArgs, CheckArgs, NextArgs, WorkflowArgs};
+use commands::{InitArgs, ContextCmd, ReportCmd, ValidateCmd, TelemetryArgs, CiDetectArgs, TaskArgs, FinishArgs, IssueArgs, PrArgs, GitArgs, InfoArgs, CheckArgs, NextArgs, WorkflowArgs, UpdateArgs};
 
 #[derive(Subcommand)]
 pub enum Commands {
@@ -47,6 +47,8 @@ pub enum Commands {
     Check(CheckArgs),
     /// Select Next Task (Dispatcher)
     Next(NextArgs),
+    /// Upgrade Protocol in current project
+    Update(UpdateArgs),
 }
 
 #[tokio::main]
@@ -126,6 +128,10 @@ async fn main() -> color_eyre::Result<()> {
             let system = gc_adapter_system::TokioSystem;
             let github = gc_adapter_github::OctocrabGitHub::new(); // Or Stub if not needed mostly
             commands::next::execute(args, &fs, &system, &github).await?;
+        }
+        Commands::Update(args) => {
+            let system = gc_adapter_system::TokioSystem;
+            commands::update::execute(args, &system).await?;
         }
     }
 
