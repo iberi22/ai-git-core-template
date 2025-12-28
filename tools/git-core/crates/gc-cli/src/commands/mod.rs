@@ -10,6 +10,7 @@ pub mod issue;
 pub mod pr;
 pub mod git;
 pub mod info;
+pub mod check;
 
 pub use init::InitArgs;
 pub use context::ContextCmd;
@@ -23,6 +24,7 @@ pub use issue::IssueArgs;
 pub use pr::PrArgs;
 pub use git::GitArgs;
 pub use info::InfoArgs;
+pub use check::CheckArgs;
 
 #[cfg(test)]
 pub mod mocks;

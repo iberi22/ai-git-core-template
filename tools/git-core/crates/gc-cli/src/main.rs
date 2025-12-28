@@ -8,7 +8,7 @@ pub struct Cli {
 }
 
 mod commands;
-use commands::{InitArgs, ContextCmd, ReportCmd, ValidateCmd, TelemetryArgs, CiDetectArgs, TaskArgs, FinishArgs, IssueArgs, PrArgs, GitArgs, InfoArgs};
+use commands::{InitArgs, ContextCmd, ReportCmd, ValidateCmd, TelemetryArgs, CiDetectArgs, TaskArgs, FinishArgs, IssueArgs, PrArgs, GitArgs, InfoArgs, CheckArgs};
 
 #[derive(Subcommand)]
 pub enum Commands {
@@ -47,6 +47,8 @@ pub enum Commands {
     Git(GitArgs),
     /// Project Info
     Info(InfoArgs),
+    /// Verify Environment Health
+    Check(CheckArgs),
 }
 
 #[tokio::main]
@@ -115,6 +117,10 @@ async fn main() -> color_eyre::Result<()> {
         Commands::Info(args) => {
             let system = gc_adapter_system::TokioSystem;
             commands::info::execute(args, &system).await?;
+        }
+        Commands::Check(args) => {
+            let system = gc_adapter_system::TokioSystem;
+            commands::check::execute(args, &system).await?;
         }
     }
 

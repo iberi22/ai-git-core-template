@@ -67,6 +67,15 @@ if ($CurrentVersion -ne "0.0.0") {
     Write-Host ""
 }
 
+# Function to check if CLI is installed globally
+function Test-CliInstalled {
+    $cliName = "context-research-agent"
+    if ($IsWindows) { $cliName += ".exe" }
+
+    $command = Get-Command $cliName -ErrorAction SilentlyContinue
+    return $null -ne $command
+}
+
 # Function to migrate from .ai/ to .✨/
 function Invoke-Migration {
     if (Test-Path ".ai") {
@@ -219,20 +228,43 @@ if ($hasFiles -and -not $AutoMode) {
 
 # Ask about binaries if not in auto mode
 $InstallBinaries = $true
+$GlobalCliDetected = Test-CliInstalled
+
 if (-not $AutoMode -and -not $NoBinaries) {
     Write-Host ""
-    Write-Host "📦 Optional Components:" -ForegroundColor Cyan
-    Write-Host "   Do you want to install pre-compiled AI agent binaries (bin/)?"
-    Write-Host "   These are useful for local execution but increase download size."
-    $binChoice = Read-Host "   Install binaries? (Y/n)"
-    if ($binChoice -match "^[nN]") {
-        $InstallBinaries = $false
-        Write-Host "   → Skipping binaries." -ForegroundColor Yellow
+    Write-Host "📦 Components:" -ForegroundColor Cyan
+
+    if ($GlobalCliDetected) {
+        Write-Host "   ✨ Global Git-Core CLI detected in PATH." -ForegroundColor Green
+        Write-Host "   Do you want to skip downloading local binaries to save space?"
+        $binChoice = Read-Host "   Skip local binaries? (Y/n)"
+        if ($binChoice -match "^[nN]") {
+            $InstallBinaries = $false
+            Write-Host "   → Using global CLI (skipping download)." -ForegroundColor Yellow
+        } else {
+            $InstallBinaries = $true
+            Write-Host "   → Downloading local binaries (using local version)." -ForegroundColor Green
+        }
     } else {
-        Write-Host "   → Installing binaries." -ForegroundColor Green
+        Write-Host "   Do you want to install pre-compiled AI agent binaries (bin/)?"
+        Write-Host "   These are useful for local execution but increase download size."
+        $binChoice = Read-Host "   Install binaries? (Y/n)"
+        if ($binChoice -match "^[nN]") {
+            $InstallBinaries = $false
+            Write-Host "   → Skipping binaries." -ForegroundColor Yellow
+        } else {
+            $InstallBinaries = $true
+            Write-Host "   → Installing binaries." -ForegroundColor Green
+        }
     }
 } elseif ($NoBinaries) {
     $InstallBinaries = $false
+} elseif ($GlobalCliDetected -and $AutoMode) {
+    # In auto mode, if global CLI exists, verify if we should skip?
+    # Current behavior defaults to install unless specified.
+    # Let's keep $InstallBinaries = $true as default unless strict flag used, or maybe respect global?
+    # For safety in auto pipelines, usually better to have local tools unless configured otherwise.
+    # We'll leave $InstallBinaries = $true as default.
 }
 
 # Backup user files before upgrade
@@ -272,18 +304,11 @@ if ($templateAiDir) {
         Copy-Item -Recurse "$templateAiDir/*" ".✨/"
         Write-Host "  ✓ .✨/ (upgraded)" -ForegroundColor Green
     } elseif (-not (Test-Path ".✨") -and -not (Test-Path ".ai")) {
-# Copy other directories
-$dirs = @(".github", "scripts", "docs")
-if ($InstallBinaries) {
-    $dirs += "bin"
-}
-
-foreach ($dir in $dirs) {
-    if (Test-Path "$TEMP_DIR/$dir") {
-        # Ensure .✨ exists
-        if (-not (Test-Path ".✨")) {
-            New-Item -ItemType Directory -Force -Path ".✨" | Out-Null
-        }
+        # Copy .✨ if neither .✨ nor .ai exists
+        New-Item -ItemType Directory -Force -Path ".✨" | Out-Null
+        Copy-Item -Recurse "$templateAiDir/*" ".✨/"
+        Write-Host "  ✓ .✨/" -ForegroundColor Green
+    } else {
         Write-Host "  ~ .✨/ (exists, merging new files)" -ForegroundColor Yellow
         Get-ChildItem $templateAiDir | ForEach-Object {
             if (-not (Test-Path ".✨/$($_.Name)")) {
@@ -294,10 +319,25 @@ foreach ($dir in $dirs) {
     }
 }
 
+# Internal workflows to exclude from consumer projects
+$InternalWorkflows = @("build-tools.yml", "release.yml", "protocol-propagation.yml")
+
 # Copy other directories
-$dirs = @(".github", "scripts", "docs", "bin")
+$dirs = @(".github", "scripts", "docs")
+if ($InstallBinaries) {
+    $dirs += "bin"
+}
+
 foreach ($dir in $dirs) {
     if (Test-Path "$TEMP_DIR/$dir") {
+        # Define filter for this directory
+        $ExcludeItems = @()
+        if ($dir -eq ".github") {
+             # We want to exclude workflows, but Copy-Item recurse is tricky with specific file excludes deep down
+             # So we copy then cleanup, or we clone carefully.
+             # Existing logic was copy then cleanup. Let's stick to that but enhance it.
+        }
+
         if ($UpgradeMode) {
             if (Test-Path $dir) {
                 Remove-Item -Recurse -Force $dir
@@ -306,8 +346,11 @@ foreach ($dir in $dirs) {
 
             # Cleanup internal files
             if ($dir -eq ".github") {
-                Remove-Item ".github/workflows/build-tools.yml" -ErrorAction SilentlyContinue
-                Remove-Item ".github/workflows/release.yml" -ErrorAction SilentlyContinue
+                foreach ($workflow in $InternalWorkflows) {
+                    if (Test-Path ".github/workflows/$workflow") {
+                        Remove-Item ".github/workflows/$workflow" -ErrorAction SilentlyContinue
+                    }
+                }
             }
             if ($dir -eq "scripts") {
                 Remove-Item "scripts/bump-version.ps1" -ErrorAction SilentlyContinue
@@ -320,8 +363,11 @@ foreach ($dir in $dirs) {
 
             # Cleanup internal files
             if ($dir -eq ".github") {
-                Remove-Item ".github/workflows/build-tools.yml" -ErrorAction SilentlyContinue
-                Remove-Item ".github/workflows/release.yml" -ErrorAction SilentlyContinue
+                foreach ($workflow in $InternalWorkflows) {
+                    if (Test-Path ".github/workflows/$workflow") {
+                        Remove-Item ".github/workflows/$workflow" -ErrorAction SilentlyContinue
+                    }
+                }
             }
             if ($dir -eq "scripts") {
                 Remove-Item "scripts/bump-version.ps1" -ErrorAction SilentlyContinue
@@ -334,8 +380,11 @@ foreach ($dir in $dirs) {
 
             # Cleanup internal files
             if ($dir -eq ".github") {
-                Remove-Item ".github/workflows/build-tools.yml" -ErrorAction SilentlyContinue
-                Remove-Item ".github/workflows/release.yml" -ErrorAction SilentlyContinue
+                foreach ($workflow in $InternalWorkflows) {
+                    if (Test-Path ".github/workflows/$workflow") {
+                        Remove-Item ".github/workflows/$workflow" -ErrorAction SilentlyContinue
+                    }
+                }
             }
             if ($dir -eq "scripts") {
                 Remove-Item "scripts/bump-version.ps1" -ErrorAction SilentlyContinue

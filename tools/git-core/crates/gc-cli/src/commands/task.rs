@@ -12,6 +12,19 @@ pub struct TaskArgs {
     /// Type of task (feat, bug, docs, chore). Auto-detected if omitted.
     #[arg(short, long)]
     pub type_: Option<String>,
+
+    /// Output in JSON format
+    #[arg(long)]
+    pub json: bool,
+}
+
+#[derive(Serialize)]
+struct TaskOutput {
+    success: bool,
+    issue_path: String,
+    branch_name: String,
+    task_type: String,
+    web_url: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -27,7 +40,9 @@ pub async fn execute(
     system: &impl SystemPort,
     _github: &impl GitHubPort,
 ) -> color_eyre::Result<()> {
-    println!("{} Starting new task...", style("🚀").cyan());
+    if !args.json {
+        println!("{} Starting new task...", style("🚀").cyan());
+    }
 
     // 1. Detect Type
     let task_type = args.type_.clone().unwrap_or_else(|| detect_type(&args.title));
@@ -37,13 +52,18 @@ pub async fn execute(
     let filename = format!("{}_{}.md", task_type.to_uppercase(), slug);
     let filepath = format!(".github/issues/{}", filename);
 
-    println!("   Type: {}", style(&task_type).yellow());
-    println!("   Slug: {}", style(&slug).dim());
+
+    if !args.json {
+        println!("   Type: {}", style(&task_type).yellow());
+        println!("   Slug: {}", style(&slug).dim());
+    }
 
     // 3. Create Issue File
     // fs.exists returns Result<bool>, so we must unwrap
     if !fs.exists(&filepath).await.unwrap_or(false) {
-        println!("{} Creating issue file: {}", style("📝").green(), filepath);
+        if !args.json {
+            println!("{} Creating issue file: {}", style("📝").green(), filepath);
+        }
 
         let frontmatter = TaskFrontmatter {
             title: args.title.clone(),
@@ -56,12 +76,16 @@ pub async fn execute(
 
         fs.write_file(&filepath, &content).await?;
     } else {
-        println!("{} Issue file already exists: {}", style("ℹ️").blue(), filepath);
+        if !args.json {
+            println!("{} Issue file already exists: {}", style("ℹ️").blue(), filepath);
+        }
     }
 
     // 4. Create Branch
     let branch_name = format!("{}/{}", task_type.to_lowercase(), slug);
-    println!("{} Switching to branch: {}", style("twisted_rightwards_arrows").blue(), branch_name); // git branch icon analog
+    if !args.json {
+        println!("{} Switching to branch: {}", style("twisted_rightwards_arrows").blue(), branch_name);
+    }
 
     // Check if branch exists
     let ref_args = vec!["show-ref".to_string(), "--verify".to_string(), format!("refs/heads/{}", branch_name)];
@@ -78,7 +102,9 @@ pub async fn execute(
     // 5. Auto-Equip Agent
     let role = detect_role(&args.title);
     if let Some(r) = role {
-        println!("{} Auto-equipping agent role: {}", style("🤖").magenta(), r);
+        if !args.json {
+            println!("{} Auto-equipping agent role: {}", style("🤖").magenta(), r);
+        }
         // We reuse the context logic here.
         // For simplicity in this iteration, we call the subcommand logic if possible,
         // or just invoke the equip logic directly.
@@ -96,12 +122,25 @@ pub async fn execute(
 
         // Refactoring idea: extract `equip` logic to `gc-core` service?
         // For MVP: Just suggest it.
-        println!("   (Run `gc context equip {}` to fully activate)", r);
+        if !args.json {
+            println!("   (Run `gc context equip {}` to fully activate)", r);
+        }
     }
 
-    println!("\n{} Task '{}' ready!", style("✅").green(), args.title);
-    println!("   Issue: {}", filepath);
-    println!("   Branch: {}", branch_name);
+    if args.json {
+        let output = TaskOutput {
+            success: true,
+            issue_path: filepath,
+            branch_name,
+            task_type,
+            web_url: None, // Could be populated if we create GH issue
+        };
+        println!("{}", serde_json::to_string(&output)?);
+    } else {
+        println!("\n{} Task '{}' ready!", style("✅").green(), args.title);
+        println!("   Issue: {}", filepath);
+        println!("   Branch: {}", branch_name);
+    }
 
     Ok(())
 }

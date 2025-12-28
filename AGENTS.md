@@ -119,10 +119,11 @@ Los agentes deben persistir su estado en los Issues usando bloques XML `<agent-s
 
 ```bash
 # Leer estado desde un Issue
-./scripts/agent-state.ps1 read -IssueNumber 42
+# ./scripts/agent-state.ps1 read -IssueNumber 42 (Legacy)
+# TODO: Implement `gc context state`
 
 # Generar bloque XML
-./scripts/agent-state.ps1 write -Intent "fix_bug" -Step "coding" -Progress 50
+# ./scripts/agent-state.ps1 write -Intent "fix_bug" -Step "coding" -Progress 50 (Legacy)
 ```
 
 ### 2. Micro-Agents (Personas)
@@ -234,8 +235,8 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 ### 📖 Required Reading Before Any Task
 
 1. `.✨/ARCHITECTURE.md` - Understand the system
-2. `gh issue list --assignee "@me"` - Your current task
-3. `gh issue list --limit 5` - Available backlog
+2. `gc issue list` - Your current task (was `gh issue list`)
+3. `gc issue list --limit 5` - Available backlog
 
 ---
 
@@ -276,7 +277,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 pwd                              # Confirmar directorio de trabajo
 
 # 2. Estado del proyecto
-git log --oneline -10            # Ver trabajo reciente
+gc git log --limit 10            # Ver trabajo reciente
 cat .✨/features.json            # Ver features y su estado (passes: true/false)
 
 # 3. Ejecutar tests existentes
@@ -300,8 +301,8 @@ npm run dev &
 cat .✨/ARCHITECTURE.md
 
 # 2. Estado del agente en el issue asignado
-gh issue list --assignee "@me" --state open
-gh issue view <id> --comments | grep -A 50 '<agent-state>'
+gc issue list --state open
+# gh issue view <id> --comments | grep -A 50 '<agent-state>' (Use gh for details for now)
 
 # 3. Research context para dependencias
 cat docs/agent-docs/RESEARCH_STACK_CONTEXT.md
@@ -335,8 +336,7 @@ git push -u origin HEAD
 gh pr create --fill --base main
 
 # Generate AI Report (NUEVO)
-./scripts/ai-report.ps1  # Windows
-./scripts/ai-report.sh   # Linux/macOS
+gc report
 
 # DO NOT manually close issues - let Git do it via commit message
 ```
@@ -377,13 +377,13 @@ Al completar un PR, ejecutar automáticamente:
 
 ```powershell
 # Generar análisis con Gemini y Copilot
-./scripts/ai-report.ps1 -PrNumber <N>
+gc report --pr <N>
 
 # Solo Gemini
-./scripts/ai-report.ps1 -ReportType gemini
+# gc report --type gemini (if supported)
 
 # Preview sin publicar
-./scripts/ai-report.ps1 -DryRun
+gc report --dry-run
 ```
 
 ### Anti-Patterns de Ejecución
@@ -673,13 +673,13 @@ git-atomize --interactive  # Separar interactivamente
 
 ---
 
-## 🛠️ Git-Core CLI (DEPRECATED)
+## 🛠️ Git-Core CLI (RECOMMENDED)
 
 ### Overview
 
-The Rust-based `git-core` CLI is **DEPRECATED**. Please use the shell scripts (`install.sh` / `install.ps1`) for all operations.
+The Rust-based `git-core` CLI (`gc`) is the **PRIMARY INTERFACE** for the protocol. It handles context injection, atomic commits, and state management that shell scripts cannot safely perform.
 
-### Installation (Scripts - Recommended)
+### Installation
 
 ```bash
 # 🚀 Linux/macOS
@@ -689,9 +689,18 @@ curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/inst
 irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 ```
 
-### Legacy CLI (Not Recommended)
+### Agent Usage (MANDATORY)
 
-The Rust CLI source code has been moved to `tools/deprecated/git-core-cli`. It is no longer maintained.
+AI Agents (Jules, Copilot, etc.) **MUST** use the CLI for task management to ensure state consistency.
+
+| Operation | Legacy Command | ✅ CLI Command | Benefit |
+|-----------|----------------|---------------|---------|
+| Start Task | `gh issue create ...` | `gc task "Title"` | Auto-creates issue + branch + frontmatter |
+| Finish Task | `git push ... gh pr create` | `gc finish` | Auto-detects branch + validates + PR + Report |
+| Report | `./scripts/ai-report.ps1` | `gc report` | Standardized AI reporting |
+
+**Machine Readable Output:**
+Future versions of the CLI will support `--json` for easier parsing. For now, parse standard output.
 
 ### AI Agent Usage
 

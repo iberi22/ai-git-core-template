@@ -24,9 +24,9 @@ Al inicio de cada conversación, detecta la intención del usuario:
 Cuando detectes intención de trabajo, ejecuta silenciosamente:
 
 ```bash
-git status --porcelain
-git log --oneline -3
-gh issue list --assignee "@me" --state open --limit 5
+gc git status
+gc git log --limit 3
+gc issue list --limit 5
 ```
 
 ## Formato de Respuesta (máx 3 líneas de contexto)

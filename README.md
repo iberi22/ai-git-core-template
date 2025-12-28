@@ -109,6 +109,13 @@ Then execute: gc init --auto
 
 ```
 
+$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
+Then execute: gc init --auto
+
+```
+
+> **✨ Smart Detect:** The installer checks if you have the Rust-based Agents installed globally (in your PATH). If detected, it asks if you want to skip downloading local binaries to save space.
+
 For Linux/Mac:
 
 ```
@@ -177,7 +184,7 @@ The `gc` (Git-Core) CLI is the primary tool for interacting with the protocol.
      ```bash
      # Windows (PowerShell)
      $env:GITHUB_TOKEN = "ghp_your_token_here"
-     
+
      # Linux/macOS
      export GITHUB_TOKEN="ghp_your_token_here"
      ```

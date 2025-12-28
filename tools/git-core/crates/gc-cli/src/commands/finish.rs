@@ -3,6 +3,8 @@ use color_eyre::Result;
 use gc_core::ports::{SystemPort, GitHubPort};
 use console::style;
 use crate::commands::{validate, report};
+use serde::Serialize;
+
 
 #[derive(Args, Debug)]
 pub struct FinishArgs {
@@ -13,6 +15,19 @@ pub struct FinishArgs {
     /// Skip report generation
     #[arg(long)]
     pub skip_report: bool,
+
+    /// Output in JSON format
+    #[arg(long)]
+    pub json: bool,
+}
+
+#[derive(Serialize)]
+struct FinishOutput {
+    success: bool,
+    branch: String,
+    validation_passed: bool,
+    pushed: bool,
+    report_generated: bool,
 }
 
 pub async fn execute(
@@ -20,25 +35,34 @@ pub async fn execute(
     system: &impl SystemPort,
     github: &impl GitHubPort,
 ) -> Result<()> {
-    println!("{} Finishing task...", style("🏁").cyan());
+    if !args.json {
+        println!("{} Finishing task...", style("🏁").cyan());
+    }
 
     // 1. Validate
     if !args.skip_validate {
-        println!("\n{} Step 1: Validation", style("🔍").yellow());
+        if !args.json {
+            println!("\n{} Step 1: Validation", style("🔍").yellow());
+        }
         // We reuse validate command logic
         // Note: Validate currently relies on gc-validator crate logic which might be internal
         // For MVP we shell out or call internal if args allow.
         // ValidateCmd is simple `struct ValidateArgs {}`.
         // Let's perform a direct check or call the module.
         // Since validate::execute is async and public, we can call it.
-        println!("   Running `gc validate`...");
+        // Since validate::execute is async and public, we can call it.
+        if !args.json {
+            println!("   Running `gc validate`...");
+        }
         validate::execute(validate::ValidateCmd::Run {
             run_id: "latest".to_string(),
             last_hours: None,
             create_pr: false, // Don't create PR from validator, we will do it in finish flow or manually
         }).await?;
     } else {
-        println!("   (Skipping validation)");
+        if !args.json {
+            println!("   (Skipping validation)");
+        }
     }
 
     // 2. Git Status Check
@@ -46,8 +70,15 @@ pub async fn execute(
     let status_args = vec!["status".to_string(), "--porcelain".to_string()];
     let status = system.run_command_output("git", &status_args).await?;
     if !status.trim().is_empty() {
-        println!("\n{} Warning: You have uncommitted changes.", style("⚠️").yellow());
-        println!("   Please commit your changes before finishing.");
+        if args.json {
+            // For JSON parsing, we might want to return a specific error structure,
+            // but for now returning result error is standard.
+            // Ideally we output JSON error, but color_eyre handles main loop.
+            // We'll let it bubble up, but maybe agents check stderr.
+        } else {
+            println!("\n{} Warning: You have uncommitted changes.", style("⚠️").yellow());
+            println!("   Please commit your changes before finishing.");
+        }
         // We could offer to auto-commit here in the future
         return Ok(());
     }
@@ -66,7 +97,11 @@ pub async fn execute(
     println!("   Pushing {}...", branch);
     let push_args = vec!["push".to_string(), "origin".to_string(), branch.to_string()];
     match system.run_command("git", &push_args).await {
-        Ok(_) => println!("   {} Pushed successfully.", style("✓").green()),
+        Ok(_) => {
+            if !args.json {
+                println!("   {} Pushed successfully.", style("✓").green());
+            }
+        },
         Err(e) => {
             eprintln!("   {} Push failed: {}", style("❌").red(), e);
             // Hint: maybe upstream is missing
@@ -77,7 +112,9 @@ pub async fn execute(
 
     // 4. Report
     if !args.skip_report {
-        println!("\n{} Step 3: AI Report", style("🤖").magenta());
+        if !args.json {
+            println!("\n{} Step 3: AI Report", style("🤖").magenta());
+        }
         // Use Full report by default
         let report_cmd = report::ReportCmd::Full {
             pr: None, // Auto-detect
@@ -86,6 +123,17 @@ pub async fn execute(
         report::execute(report_cmd, system, github).await?;
     }
 
-    println!("\n{} Task Finish Sequence Complete!", style("✨").green());
+    if args.json {
+        let output = FinishOutput {
+            success: true,
+            branch: branch.to_string(),
+            validation_passed: !args.skip_validate,
+            pushed: true,
+            report_generated: !args.skip_report,
+        };
+        println!("{}", serde_json::to_string(&output).unwrap()); // Safe unwrap for basic struct
+    } else {
+        println!("\n{} Task Finish Sequence Complete!", style("✨").green());
+    }
     Ok(())
 }
