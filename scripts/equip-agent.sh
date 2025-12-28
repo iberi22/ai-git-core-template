@@ -5,7 +5,7 @@
 #
 # DESCRIPTION
 #     This script acts as the "Context Injector" for the AI. It:
-#     1. Looks up the requested Role in .✨/AGENT_INDEX.md.
+#     1. Looks up the requested Role in .ai-core/AGENT_INDEX.md.
 #     2. Extracts the recipe path.
 #     3. Downloads the recipe content from the remote repository.
 #     4. Appends standard protocol skills (Atomic Commits, Architecture).
@@ -22,7 +22,7 @@ if [ -z "$ROLE" ]; then
 fi
 
 REPO_BASE_URL="https://raw.githubusercontent.com/iberi22/agents-flows-recipes/main"
-CONFIG_DIR=".✨"
+CONFIG_DIR=".ai-core"
 CONTEXT_FILE="$CONFIG_DIR/CURRENT_CONTEXT.md"
 INDEX_FILE="$CONFIG_DIR/AGENT_INDEX.md"
 

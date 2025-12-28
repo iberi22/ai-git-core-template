@@ -108,7 +108,7 @@ foreach ($project in $projects) {
     prompt: |
       CONTEXT SWITCH: $($project.Name) ($($project.Tech))
       Path: $($project.Path)
-      Load: cat ".✨/ARCHITECTURE.md" 2>`$null || cat "AGENTS.md" 2>`$null
+      Load: cat ".ai-core/ARCHITECTURE.md" 2>`$null || cat "AGENTS.md" 2>`$null
       Then: gh issue list --assignee "@me"
     send: false
 "@
@@ -188,7 +188,7 @@ $projectTable
 ``powershell
 # When user clicks a project button:
 cd "{PROJECT_PATH}"
-cat ".✨/ARCHITECTURE.md" 2>`$null || cat "AGENTS.md" 2>`$null
+cat ".ai-core/ARCHITECTURE.md" 2>`$null || cat "AGENTS.md" 2>`$null
 git status --short
 gh issue list --assignee "@me" --limit 5
 ``

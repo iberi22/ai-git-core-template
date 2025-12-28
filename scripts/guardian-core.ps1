@@ -36,7 +36,7 @@ param (
 )
 
 # --- Configuration ---
-$RISK_MAP_FILE = ".✨/risk-map.json"
+$RISK_MAP_FILE = ".ai-core/risk-map.json"
 $THRESHOLD_CONFIDENCE = 70
 $DEFAULT_RISK = 50
 

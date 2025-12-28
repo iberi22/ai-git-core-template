@@ -13,7 +13,7 @@ It contains the protocol definition, documentation, helper scripts, and the offi
 - `docs/` - Documentation and specifications (agent-docs, prompts, etc.)
 - `tools/deprecated/git-core-cli/` - Deprecated Rust CLI
 - `.github/` - GitHub configuration, workflows, and issue templates
-- `.✨/` - AI Context folder (ARCHITECTURE.md, AGENT_INDEX.md)
+- `.ai-core/` - AI Context folder (ARCHITECTURE.md, AGENT_INDEX.md)
 
 ## Development Commands
 
@@ -52,5 +52,5 @@ It contains the protocol definition, documentation, helper scripts, and the offi
 ### Agent Behavior
 
 - **State**: Always use GitHub Issues for state (Stateless Reducer)
-- **Context**: Read `.✨/ARCHITECTURE.md` before starting
+- **Context**: Read `.ai-core/ARCHITECTURE.md` before starting
 - **Commits**: Use Conventional Commits with `#issue` reference

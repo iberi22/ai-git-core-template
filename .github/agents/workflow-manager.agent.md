@@ -102,7 +102,7 @@ When specialized expertise is needed, integrate with the recipe system:
 
 ```bash
 # List available roles
-cat .✨/AGENT_INDEX.md
+cat .ai-core/AGENT_INDEX.md
 
 # Equip a role
 ./scripts/equip-agent.ps1 -Role "Backend Architect"

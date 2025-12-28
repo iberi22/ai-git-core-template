@@ -177,7 +177,7 @@ rand = "0.8"                # Random strategy
 
 - PowerShell original: `scripts/dispatcher-core.ps1`
 - Workflow actual: `.github/workflows/agent-dispatcher.yml`
-- Risk map: `.✨/risk-map.json`
+- Risk map: `.ai-core/risk-map.json`
 - Related: #FEAT_rust-guardian-agent
 
 ## 🎯 Roadmap

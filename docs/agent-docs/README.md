@@ -168,7 +168,7 @@ Los archivos previamente prohibidos por el protocolo se migran así:
 | Archivo Antiguo | Nuevo Destino |
 |-----------------|---------------|
 | `TASK.md` | → GitHub Issues (NO archivo) |
-| `PLANNING.md` | → `.✨/ARCHITECTURE.md` (secciones) |
+| `PLANNING.md` | → `.ai-core/ARCHITECTURE.md` (secciones) |
 | `IMPLEMENTATION.md` | → `specs/SPEC_*.md` |
 | `SUMMARY.md` | → `reports/REPORT_*.md` |
 | `NOTES.md` | → `sessions/SESSION_*.md` |

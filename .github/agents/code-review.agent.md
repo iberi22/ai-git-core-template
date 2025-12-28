@@ -52,7 +52,7 @@ git diff main..HEAD
 ### Step 2: Analyze Against Architecture
 ```bash
 # Read architecture decisions
-cat .✨/ARCHITECTURE.md
+cat .ai-core/ARCHITECTURE.md
 
 # Check for violations
 ```

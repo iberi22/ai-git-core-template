@@ -127,8 +127,8 @@ pub async fn execute(
     }
 
     // 4. Architecture File
-    let arch_path = if target_path == "." { ".✨/ARCHITECTURE.md".to_string() } else { format!("{}/.✨/ARCHITECTURE.md", target_path) };
-    let arch_dir = if target_path == "." { ".✨".to_string() } else { format!("{}/.✨", target_path) };
+    let arch_path = if target_path == "." { ".ai-core/ARCHITECTURE.md".to_string() } else { format!("{}/.ai-core/ARCHITECTURE.md", target_path) };
+    let arch_dir = if target_path == "." { ".ai-core".to_string() } else { format!("{}/.ai-core", target_path) };
 
     if !fs.exists(&arch_path).await? {
         println!("\n{}", style("📐 Setting up ARCHITECTURE.md...").yellow());
@@ -143,7 +143,7 @@ pub async fn execute(
 _Document architectural decisions here_
 "#;
         fs.write_file(&arch_path, content).await?;
-        println!("{}", style("✓ Created .✨/ARCHITECTURE.md").green());
+        println!("{}", style("✓ Created .ai-core/ARCHITECTURE.md").green());
     }
 
     // 4.1 Protocol Version File
@@ -193,7 +193,7 @@ _Document architectural decisions here_
     println!("\n{}", style("📝 Creating initial issues...").yellow());
     let issues = vec![
         ("🏗️ SETUP: Define Architecture and Tech Stack",
-         "## Objective\nDefine stack.\n\n## Tasks\n- [ ] Define language\n- [ ] Define db\n- [ ] Document in .✨/ARCHITECTURE.md",
+         "## Objective\nDefine stack.\n\n## Tasks\n- [ ] Define language\n- [ ] Define db\n- [ ] Document in .ai-core/ARCHITECTURE.md",
          "ai-plan"),
         ("⚙️ INFRA: Initial dev setup",
          "## Objective\nSetup tools.\n\n## Tasks\n- [ ] Linter\n- [ ] Formatter",
@@ -323,15 +323,15 @@ mod tests {
 
         // Expect Architecture file logic
         mock_fs.expect_exists()
-            .with(eq(".✨/ARCHITECTURE.md"))
+            .with(eq(".ai-core/ARCHITECTURE.md"))
             .returning(|_| Ok(false));
 
         mock_fs.expect_create_dir()
-            .with(eq(".✨"))
+            .with(eq(".ai-core"))
             .returning(|_| Ok(()));
 
         mock_fs.expect_write_file()
-            .with(eq(".✨/ARCHITECTURE.md"), always())
+            .with(eq(".ai-core/ARCHITECTURE.md"), always())
             .returning(|_, _| Ok(()));
 
 

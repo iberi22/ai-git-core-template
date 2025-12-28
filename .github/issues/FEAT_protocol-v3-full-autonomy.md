@@ -49,7 +49,7 @@ Evolucionar el Git-Core Protocol de v1.5.0 (v2.1 conceptual) a v3.0.0 "Full Auto
 ### Fase 2: Documentación
 - [ ] Actualizar `AGENTS.md` con sección v3.0 Autonomous Agents
 - [ ] Actualizar `README.md` con nuevo diagrama
-- [ ] Crear template `.✨/features.json`
+- [ ] Crear template `.ai-core/features.json`
 
 ### Fase 3: Instalador
 - [ ] Actualizar `install.ps1` para incluir nuevos workflows
@@ -62,7 +62,7 @@ Evolucionar el Git-Core Protocol de v1.5.0 (v2.1 conceptual) a v3.0.0 "Full Auto
 
 ## 📦 Breaking Changes
 
-1. **Nuevo archivo requerido**: `.✨/features.json` para Planner
+1. **Nuevo archivo requerido**: `.ai-core/features.json` para Planner
 2. **Nuevos labels**: `high-stakes`, `needs-human`, `automation`
 3. **Auto-merge**: PRs que cumplan criterios se mergean automáticamente
 

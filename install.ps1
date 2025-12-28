@@ -76,18 +76,18 @@ function Test-CliInstalled {
     return $null -ne $command
 }
 
-# Function to migrate from .ai/ to .✨/
+# Function to migrate from .ai/ to .ai-core/
 function Invoke-Migration {
     if (Test-Path ".ai") {
         Write-Host "🔄 Detected legacy .ai/ directory..." -ForegroundColor Yellow
 
-        if (-not (Test-Path ".✨")) {
-            New-Item -ItemType Directory -Force -Path ".✨" | Out-Null
+        if (-not (Test-Path ".ai-core")) {
+            New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
         }
 
-        # Copy all files from .ai/ to .✨/
+        # Copy all files from .ai/ to .ai-core/
         Get-ChildItem ".ai" -Recurse | ForEach-Object {
-            $destPath = $_.FullName -replace [regex]::Escape(".ai"), ".✨"
+            $destPath = $_.FullName -replace [regex]::Escape(".ai"), ".ai-core"
             if ($_.PSIsContainer) {
                 New-Item -ItemType Directory -Force -Path $destPath | Out-Null
             } else {
@@ -95,7 +95,7 @@ function Invoke-Migration {
             }
         }
 
-        Write-Host "  ✓ Migrated .ai/ → .✨/" -ForegroundColor Green
+        Write-Host "  ✓ Migrated .ai/ → .ai-core/" -ForegroundColor Green
         Write-Host "  ℹ️  You can safely delete .ai/ after verifying" -ForegroundColor Cyan
         return $true
     }
@@ -107,8 +107,8 @@ function Backup-UserFiles {
     Write-Host "💾 Backing up user files..." -ForegroundColor Cyan
     New-Item -ItemType Directory -Force -Path $BACKUP_DIR | Out-Null
 
-    # Check both .✨/ and .ai/ for backwards compatibility
-    $aiDir = if (Test-Path ".✨") { ".✨" } elseif (Test-Path ".ai") { ".ai" } else { $null }
+    # Check both .ai-core/ and .ai/ for backwards compatibility
+    $aiDir = if (Test-Path ".ai-core") { ".ai-core" } elseif (Test-Path ".ai") { ".ai" } else { $null }
 
     # Backup ARCHITECTURE.md
     if ($aiDir -and (Test-Path "$aiDir/ARCHITECTURE.md")) {
@@ -140,21 +140,21 @@ function Backup-UserFiles {
 function Restore-UserFiles {
     Write-Host "📥 Restoring user files..." -ForegroundColor Cyan
 
-    # Ensure .✨ directory exists for restoration
-    if (-not (Test-Path ".✨")) {
-        New-Item -ItemType Directory -Force -Path ".✨" | Out-Null
+    # Ensure .ai-core directory exists for restoration
+    if (-not (Test-Path ".ai-core")) {
+        New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
     }
 
     # Restore ARCHITECTURE.md (unless force mode)
     if (-not $ForceMode -and (Test-Path "$BACKUP_DIR/ARCHITECTURE.md")) {
-        Copy-Item "$BACKUP_DIR/ARCHITECTURE.md" ".✨/ARCHITECTURE.md" -Force
-        Write-Host "  ✓ .✨/ARCHITECTURE.md restored" -ForegroundColor Green
+        Copy-Item "$BACKUP_DIR/ARCHITECTURE.md" ".ai-core/ARCHITECTURE.md" -Force
+        Write-Host "  ✓ .ai-core/ARCHITECTURE.md restored" -ForegroundColor Green
     }
 
     # Always restore CONTEXT_LOG.md
     if (Test-Path "$BACKUP_DIR/CONTEXT_LOG.md") {
-        Copy-Item "$BACKUP_DIR/CONTEXT_LOG.md" ".✨/CONTEXT_LOG.md" -Force
-        Write-Host "  ✓ .✨/CONTEXT_LOG.md restored" -ForegroundColor Green
+        Copy-Item "$BACKUP_DIR/CONTEXT_LOG.md" ".ai-core/CONTEXT_LOG.md" -Force
+        Write-Host "  ✓ .ai-core/CONTEXT_LOG.md restored" -ForegroundColor Green
     }
 
     # Restore custom workflows
@@ -287,32 +287,32 @@ Remove-Item -Recurse -Force "$TEMP_DIR/.git" -ErrorAction SilentlyContinue
 # Install files
 Write-Host "📦 Installing protocol files..." -ForegroundColor Cyan
 
-# Run migration from .ai/ to .✨/ if needed
+# Run migration from .ai/ to .ai-core/ if needed
 $migrated = Invoke-Migration
 
-# Handle .✨ directory (protocol uses .✨, template may have .ai)
-$templateAiDir = if (Test-Path "$TEMP_DIR/.✨") { "$TEMP_DIR/.✨" } elseif (Test-Path "$TEMP_DIR/.ai") { "$TEMP_DIR/.ai" } else { $null }
+# Handle .ai-core directory (protocol uses .ai-core, template may have .ai)
+$templateAiDir = if (Test-Path "$TEMP_DIR/.ai-core") { "$TEMP_DIR/.ai-core" } elseif (Test-Path "$TEMP_DIR/.ai") { "$TEMP_DIR/.ai" } else { $null }
 
 if ($templateAiDir) {
     if ($UpgradeMode) {
         # Remove old directories
-        if (Test-Path ".✨") { Remove-Item -Recurse -Force ".✨" }
+        if (Test-Path ".ai-core") { Remove-Item -Recurse -Force ".ai-core" }
         if (Test-Path ".ai") { Remove-Item -Recurse -Force ".ai" }
 
-        # Copy to .✨
-        New-Item -ItemType Directory -Force -Path ".✨" | Out-Null
-        Copy-Item -Recurse "$templateAiDir/*" ".✨/"
-        Write-Host "  ✓ .✨/ (upgraded)" -ForegroundColor Green
-    } elseif (-not (Test-Path ".✨") -and -not (Test-Path ".ai")) {
-        # Copy .✨ if neither .✨ nor .ai exists
-        New-Item -ItemType Directory -Force -Path ".✨" | Out-Null
-        Copy-Item -Recurse "$templateAiDir/*" ".✨/"
-        Write-Host "  ✓ .✨/" -ForegroundColor Green
+        # Copy to .ai-core
+        New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
+        Copy-Item -Recurse "$templateAiDir/*" ".ai-core/"
+        Write-Host "  ✓ .ai-core/ (upgraded)" -ForegroundColor Green
+    } elseif (-not (Test-Path ".ai-core") -and -not (Test-Path ".ai")) {
+        # Copy .ai-core if neither .ai-core nor .ai exists
+        New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
+        Copy-Item -Recurse "$templateAiDir/*" ".ai-core/"
+        Write-Host "  ✓ .ai-core/" -ForegroundColor Green
     } else {
-        Write-Host "  ~ .✨/ (exists, merging new files)" -ForegroundColor Yellow
+        Write-Host "  ~ .ai-core/ (exists, merging new files)" -ForegroundColor Yellow
         Get-ChildItem $templateAiDir | ForEach-Object {
-            if (-not (Test-Path ".✨/$($_.Name)")) {
-                Copy-Item $_.FullName ".✨/"
+            if (-not (Test-Path ".ai-core/$($_.Name)")) {
+                Copy-Item $_.FullName ".ai-core/"
                 Write-Host "    + $($_.Name)" -ForegroundColor Green
             }
         }
@@ -432,7 +432,7 @@ if (Test-Path ".agent/rules") {
 > This project follows the Git-Core Protocol. See root-level files for full configuration.
 
 ### Quick Reference
-- **Architecture Decisions:** ``.✨/ARCHITECTURE.md``
+- **Architecture Decisions:** ``.ai-core/ARCHITECTURE.md``
 - **Agent Rules:** ``AGENTS.md``
 - **Issues:** ``.github/issues/`` or ``gh issue list``
 
@@ -491,7 +491,7 @@ if ($UpgradeMode) {
     }
 } else {
     Write-Host "📋 Files installed:"
-    Write-Host "   .✨/ARCHITECTURE.md    - Document your architecture here"
+    Write-Host "   .ai-core/ARCHITECTURE.md    - Document your architecture here"
     Write-Host "   .github/               - Copilot rules + workflows"
     Write-Host "   scripts/               - Init and update scripts"
     Write-Host "   AGENTS.md              - Rules for all AI agents"
