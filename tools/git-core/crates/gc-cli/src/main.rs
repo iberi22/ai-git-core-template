@@ -60,7 +60,8 @@ async fn main() -> color_eyre::Result<()> {
         Commands::Init(args) => {
             let fs = gc_adapter_fs::TokioFileSystem;
             let system = gc_adapter_system::TokioSystem;
-            commands::init::execute(args, &fs, &system).await?;
+            let github = gc_adapter_github::OctocrabGitHub::new();
+            commands::init::execute(args, &fs, &system, &github).await?;
         }
         Commands::Context { subcmd } => {
             let fs = gc_adapter_fs::TokioFileSystem;
@@ -120,8 +121,10 @@ async fn main() -> color_eyre::Result<()> {
             commands::info::execute(args, &system).await?;
         }
         Commands::Check(args) => {
+            let fs = gc_adapter_fs::TokioFileSystem;
             let system = gc_adapter_system::TokioSystem;
-            commands::check::execute(args, &system).await?;
+            let github = gc_adapter_github::OctocrabGitHub::new();
+            commands::check::execute(args, &fs, &system, &github).await?;
         }
         Commands::Next(args) => {
             let fs = gc_adapter_fs::TokioFileSystem;
@@ -130,8 +133,10 @@ async fn main() -> color_eyre::Result<()> {
             commands::next::execute(args, &fs, &system, &github).await?;
         }
         Commands::Update(args) => {
+            let fs = gc_adapter_fs::TokioFileSystem;
             let system = gc_adapter_system::TokioSystem;
-            commands::update::execute(args, &system).await?;
+            let github = gc_adapter_github::OctocrabGitHub::new();
+            commands::update::execute(args, &fs, &system, &github).await?;
         }
     }
 

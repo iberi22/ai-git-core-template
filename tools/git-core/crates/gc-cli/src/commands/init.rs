@@ -1,5 +1,5 @@
 use clap::Args;
-use gc_core::ports::{FileSystemPort, SystemPort};
+use gc_core::ports::{FileSystemPort, SystemPort, GitHubPort};
 use console::style;
 
 #[derive(Args, Debug)]
@@ -20,7 +20,8 @@ pub struct InitArgs {
 pub async fn execute(
     args: InitArgs,
     fs: &impl FileSystemPort,
-    system: &impl SystemPort
+    system: &impl SystemPort,
+    github: &impl GitHubPort
 ) -> color_eyre::Result<()> {
     println!("{}", style("🧠 Initializing Git-Core Protocol...").cyan());
     println!("{}", style("==========================================").cyan());
@@ -145,6 +146,20 @@ _Document architectural decisions here_
         println!("{}", style("✓ Created .✨/ARCHITECTURE.md").green());
     }
 
+    // 4.1 Protocol Version File
+    let version_path = if target_path == "." { ".git-core-protocol-version".to_string() } else { format!("{}/.git-core-protocol-version", target_path) };
+    if !fs.exists(&version_path).await? {
+        let latest_version = github.get_file_content(
+            "iberi22",
+            "Git-Core-Protocol",
+            "main",
+            ".git-core-protocol-version"
+        ).await.unwrap_or_else(|_| "3.0.0".to_string()).trim().to_string();
+
+        fs.write_file(&version_path, &latest_version).await?;
+        println!("{}", style(format!("✓ Created {} ({})", version_path, latest_version)).green());
+    }
+
     // 5. Create Labels (Parity)
     println!("\n{}", style("🏷️  Creating semantic labels...").yellow());
     let labels = vec![
@@ -248,7 +263,7 @@ fi
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::commands::mocks::{MockFileSystemPort, MockSystemPort};
+    use crate::commands::mocks::{MockFileSystemPort, MockSystemPort, MockGitHubPort};
     use mockall::predicate::*;
 
     #[tokio::test]
@@ -261,6 +276,7 @@ mod tests {
 
         let mut mock_fs = MockFileSystemPort::new();
         let mut mock_system = MockSystemPort::new();
+        let mut mock_github = MockGitHubPort::new();
 
         // Expect check checks
         mock_system.expect_check_command()
@@ -319,7 +335,21 @@ mod tests {
             .returning(|_, _| Ok(()));
 
 
-        let res = execute(args, &mock_fs, &mock_system).await;
+        // Expect Version file logic
+        mock_fs.expect_exists()
+            .with(eq("test-project/.git-core-protocol-version"))
+            .returning(|_| Ok(false));
+
+        mock_github.expect_get_file_content()
+             .with(eq("iberi22"), eq("Git-Core-Protocol"), eq("main"), eq(".git-core-protocol-version"))
+             .returning(|_, _, _, _| Ok("3.0.0".to_string()));
+
+        mock_fs.expect_write_file()
+            .with(eq("test-project/.git-core-protocol-version"), eq("3.0.0"))
+            .returning(|_, _| Ok(()));
+
+
+        let res = execute(args, &mock_fs, &mock_system, &mock_github).await;
         assert!(res.is_ok());
     }
 }
