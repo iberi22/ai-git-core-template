@@ -38,9 +38,15 @@ impl GitHubPort for OctocrabGitHub {
         Ok(())
     }
 
-    async fn create_issue(&self, title: &str, body: &str, labels: &[String]) -> Result<()> {
-        // Requires repo context. For now simplified.
-        let _ = (title, body, labels);
+    async fn create_issue(&self, owner: &str, repo: &str, title: &str, body: &str, labels: &[String]) -> Result<()> {
+        self.client
+            .issues(owner, repo)
+            .create(title)
+            .body(body)
+            .labels(labels.to_vec())
+            .send()
+            .await
+            .map_err(|e| CoreError::GitHub(e.to_string()))?;
         Ok(())
     }
 

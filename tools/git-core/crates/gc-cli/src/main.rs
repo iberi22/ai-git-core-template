@@ -105,9 +105,10 @@ async fn main() -> color_eyre::Result<()> {
             commands::finish::execute(args, &system, &github).await?;
         }
         Commands::Issue(args) => {
+            let fs = gc_adapter_fs::TokioFileSystem;
             let github = gc_adapter_github::OctocrabGitHub::new();
             let system = gc_adapter_system::TokioSystem;
-            commands::issue::execute(args, &github, &system).await?;
+            commands::issue::execute(args, &github, &system, &fs).await?;
         }
         Commands::Pr(args) => {
             let github = gc_adapter_github::OctocrabGitHub::new();
