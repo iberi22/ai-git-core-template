@@ -6,6 +6,7 @@ members = [
     "crates/gc-adapter-github",
     "crates/gc-adapter-fs",
     "crates/gc-adapter-system",
+    "crates/gc-adapter-cli",
     "crates/gc-validator",
 ]
 
@@ -38,3 +39,4 @@ gc-core = { path = "crates/gc-core" }
 gc-adapter-github = { path = "crates/gc-adapter-github" }
 gc-adapter-fs = { path = "crates/gc-adapter-fs" }
 gc-adapter-system = { path = "crates/gc-adapter-system" }
+gc-adapter-cli = { path = "crates/gc-adapter-cli" }

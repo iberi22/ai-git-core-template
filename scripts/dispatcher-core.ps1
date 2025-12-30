@@ -34,7 +34,7 @@ param (
 )
 
 # --- Configuration ---
-$RISK_MAP_FILE = ".✨/risk-map.json"
+$RISK_MAP_FILE = ".ai-core/risk-map.json"
 $HIGH_RISK_THRESHOLD = 80
 
 # --- Helper Functions ---

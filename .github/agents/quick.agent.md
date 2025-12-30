@@ -86,7 +86,7 @@ For quick tasks, recipes are usually overkill. But if needed:
 
 ```bash
 # Check if specialized role would help
-cat .✨/AGENT_INDEX.md
+cat .ai-core/AGENT_INDEX.md
 
 # For simple tasks, prefer direct handoff over recipes
 ```

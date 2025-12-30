@@ -29,4 +29,29 @@ impl FileSystemPort for TokioFileSystem {
     async fn exists(&self, path: &str) -> Result<bool> {
         Ok(Path::new(path).exists())
     }
+
+    async fn move_file(&self, source: &str, dest: &str) -> Result<()> {
+        fs::rename(source, dest).await.map_err(CoreError::Io)?;
+        Ok(())
+    }
+
+    async fn list_files(&self, dir: &str, pattern: Option<&str>) -> Result<Vec<String>> {
+        let mut entries = fs::read_dir(dir).await.map_err(CoreError::Io)?;
+        let mut files = Vec::new();
+
+        while let Some(entry) = entries.next_entry().await.map_err(CoreError::Io)? {
+            let path = entry.path();
+            if path.is_file() {
+                let name = path.file_name().unwrap_or_default().to_string_lossy().to_string();
+                if let Some(pat) = pattern {
+                    if name.contains(pat) || (pat.starts_with("*.") && name.ends_with(&pat[1..])) {
+                        files.push(name);
+                    }
+                } else {
+                    files.push(name);
+                }
+            }
+        }
+        Ok(files)
+    }
 }

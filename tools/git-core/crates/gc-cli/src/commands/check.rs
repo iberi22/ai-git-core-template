@@ -1,6 +1,6 @@
 use clap::Args;
 use color_eyre::Result;
-use gc_core::ports::SystemPort;
+use gc_core::ports::{SystemPort, FileSystemPort, GitHubPort};
 use console::style;
 use serde::Serialize;
 
@@ -17,10 +17,18 @@ struct CheckOutput {
     gh_cli_installed: bool,
     in_git_repo: bool,
     has_gh_token: bool,
+    protocol_version: String,
+    latest_protocol_version: String,
+    update_available: bool,
     all_passed: bool,
 }
 
-pub async fn execute(args: CheckArgs, system: &impl SystemPort) -> Result<()> {
+pub async fn execute(
+    args: CheckArgs,
+    fs: &impl FileSystemPort,
+    system: &impl SystemPort,
+    github: &impl GitHubPort
+) -> Result<()> {
     if !args.json {
         println!("{} Checking environment health...", style("hz").cyan()); // Heartbeat/Health icon
     }
@@ -61,7 +69,40 @@ pub async fn execute(args: CheckArgs, system: &impl SystemPort) -> Result<()> {
         }
     }
 
-    let all_passed = git_installed && in_git_repo; // Minimal requirement
+    // 5. Check Protocol Version
+    let version_file = ".git-core-protocol-version";
+    let protocol_version = if fs.exists(version_file).await.unwrap_or(false) {
+        fs.read_file(version_file).await.unwrap_or_else(|_| "0.0.0".to_string()).trim().to_string()
+    } else {
+        "0.0.0".to_string()
+    };
+
+    if !args.json {
+        println!("   {} Protocol Version: {}", style("ℹ").blue(), protocol_version);
+    }
+
+    // 6. Check Latest Version (Remote)
+    let latest_protocol_version = github.get_file_content(
+        "iberi22",
+        "Git-Core-Protocol",
+        "main",
+        ".git-core-protocol-version"
+    ).await.unwrap_or_else(|_| "unknown".to_string()).trim().to_string();
+
+    let update_available = latest_protocol_version != "unknown" && protocol_version != latest_protocol_version;
+
+    if !args.json {
+        if latest_protocol_version == "unknown" {
+            println!("   {} Could not fetch latest version (check internet/token)", style("!").yellow());
+        } else if update_available {
+            println!("   {} Update Available: {}", style("!").yellow(), latest_protocol_version);
+            println!("      (Run 'gc update' to upgrade)");
+        } else {
+            println!("   {} Protocol is up to date", style("✓").green());
+        }
+    }
+
+    let all_passed = git_installed && in_git_repo && !update_available; // Requirement includes being up to date
 
     if args.json {
         let output = CheckOutput {
@@ -69,6 +110,9 @@ pub async fn execute(args: CheckArgs, system: &impl SystemPort) -> Result<()> {
             gh_cli_installed,
             in_git_repo,
             has_gh_token,
+            protocol_version,
+            latest_protocol_version,
+            update_available,
             all_passed,
         };
         println!("{}", serde_json::to_string(&output)?);

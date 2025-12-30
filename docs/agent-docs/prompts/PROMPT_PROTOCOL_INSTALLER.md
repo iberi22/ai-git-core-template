@@ -74,7 +74,7 @@ Después de analizar, presenta EXACTAMENTE estas 3 opciones:
 **Descripción:** El protocolo se ejecuta sin modificar nada existente.
 
 **Qué hace:**
-- Crea carpeta `.✨/` con archivos del protocolo
+- Crea carpeta `.ai-core/` con archivos del protocolo
 - NO modifica archivos existentes
 - NO mueve ni renombra nada
 - Coexiste con tu estructura actual
@@ -86,7 +86,7 @@ Después de analizar, presenta EXACTAMENTE estas 3 opciones:
 
 **Archivos que se crearán:**
 ```
-.✨/
+.ai-core/
 ├── ARCHITECTURE.md
 ├── AGENT_INDEX.md
 └── protocol.config.json (mode: "observe")
@@ -99,7 +99,7 @@ Después de analizar, presenta EXACTAMENTE estas 3 opciones:
 **Descripción:** Integra el sistema de contexto preservando archivos útiles.
 
 **Qué hace:**
-- Crea estructura `.✨/` completa
+- Crea estructura `.ai-core/` completa
 - PRESERVA: TASK.md, PLANNING.md, RULES.md
 - Crea un **PR con cambios propuestos** para review
 - Permite merge selectivo de cambios
@@ -162,7 +162,7 @@ migrations:
     
   - action: integrate
     source: PLANNING.md
-    into: .✨/ARCHITECTURE.md
+    into: .ai-core/ARCHITECTURE.md
     section: "Planning Context"
     
   - action: create
@@ -182,9 +182,9 @@ migrations:
 
 \`\`\`bash
 # Crear estructura mínima
-mkdir -p .✨
+mkdir -p .ai-core
 
-cat > .✨/protocol.config.json << 'EOF'
+cat > .ai-core/protocol.config.json << 'EOF'
 {
   "version": "2.0.0",
   "mode": "observe",
@@ -198,7 +198,7 @@ cat > .✨/protocol.config.json << 'EOF'
 }
 EOF
 
-cat > .✨/ARCHITECTURE.md << 'EOF'
+cat > .ai-core/ARCHITECTURE.md << 'EOF'
 # Architecture (Observe Mode)
 
 Protocol is observing but not modifying project structure.
@@ -217,11 +217,11 @@ echo "✅ Observe mode installed. Protocol will not modify existing files."
 git checkout -b protocol/hybrid-install
 
 # Crear estructura del protocolo
-mkdir -p .✨
+mkdir -p .ai-core
 mkdir -p .github/instructions
 
 # Generar config
-cat > .✨/protocol.config.json << 'EOF'
+cat > .ai-core/protocol.config.json << 'EOF'
 {
   "version": "2.0.0",
   "mode": "hybrid",
@@ -238,7 +238,7 @@ EOF
 # [El agente debe analizar el proyecto y generar contenido relevante]
 
 # Commit y PR
-git add .✨ .github
+git add .ai-core .github
 git commit -m "feat(protocol): install Git-Core Protocol in hybrid mode"
 gh pr create --title "🔧 Install Git-Core Protocol (Hybrid Mode)" \
   --body "## Git-Core Protocol Installation
@@ -251,7 +251,7 @@ This PR adds the Git-Core Protocol structure while preserving:
 - ✅ RULES.md
 
 ### Changes:
-- Creates \`.✨/\` protocol directory
+- Creates \`.ai-core/\` protocol directory
 - Adds \`protocol.config.json\`
 - Adds \`ARCHITECTURE.md\`
 
@@ -290,8 +290,8 @@ cat > .MIGRATION_PLAN.md << 'EOF'
 
 ## New Files to Create:
 1. AGENTS.md
-2. .✨/ARCHITECTURE.md
-3. .✨/protocol.config.json
+2. .ai-core/ARCHITECTURE.md
+3. .ai-core/protocol.config.json
 4. .github/copilot-instructions.md
 
 ---
@@ -312,7 +312,7 @@ echo "✅ Git-Core Protocol v2.0.0 instalado"
 echo "📁 Modo: [OBSERVE|HYBRID|STRICT]"
 echo ""
 echo "Próximos pasos:"
-echo "1. Lee .✨/ARCHITECTURE.md"
+echo "1. Lee .ai-core/ARCHITECTURE.md"
 echo "2. Configura tus agentes en AGENTS.md"
 echo "3. Usa 'gh issue list' para ver tareas"
 \`\`\`
@@ -369,4 +369,4 @@ gemini -f docs/agent-docs/PROMPT_PROTOCOL_INSTALLER.md -p "Install protocol in t
 
 - Documentación completa: `AGENTS.md`
 - Instrucciones de Copilot: `.github/copilot-instructions.md`
-- Configuración del protocolo: `.✨/protocol.config.json`
+- Configuración del protocolo: `.ai-core/protocol.config.json`

@@ -29,13 +29,13 @@ pub trait GitPort: Send + Sync {
 pub trait GitHubPort: Send + Sync {
     async fn check_auth(&self) -> Result<String>; // returns username
     async fn create_repo(&self, name: &str, private: bool) -> Result<()>;
-    async fn create_issue(&self, title: &str, body: &str, labels: &[String]) -> Result<()>;
+    async fn create_issue(&self, owner: &str, repo: &str, title: &str, body: &str, labels: &[String]) -> Result<()>;
     async fn create_label(&self, name: &str, color: &str, desc: &str) -> Result<()>;
     async fn get_file_content(&self, owner: &str, repo: &str, branch: &str, path: &str) -> Result<String>;
     async fn get_pr_diff(&self, owner: &str, repo: &str, pr_number: u64) -> Result<String>;
     async fn post_comment(&self, owner: &str, repo: &str, issue_number: u64, body: &str) -> Result<()>;
-    async fn list_issues(&self, owner: &str, repo: &str, state: Option<&str>, assignee: Option<&str>) -> Result<Vec<Issue>>;
-    async fn list_prs(&self, owner: &str, repo: &str, state: Option<&str>) -> Result<Vec<PullRequest>>;
+    async fn list_issues(&self, owner: &str, repo: &str, state: Option<String>, assignee: Option<String>) -> Result<Vec<Issue>>;
+    async fn list_prs(&self, owner: &str, repo: &str, state: Option<String>) -> Result<Vec<PullRequest>>;
 }
 
 #[async_trait]
@@ -44,6 +44,8 @@ pub trait FileSystemPort: Send + Sync {
     async fn write_file(&self, path: &str, content: &str) -> Result<()>;
     async fn read_file(&self, path: &str) -> Result<String>;
     async fn exists(&self, path: &str) -> Result<bool>;
+    async fn move_file(&self, source: &str, dest: &str) -> Result<()>;
+    async fn list_files(&self, dir: &str, pattern: Option<&str>) -> Result<Vec<String>>;
 }
 
 #[async_trait]
@@ -51,4 +53,14 @@ pub trait SystemPort: Send + Sync {
     async fn check_command(&self, name: &str) -> Result<bool>;
     async fn run_command(&self, name: &str, args: &[String]) -> Result<()>;
     async fn run_command_output(&self, name: &str, args: &[String]) -> Result<String>;
+}
+
+#[async_trait]
+pub trait JulesPort: Send + Sync {
+    async fn execute_task(&self, task_desc: &str) -> Result<()>;
+}
+
+#[async_trait]
+pub trait CopilotPort: Send + Sync {
+    async fn suggest(&self, prompt: &str) -> Result<String>;
 }

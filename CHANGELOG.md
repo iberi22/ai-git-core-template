@@ -253,7 +253,7 @@ See `docs/explanation/DOCUMENTATION_MIGRATION.md` for how to handle existing pro
 ### Experimental
 
 - **🧠 Context-Driven Decision Engine**: Introduction of Semantic Risk Analysis for Guardian Agent.
-- **🗺️ Risk Map**: New `.✨/risk-map.json` configuration to define risk scores per file path.
+- **🗺️ Risk Map**: New `.ai-core/risk-map.json` configuration to define risk scores per file path.
 - **Shadow Mode**: Guardian Agent now calculates `semantic_risk_score` in logs without blocking merges (data collection phase).
 - **🏗️ Hybrid Dispatcher**: `agent-dispatcher.yml` is now a thin wrapper around `scripts/dispatcher-core.ps1`.
 - **🚦 Risk-Based Routing**: Dispatcher now routes high-risk issues (from `risk-map.json`) to Human/Senior Review automatically.
@@ -267,7 +267,7 @@ See `docs/explanation/DOCUMENTATION_MIGRATION.md` for how to handle existing pro
 - **🧠 Planner Agent**: New `planner-agent.yml` workflow that reads `ARCHITECTURE.md` and generates atomic issues automatically.
 - **🛡️ Guardian Agent**: New `guardian-agent.yml` workflow with confidence scoring for auto-merge decisions.
 - **Autonomous Cycle**: Complete development cycle without human intervention (except high-stakes operations).
-- **Features Tracking**: New `.✨/features.json` template for tracking feature status.
+- **Features Tracking**: New `.ai-core/features.json` template for tracking feature status.
 - **New Labels**: `high-stakes`, `needs-human`, `auto-merged`, `ai-plan`, `planner-generated`.
 
 ### Changed
@@ -278,7 +278,7 @@ See `docs/explanation/DOCUMENTATION_MIGRATION.md` for how to handle existing pro
 
 ### Breaking Changes
 
-- **Required Files**: Projects using v3.0 should create `.✨/features.json` for Planner Agent.
+- **Required Files**: Projects using v3.0 should create `.ai-core/features.json` for Planner Agent.
 - **Auto-Merge**: PRs meeting Guardian criteria (70%+ confidence) will be auto-merged.
 - **New Labels Required**: Run `setup-labels.yml` to create v3.0 labels.
 

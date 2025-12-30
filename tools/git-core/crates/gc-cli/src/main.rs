@@ -8,7 +8,7 @@ pub struct Cli {
 }
 
 mod commands;
-use commands::{InitArgs, ContextCmd, ReportCmd, ValidateCmd, TelemetryArgs, CiDetectArgs, TaskArgs, FinishArgs, IssueArgs, PrArgs, GitArgs, InfoArgs, CheckArgs};
+use commands::{InitArgs, ContextCmd, ReportCmd, ValidateCmd, TelemetryArgs, CiDetectArgs, TaskArgs, FinishArgs, IssueArgs, PrArgs, GitArgs, InfoArgs, CheckArgs, NextArgs, WorkflowArgs, UpdateArgs, DispatchArgs};
 
 #[derive(Subcommand)]
 pub enum Commands {
@@ -30,11 +30,7 @@ pub enum Commands {
     #[command(subcommand)]
     Validate(ValidateCmd),
     /// Execute Workflows
-    Workflow {
-        /// Workflow to validate
-        #[arg(long)]
-        name: Option<String>,
-    },
+    Workflow(WorkflowArgs),
     /// Start a new Task (Simplicity)
     Task(TaskArgs),
     /// Finish current Task (Automation)
@@ -49,6 +45,12 @@ pub enum Commands {
     Info(InfoArgs),
     /// Verify Environment Health
     Check(CheckArgs),
+    /// Select Next Task (Dispatcher)
+    Next(NextArgs),
+    /// Upgrade Protocol in current project
+    Update(UpdateArgs),
+    /// Dispatch task to Agent (Jules, Copilot)
+    Dispatch(DispatchArgs),
 }
 
 #[tokio::main]
@@ -60,7 +62,8 @@ async fn main() -> color_eyre::Result<()> {
         Commands::Init(args) => {
             let fs = gc_adapter_fs::TokioFileSystem;
             let system = gc_adapter_system::TokioSystem;
-            commands::init::execute(args, &fs, &system).await?;
+            let github = gc_adapter_github::OctocrabGitHub::new();
+            commands::init::execute(args, &fs, &system, &github).await?;
         }
         Commands::Context { subcmd } => {
             let fs = gc_adapter_fs::TokioFileSystem;
@@ -85,8 +88,9 @@ async fn main() -> color_eyre::Result<()> {
         Commands::Validate(args) => {
             commands::validate::execute(args).await?;
         }
-        Commands::Workflow { name } => {
-            println!("Validating workflow: {:?}", name);
+        Commands::Workflow(args) => {
+            let fs = gc_adapter_fs::TokioFileSystem;
+            commands::workflow::execute(args, &fs).await?;
         }
         Commands::Task(args) => {
             let fs = gc_adapter_fs::TokioFileSystem;
@@ -101,9 +105,10 @@ async fn main() -> color_eyre::Result<()> {
             commands::finish::execute(args, &system, &github).await?;
         }
         Commands::Issue(args) => {
+            let fs = gc_adapter_fs::TokioFileSystem;
             let github = gc_adapter_github::OctocrabGitHub::new();
             let system = gc_adapter_system::TokioSystem;
-            commands::issue::execute(args, &github, &system).await?;
+            commands::issue::execute(args, &github, &system, &fs).await?;
         }
         Commands::Pr(args) => {
             let github = gc_adapter_github::OctocrabGitHub::new();
@@ -119,8 +124,28 @@ async fn main() -> color_eyre::Result<()> {
             commands::info::execute(args, &system).await?;
         }
         Commands::Check(args) => {
+            let fs = gc_adapter_fs::TokioFileSystem;
             let system = gc_adapter_system::TokioSystem;
-            commands::check::execute(args, &system).await?;
+            let github = gc_adapter_github::OctocrabGitHub::new();
+            commands::check::execute(args, &fs, &system, &github).await?;
+        }
+        Commands::Next(args) => {
+            let fs = gc_adapter_fs::TokioFileSystem;
+            let system = gc_adapter_system::TokioSystem;
+            let github = gc_adapter_github::OctocrabGitHub::new(); // Or Stub if not needed mostly
+            commands::next::execute(args, &fs, &system, &github).await?;
+        }
+        Commands::Update(args) => {
+            let fs = gc_adapter_fs::TokioFileSystem;
+            let system = gc_adapter_system::TokioSystem;
+            let github = gc_adapter_github::OctocrabGitHub::new();
+            commands::update::execute(args, &fs, &system, &github).await?;
+        }
+        Commands::Dispatch(args) => {
+            let git = gc_adapter_cli::CliGitAdapter;
+            let jules = gc_adapter_cli::CliJulesAdapter;
+            let copilot = gc_adapter_cli::CliCopilotAdapter;
+            commands::dispatch::execute(args, &git, &jules, &copilot).await?;
         }
     }
 

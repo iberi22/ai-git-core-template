@@ -118,7 +118,7 @@ enum Commands {
         threshold: u8,
 
         /// Path to risk-map.json
-        #[arg(long, default_value = ".✨/risk-map.json")]
+        #[arg(long, default_value = ".ai-core/risk-map.json")]
         risk_map: String,
 
         /// Dry run mode (don't execute merge)

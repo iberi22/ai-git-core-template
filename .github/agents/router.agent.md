@@ -96,7 +96,7 @@ If a task requires specialized knowledge, recommend loading a recipe:
 
 ```bash
 # Check available recipes
-cat .✨/AGENT_INDEX.md
+cat .ai-core/AGENT_INDEX.md
 
 # Load specialized role
 ./scripts/equip-agent.ps1 -Role "RoleName"

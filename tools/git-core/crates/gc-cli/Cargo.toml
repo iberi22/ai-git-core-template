@@ -3,6 +3,10 @@ name = "gc-cli"
 version.workspace = true
 edition.workspace = true
 
+[[bin]]
+name = "gc"
+path = "src/main.rs"
+
 [dependencies]
 clap.workspace = true
 tokio.workspace = true
@@ -16,6 +20,7 @@ gc-core.workspace = true
 gc-adapter-github.workspace = true
 gc-adapter-fs.workspace = true
 gc-adapter-system.workspace = true
+gc-adapter-cli = { path = "../gc-adapter-cli" }
 serde_json.workspace = true
 gc-validator = { version = "0.1.0", path = "../gc-validator" }
 chrono = { version = "0.4", features = ["serde"] }
@@ -25,8 +30,13 @@ hex = "0.4"
 regex = "1.10"
 serde_yaml = "0.9.34"
 slug = "0.1.6"
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+zip = "0.6"
 
 [dev-dependencies]
 async-trait = "0.1.89"
 mockall = "0.14.0"
 tokio = { workspace = true, features = ["full"] }
+assert_cmd = "2.0"
+assert_fs = "1.1"
+predicates = "3.1"

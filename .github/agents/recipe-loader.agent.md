@@ -88,7 +88,7 @@ curl -sL "https://raw.githubusercontent.com/iberi22/agents-flows-recipes/main/en
 ## 📋 After Loading
 
 Once a recipe is loaded:
-1. Read `.✨/CURRENT_CONTEXT.md` for your new persona
+1. Read `.ai-core/CURRENT_CONTEXT.md` for your new persona
 2. Follow the role-specific instructions
 3. Maintain Git-Core Protocol rules
 
@@ -97,7 +97,7 @@ Once a recipe is loaded:
 Regardless of recipe loaded, these skills are ALWAYS active:
 
 1. **Token Economy** - Use GitHub Issues, no .md tracking
-2. **Architecture First** - Verify against `.✨/ARCHITECTURE.md`
+2. **Architecture First** - Verify against `.ai-core/ARCHITECTURE.md`
 3. **Atomic Commits** - One logical change per commit
 
 ## 🔍 Recipe Selection Helper
@@ -121,5 +121,5 @@ If scripts unavailable:
 
 Full index available at:
 ```bash
-cat .✨/AGENT_INDEX.md
+cat .ai-core/AGENT_INDEX.md
 ```

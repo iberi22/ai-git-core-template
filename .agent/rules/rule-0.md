@@ -72,8 +72,8 @@ You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, 
 ### ✅ ONLY ALLOWED `.md` FILES:
 - ✅ `README.md` (project overview ONLY)
 - ✅ `AGENTS.md` (agent configuration ONLY)
-- ✅ `.✨/ARCHITECTURE.md` (system architecture ONLY)
-- ✅ `.✨/AGENT_INDEX.md` (agent routing ONLY)
+- ✅ `.ai-core/ARCHITECTURE.md` (system architecture ONLY)
+- ✅ `.ai-core/AGENT_INDEX.md` (agent routing ONLY)
 - ✅ `CONTRIBUTING.md`, `LICENSE.md` (standard repo files)
 - ✅ `docs/prompts/*.md` (session continuation prompts - SCRIPT GENERATED ONLY)
 
@@ -195,17 +195,17 @@ Agregar autenticación OAuth al sistema.
 Before any task:
 ```bash
 # 1. Check the Agent Index to see if you need a specific Role
-cat .✨/AGENT_INDEX.md
+cat .ai-core/AGENT_INDEX.md
 
 # 2. Read Living Research Context (CRITICAL for dependencies)
 cat docs/agent-docs/RESEARCH_STACK_CONTEXT.md
 
 # 3. If a Role fits the task, EQUIP IT:
 # ./scripts/equip-agent.ps1 -Role "RoleName"
-# cat .✨/CURRENT_CONTEXT.md
+# cat .ai-core/CURRENT_CONTEXT.md
 
 # 4. Read architecture
-cat .✨/ARCHITECTURE.md
+cat .ai-core/ARCHITECTURE.md
 
 # 5. Check your assigned issues
 gh issue list --assignee "@me"
@@ -261,15 +261,15 @@ gh workflow run living-context.yml
 
 ### 4. Architecture First Rule
 Before implementing ANY infrastructure feature:
-1. Run: `grep -A 20 'CRITICAL DECISIONS' .✨/ARCHITECTURE.md`
+1. Run: `grep -A 20 'CRITICAL DECISIONS' .ai-core/ARCHITECTURE.md`
 2. Check CRITICAL DECISIONS table
 3. If conflict with issue, ARCHITECTURE wins
 
 **Why this matters:** A critical error occurred when Vercel was implemented despite ARCHITECTURE.md specifying GitHub Pages. Issues may mention multiple options, but architecture decisions are final.
 
 **Related Documentation:**
-- `.✨/ARCHITECTURE.md` - CRITICAL DECISIONS table
-- `.✨/AGENT_INDEX.md` - Agent roles and routing
+- `.ai-core/ARCHITECTURE.md` - CRITICAL DECISIONS table
+- `.ai-core/AGENT_INDEX.md` - Agent roles and routing
 - `AGENTS.md` - Architecture Verification Rule
 
 ### 5. Development Flow

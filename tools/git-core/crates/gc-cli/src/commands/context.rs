@@ -20,13 +20,13 @@ pub async fn execute(
     match cmd {
         ContextCmd::List => {
             // MVP: Just cat the index file or something simple
-            println!("Available roles (check .✨/AGENT_INDEX.md):");
+            println!("Available roles (check .ai-core/AGENT_INDEX.md):");
             // ... implementation skipped for MVP smoothness on 'equip' focus
         }
         ContextCmd::Equip { role } => {
             println!("{}", style(format!("🔍 Searching for role '{}'...", role)).cyan());
 
-            let index_path = ".✨/AGENT_INDEX.md";
+            let index_path = ".ai-core/AGENT_INDEX.md";
             if !fs.exists(index_path).await? {
                 color_eyre::eyre::bail!("Index file not found at {}", index_path);
             }
@@ -65,7 +65,7 @@ pub async fn execute(
                 &recipe_path
             ).await?;
 
-            let context_path = ".✨/CURRENT_CONTEXT.md";
+            let context_path = ".ai-core/CURRENT_CONTEXT.md";
             let header = format!(r#"# 🎭 ACTIVE AGENT PERSONA: {}
 > GENERATED CONTEXT - DO NOT EDIT MANUALLY
 > Loaded via Git-Core CLI
@@ -77,7 +77,7 @@ pub async fn execute(
 ---
 ## 🛡️ MANDATORY PROTOCOL SKILLS
 1. **Token Economy:** Use GitHub Issues for state. No TODO.md.
-2. **Architecture First:** Verify against .✨/ARCHITECTURE.md.
+2. **Architecture First:** Verify against .ai-core/ARCHITECTURE.md.
 3. **Atomic Commits:** One logical change per commit.
 "#;
 
@@ -105,7 +105,7 @@ mod tests {
 
         // 1. Check Index Exists
         mock_fs.expect_exists()
-            .with(eq(".✨/AGENT_INDEX.md"))
+            .with(eq(".ai-core/AGENT_INDEX.md"))
             .returning(|_| Ok(true));
 
         // 2. Read Index
@@ -114,7 +114,7 @@ mod tests {
 - **Architect**: `roles/architect.md`
 "#;
         mock_fs.expect_read_file()
-            .with(eq(".✨/AGENT_INDEX.md"))
+            .with(eq(".ai-core/AGENT_INDEX.md"))
             .returning(move |_| Ok(index_content.to_string()));
 
         // 3. GitHub Fetch Recipe
@@ -124,7 +124,7 @@ mod tests {
 
         // 4. Write Context
         mock_fs.expect_write_file()
-            .with(eq(".✨/CURRENT_CONTEXT.md"), always()) // Check content if strict
+            .with(eq(".ai-core/CURRENT_CONTEXT.md"), always()) // Check content if strict
             .returning(|_, _| Ok(()));
 
         let res = execute(cmd, &mock_fs, &mock_github).await;

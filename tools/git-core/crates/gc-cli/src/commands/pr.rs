@@ -34,7 +34,7 @@ pub async fn execute(
 
             println!("{}", style(format!("Fetching PRs for {}/{}...", owner, repo)).dim());
 
-            let prs = github.list_prs(&owner, &repo, Some(&state)).await?;
+            let prs = github.list_prs(&owner, &repo, Some(state.clone())).await?;
 
             if prs.is_empty() {
                 println!("No PRs found.");

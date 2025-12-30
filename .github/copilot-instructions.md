@@ -68,8 +68,8 @@ You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, 
 ### ✅ ONLY ALLOWED `.md` FILES:
 - ✅ `README.md` (project overview ONLY)
 - ✅ `AGENTS.md` (agent configuration ONLY)
-- ✅ `.✨/ARCHITECTURE.md` (system architecture ONLY)
-- ✅ `.✨/AGENT_INDEX.md` (agent routing ONLY)
+- ✅ `.ai-core/ARCHITECTURE.md` (system architecture ONLY)
+- ✅ `.ai-core/AGENT_INDEX.md` (agent routing ONLY)
 - ✅ `CONTRIBUTING.md`, `LICENSE.md` (standard repo files)
 - ✅ `docs/prompts/*.md` (session continuation prompts - SCRIPT GENERATED ONLY)
 
@@ -194,7 +194,7 @@ Agregar autenticación OAuth al sistema.
 ```bash
 # 1. Estado del proyecto
 git log --oneline -10            # Ver trabajo reciente
-cat .✨/features.json            # Features con passes: true/false
+cat .ai-core/features.json            # Features con passes: true/false
 
 # 2. Ejecutar tests
 npm test  # o: cargo test, pytest, etc.
@@ -208,24 +208,24 @@ npm test  # o: cargo test, pytest, etc.
 Before any task:
 ```bash
 # 1. Check the Agent Index to see if you need a specific Role
-cat .✨/AGENT_INDEX.md
+cat .ai-core/AGENT_INDEX.md
 
 # 2. Read Living Research Context (CRITICAL for dependencies)
 cat docs/agent-docs/RESEARCH_STACK_CONTEXT.md
 
 # 3. If a Role fits the task, EQUIP IT:
 # ./scripts/equip-agent.ps1 -Role "RoleName"
-# cat .✨/CURRENT_CONTEXT.md
+# cat .ai-core/CURRENT_CONTEXT.md
 
 # 4. Read architecture
-cat .✨/ARCHITECTURE.md
+cat .ai-core/ARCHITECTURE.md
 
 # 5. Check your assigned issues + agent state
 gh issue list --assignee "@me"
 gh issue view <id> --comments | grep -A 50 '<agent-state>'
 
 # 6. Check features.json for next priority
-cat .✨/features.json | jq '.features[] | select(.passes == false)'
+cat .ai-core/features.json | jq '.features[] | select(.passes == false)'
 ```
 
 ### 4. Dependency Quarantine Rule (NEW)
@@ -278,15 +278,15 @@ gh workflow run living-context.yml
 
 ### 4. Architecture First Rule
 Before implementing ANY infrastructure feature:
-1. Run: `grep -A 20 'CRITICAL DECISIONS' .✨/ARCHITECTURE.md`
+1. Run: `grep -A 20 'CRITICAL DECISIONS' .ai-core/ARCHITECTURE.md`
 2. Check CRITICAL DECISIONS table
 3. If conflict with issue, ARCHITECTURE wins
 
 **Why this matters:** A critical error occurred when Vercel was implemented despite ARCHITECTURE.md specifying GitHub Pages. Issues may mention multiple options, but architecture decisions are final.
 
 **Related Documentation:**
-- `.✨/ARCHITECTURE.md` - CRITICAL DECISIONS table
-- `.✨/AGENT_INDEX.md` - Agent roles and routing
+- `.ai-core/ARCHITECTURE.md` - CRITICAL DECISIONS table
+- `.ai-core/AGENT_INDEX.md` - Agent roles and routing
 - `AGENTS.md` - Architecture Verification Rule
 
 ### 5. Development Flow
@@ -768,12 +768,17 @@ cargo build --release
 | Command | Description | When to Use |
 |---------|-------------|-------------|
 | `gc init [name]` | Initialize new project + protocol | Start of project |
-| `gc context list` | List available agent roles | Discovery |
-| `gc context equip <role>`| Switch AI context (e.g. `security`) | Changing tasks |
+| `gc issue list` | List issues (filterable) | Task selection |
+| `gc issue create`| Create issue directly on GitHub | Task creation |
+| `gc issue sync` | Sync local markdown issues to GitHub | Batch creation |
+| `gc next` | Select next priority task | Workflow automation |
+| `gc context equip`| Switch AI context (e.g. `security`) | Changing tasks |
 | `gc report` | Generate AI Pull Request Report | Before merging |
 | `gc validate` | Check CI workflows & integrity | Pre-push check |
 | `gc telemetry` | Send anonymous usage stats | Automated |
 | `gc ci-detect` | Detect environment (CI/Local) | Automated |
+| `gc check` | Verify environment health | Troubleshooting |
+| `gc update` | Upgrade protocol version | Maintenance |
 
 ### 🚀 Simplified AI Agent Workflow (Sofisticación Invisible)
 
@@ -802,40 +807,40 @@ cargo build --release
 | `./scripts/equip-agent.ps1` | `gc context equip` |
 | `./scripts/ai-report.ps1` | `gc report` |
 | `./scripts/send-telemetry.ps1`| `gc telemetry` |
+| `./scripts/next-task.ps1` | `gc next` |
+| `./scripts/sync-issues.ps1` | `gc issue sync` |
+| `./scripts/install-cli.ps1` | `gc update` |
 
 ### AI Agent Usage
 
 **When bootstrapping a new project:**
 ```bash
-# Step 1: Install protocol (scripts are visible and auditable)
+# Step 1: Install protocol
 curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 
 # Or if CLI is available:
-git-core init my-project
+gc init my-project
 
 # Step 2: Verify installation
-git-core check
+gc check
 ```
 
 **When upgrading existing project:**
 ```bash
-# Safe upgrade (preserves your ARCHITECTURE.md)
-git-core upgrade
+# Safe upgrade
+gc update
 
 # Check what changed
-git-core status
+gc info
 ```
 
 **When troubleshooting:**
 ```bash
 # Check integrity
-git-core check
-
-# Auto-fix issues
-git-core check --fix
+gc check
 
 # Full status report
-git-core status
+gc info
 ```
 
 ### Legacy Scripts (Alternative)

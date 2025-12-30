@@ -144,7 +144,7 @@ regex = "1"
 
 - PowerShell original: `scripts/guardian-core.ps1`
 - Workflow actual: `.github/workflows/guardian-agent.yml`
-- Risk map: `.✨/risk-map.json`
+- Risk map: `.ai-core/risk-map.json`
 - Base orchestrator: `tools/workflow-orchestrator/`
 
 ## 🎯 Roadmap

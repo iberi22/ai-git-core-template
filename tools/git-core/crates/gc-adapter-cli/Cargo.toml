@@ -1,0 +1,10 @@
+[package]
+name = "gc-adapter-cli"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+gc-core.workspace = true
+async-trait = "0.1.89"
+tokio = { workspace = true, features = ["process"] }
+tracing = { workspace = true }

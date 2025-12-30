@@ -114,7 +114,7 @@ Then, run the `equip-agent` script to load that persona.
 *Skills are appended to the agent's context when loaded.*
 
 - **Atomic Commits:** Enforces the Git-Core Protocol commit style.
-- **Architecture Check:** Validates against `.✨/ARCHITECTURE.md`.
+- **Architecture Check:** Validates against `.ai-core/ARCHITECTURE.md`.
 - **POML Parser:** Ability to understand Prompt Object Markup Language.
 
 ---

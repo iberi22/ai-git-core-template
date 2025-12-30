@@ -15,7 +15,7 @@ O en Linux/macOS:
 GIT_CORE_UPGRADE=1 curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 ```
 
-**Importante:** Tu archivo `.✨/ARCHITECTURE.md` será preservado automáticamente.
+**Importante:** Tu archivo `.ai-core/ARCHITECTURE.md` será preservado automáticamente.
 
 Después de actualizar:
 1. Revisa los cambios con `git diff`

@@ -70,7 +70,7 @@ These are configuration files, not executable code.
 
 ```text
 Creates these folders in YOUR project:
-├── .✨/              (AI context folder)
+├── .ai-core/              (AI context folder)
 ├── .github/          (GitHub configuration)
 ├── scripts/          (Helper scripts)
 └── docs/             (Documentation)
@@ -136,7 +136,7 @@ https://github.com/iberi22/Git-Core-Protocol/tree/main/tools/git-core-cli
 | `src/utils.rs` | Helper functions (print, copy files) | ~100 | [View](https://github.com/iberi22/Git-Core-Protocol/blob/main/tools/git-core-cli/src/utils.rs) |
 | `src/commands/install.rs` | Install command logic | ~80 | [View](https://github.com/iberi22/Git-Core-Protocol/blob/main/tools/git-core-cli/src/commands/install.rs) |
 | `src/commands/upgrade.rs` | Upgrade command logic | ~80 | [View](https://github.com/iberi22/Git-Core-Protocol/blob/main/tools/git-core-cli/src/commands/upgrade.rs) |
-| `src/commands/migrate.rs` | Migration from .ai/ to .✨/ | ~70 | [View](https://github.com/iberi22/Git-Core-Protocol/blob/main/tools/git-core-cli/src/commands/migrate.rs) |
+| `src/commands/migrate.rs` | Migration from .ai/ to .ai-core/ | ~70 | [View](https://github.com/iberi22/Git-Core-Protocol/blob/main/tools/git-core-cli/src/commands/migrate.rs) |
 | `src/commands/check.rs` | Integrity verification | ~150 | [View](https://github.com/iberi22/Git-Core-Protocol/blob/main/tools/git-core-cli/src/commands/check.rs) |
 | `src/commands/status.rs` | Status display | ~80 | [View](https://github.com/iberi22/Git-Core-Protocol/blob/main/tools/git-core-cli/src/commands/status.rs) |
 | `src/installer/download.rs` | Download from GitHub | ~100 | [View](https://github.com/iberi22/Git-Core-Protocol/blob/main/tools/git-core-cli/src/installer/download.rs) |
