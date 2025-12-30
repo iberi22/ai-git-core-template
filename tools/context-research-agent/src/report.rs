@@ -5,8 +5,8 @@ use std::path::Path;
 use tokio::fs;
 use chrono::{Local, Utc, NaiveDate};
 
-/// Quarantine threshold in days (14 days as per Git-Core Protocol)
-const QUARANTINE_DAYS: i64 = 14;
+/// Quarantine threshold in days (7 days as per Git-Core Protocol)
+const QUARANTINE_DAYS: i64 = 7;
 
 #[derive(Debug, Clone)]
 pub struct QuarantineStatus {
@@ -87,7 +87,7 @@ pub async fn generate_report(
     }
 
     content.push_str("## 🚧 Quarantine Status\n\n");
-    content.push_str("> **Why 14 days?** Research indicates that most malicious package takeovers (typosquatting, account hijacking) are detected and removed within 3-7 days. A 14-day buffer provides a 2x safety margin against supply chain attacks.\n\n");
+    content.push_str("> **Why 7 days?** Research indicates that most malicious package takeovers (typosquatting, account hijacking) are detected and removed within 3-5 days. A 7-day buffer provides adequate safety margin against supply chain attacks while enabling faster dependency adoption.\n\n");
     content.push_str(&format!(
         "Dependencies currently in quarantine (<{} days since release):\n\n",
         QUARANTINE_DAYS
@@ -202,7 +202,7 @@ mod tests {
 
     #[test]
     fn test_quarantine_threshold_boundary() {
-        // Exactly 14 days ago should NOT be in quarantine (>= threshold)
+        // Exactly 7 days ago should NOT be in quarantine (>= threshold)
         let boundary_date = Utc::now().date_naive() - chrono::Duration::days(QUARANTINE_DAYS);
         let status = check_quarantine_status("boundary", "1.0.0", Some(boundary_date));
 

@@ -231,13 +231,13 @@ cat .ai-core/features.json | jq '.features[] | select(.passes == false)'
 ### 4. Dependency Quarantine Rule (NEW)
 When working with dependencies:
 1. **Check quarantine status**: `gh pr list --label "quarantine"`
-2. **Never use bleeding-edge**: Versions < 2 weeks old are in quarantine
+2. **Never use bleeding-edge**: Versions < 7 days old are in quarantine
 3. **Check RESEARCH_STACK_CONTEXT.md**: Contains known issues for current versions
 4. **Prefer stable patterns**: Use the "Intelligent Patterns" section, not latest docs
 
 **Workflow Integration:**
 - Dependabot creates PRs → Auto-labeled "quarantine"
-- After 14 days → Auto-promoted to "ready-to-adopt"
+- After 7 days → Auto-promoted to "ready-to-adopt"
 - On merge → Context Research Agent updates documentation
 
 ### 4.1 Living Context Protocol (Context7 Replacement)
@@ -274,7 +274,7 @@ gh workflow run living-context.yml
 | Generic docs | Project-specific context |
 | External API | Self-hosted in repo |
 | Manual trigger | Automated via workflows |
-| No risk analysis | 14-day quarantine + AI review |
+| No risk analysis | 7-day quarantine + AI review |
 
 ### 4. Architecture First Rule
 Before implementing ANY infrastructure feature:
