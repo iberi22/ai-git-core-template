@@ -59,6 +59,15 @@ pub async fn execute(
     }
 
     // 3. Create Issue File
+    // Ensure parent directory exists
+    if let Some(parent) = std::path::Path::new(&filepath).parent() {
+        if let Some(parent_str) = parent.to_str() {
+             if !fs.exists(parent_str).await.unwrap_or(false) {
+                 fs.create_dir(parent_str).await?;
+             }
+        }
+    }
+
     // fs.exists returns Result<bool>, so we must unwrap
     if !fs.exists(&filepath).await.unwrap_or(false) {
         if !args.json {
