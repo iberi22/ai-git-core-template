@@ -3,7 +3,7 @@ title: "System Architecture"
 type: ARCHITECTURE
 id: "arch-system"
 created: 2025-12-01
-updated: 2025-12-01
+updated: 2025-12-31
 agent: copilot
 model: gemini-3-pro
 requested_by: system
@@ -39,10 +39,10 @@ project: Git-Core-Protocol
 ---
 
 ## Stack
-- **Language:** TBD
-- **Framework:** TBD
-- **Database:** TBD
-- **Infrastructure:** TBD
+- **Language:** Rust (gc-cli), PowerShell/Bash (legacy scripts)
+- **Framework:** Clap 4.5 (CLI), Tokio (async runtime), Octocrab (GitHub API)
+- **Database:** GitHub Issues (state management), None (local - stateless)
+- **Infrastructure:** GitHub Actions (CI/CD), GitHub Pages (hosting)
 
 ## Key Decisions
 
@@ -76,15 +76,23 @@ project: Git-Core-Protocol
 ## Dependencies
 | Package | Version | Purpose |
 |---------|---------|----------|
-| TBD     | x.x.x   | TBD      |
+| clap | 4.5.x | CLI argument parsing |
+| tokio | 1.48.x | Async runtime |
+| octocrab | 0.48.x | GitHub API client |
+| serde | 1.0.x | Serialization |
+| color-eyre | 0.6.x | Error handling |
+| walkdir | 2.x | Directory traversal |
 
 ## Integration Points
 - [ ] External API 1
 - [ ] External API 2
 
 ## Security Considerations
-- TBD
+- GitHub tokens stored in environment variables only
+- No secrets committed to repository
+- Pre-commit hooks prevent accidental credential exposure
+- CLI uses HTTPS for all API calls
 
 ---
-*Last updated by AI Agent: Never*
+*Last updated by AI Agent: 2025-12-31*
 
