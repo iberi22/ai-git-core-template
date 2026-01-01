@@ -767,18 +767,15 @@ cargo build --release
 
 | Command | Description | When to Use |
 |---------|-------------|-------------|
-| `gc init [name]` | Initialize new project + protocol | Start of project |
-| `gc issue list` | List issues (filterable) | Task selection |
-| `gc issue create`| Create issue directly on GitHub | Task creation |
-| `gc issue sync` | Sync local markdown issues to GitHub | Batch creation |
-| `gc next` | Select next priority task | Workflow automation |
-| `gc context equip`| Switch AI context (e.g. `security`) | Changing tasks |
-| `gc report` | Generate AI Pull Request Report | Before merging |
-| `gc validate` | Check CI workflows & integrity | Pre-push check |
-| `gc telemetry` | Send anonymous usage stats | Automated |
-| `gc ci-detect` | Detect environment (CI/Local) | Automated |
-| `gc check` | Verify environment health | Troubleshooting |
-| `gc update` | Upgrade protocol version | Maintenance |
+| `gc init` | Initialize project (smart detect) | Start/Setup |
+| `gc check` | Validate env & dependencies | Health Check |
+| `gc issue list` | List tasks | Planning |
+| `gh issue create`| Create issue on GitHub | Task Creation |
+| `gemini analyze`| Analyze context/files | Large Context |
+| `gh copilot suggest`| Get code suggestions | Implementation |
+| `jules run` | Delegate autonomous task | Delegation |
+
+> **📘 Full Guide:** See [docs/agent-docs/CLI_GUIDE.md](../docs/agent-docs/CLI_GUIDE.md) for detailed usage of all ecosystem tools (`gc`, `gh`, `gemini`, `copilot`, `jules`).
 
 ### 🚀 Simplified AI Agent Workflow (Sofisticación Invisible)
 
