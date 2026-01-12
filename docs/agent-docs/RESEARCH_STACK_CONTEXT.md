@@ -2,7 +2,7 @@
 title: "Living Research Context"
 type: RESEARCH
 agent: context-research-agent
-updated: 2025-12-29
+updated: 2026-01-12
 ai_provider: "None"
 ai_model: "N/A"
 quarantine_threshold_days: 14
@@ -17,43 +17,46 @@ quarantine_threshold_days: 14
 
 | Dependency | Version | Ecosystem | Status |
 |------------|---------|-----------|--------|
-| **toml** | `0.8` | Rust | ✅ Stable |
-| **clap** | `4.4` | Rust | ✅ Stable |
-| **serde_json** | `1.0` | Rust | ✅ Stable |
-| **chrono** | `0.4` | Rust | ✅ Stable |
-| **reqwest** | `0.11` | Rust | ✅ Stable |
-| **futures** | `0.3` | Rust | ✅ Stable |
 | **tokio** | `1.32` | Rust | ✅ Stable |
 | **regex** | `1.10` | Rust | ✅ Stable |
+| **clap** | `4.4` | Rust | ✅ Stable |
+| **chrono** | `0.4` | Rust | ✅ Stable |
+| **futures** | `0.3` | Rust | ✅ Stable |
+| **anyhow** | `1.0` | Rust | ✅ Stable |
 | **dotenv** | `0.15` | Rust | ✅ Stable |
 | **serde** | `1.0` | Rust | ✅ Stable |
-| **anyhow** | `1.0` | Rust | ✅ Stable |
-| **base64** | `0.22.1` | Rust | ✅ Stable |
-| **octocrab** | `*` | Rust | ✅ Stable |
-| **gc-core** | `*` | Rust | ✅ Stable |
+| **serde_json** | `1.0` | Rust | ✅ Stable |
+| **toml** | `0.8` | Rust | ✅ Stable |
+| **reqwest** | `0.11` | Rust | ✅ Stable |
 | **async-trait** | `0.1` | Rust | ✅ Stable |
+| **octocrab** | `*` | Rust | ✅ Stable |
+| **base64** | `0.22.1` | Rust | ✅ Stable |
+| **gc-core** | `*` | Rust | ✅ Stable |
 | **thiserror** | `*` | Rust | ✅ Stable |
-| **tracing-subscriber** | `0.3` | Rust | ✅ Stable |
-| **pulldown-cmark** | `0.12` | Rust | ✅ Stable |
+| **tracing** | `*` | Rust | ✅ Stable |
+| **tokio-process** | `0.2` | Rust | ✅ Stable |
+| **governor** | `0.7` | Rust | ✅ Stable |
 | **rayon** | `1.10` | Rust | ✅ Stable |
 | **tokio-retry** | `0.3` | Rust | ✅ Stable |
-| **serde_yaml** | `0.9` | Rust | ✅ Stable |
-| **tracing** | `0.1` | Rust | ✅ Stable |
-| **tokio-process** | `0.2` | Rust | ✅ Stable |
+| **pulldown-cmark** | `0.12` | Rust | ✅ Stable |
 | **rand** | `0.8` | Rust | ✅ Stable |
-| **governor** | `0.7` | Rust | ✅ Stable |
+| **tracing-subscriber** | `0.3` | Rust | ✅ Stable |
+| **serde_yaml** | `0.9` | Rust | ✅ Stable |
+| **walkdir** | `2.3` | Rust | ✅ Stable |
+| **console** | `*` | Rust | ✅ Stable |
 | **indicatif** | `*` | Rust | ✅ Stable |
-| **gc-adapter-fs** | `*` | Rust | ✅ Stable |
+| **slug** | `0.1.6` | Rust | ✅ Stable |
+| **hex** | `0.4` | Rust | ✅ Stable |
+| **gc-adapter-cli** | `*` | Rust | ✅ Stable |
+| **gc-validator** | `0.1.0` | Rust | ✅ Stable |
 | **gc-adapter-system** | `*` | Rust | ✅ Stable |
+| **gc-adapter-fs** | `*` | Rust | ✅ Stable |
 | **sha2** | `0.10` | Rust | ✅ Stable |
 | **color-eyre** | `*` | Rust | ✅ Stable |
-| **console** | `*` | Rust | ✅ Stable |
-| **gc-validator** | `0.1.0` | Rust | ✅ Stable |
-| **hex** | `0.4` | Rust | ✅ Stable |
-| **slug** | `0.1.6` | Rust | ✅ Stable |
+| **copypasta** | `0.10` | Rust | ✅ Stable |
+| **zip** | `0.6` | Rust | ✅ Stable |
 | **gc-adapter-github** | `*` | Rust | ✅ Stable |
 | **colored** | `3.0` | Rust | ✅ Stable |
-| **walkdir** | `2.5` | Rust | ✅ Stable |
 | **notify** | `6.1` | Rust | ✅ Stable |
 
 ## 🧠 Intelligent Patterns & Anomalies
@@ -79,55 +82,58 @@ Dependencies that have passed quarantine and are safe to upgrade:
 
 | Dependency | Version | Days Since Release |
 |------------|---------|-------------------|
-| **toml** | `0.8` | 15 days |
-| **clap** | `4.4` | 15 days |
-| **serde_json** | `1.0` | 15 days |
-| **chrono** | `0.4` | 15 days |
-| **reqwest** | `0.11` | 15 days |
-| **futures** | `0.3` | 15 days |
 | **tokio** | `1.32` | 15 days |
 | **regex** | `1.10` | 15 days |
+| **clap** | `4.4` | 15 days |
+| **chrono** | `0.4` | 15 days |
+| **futures** | `0.3` | 15 days |
+| **anyhow** | `1.0` | 15 days |
 | **dotenv** | `0.15` | 15 days |
 | **serde** | `1.0` | 15 days |
-| **anyhow** | `1.0` | 15 days |
-| **base64** | `0.22.1` | 608 days |
-| **octocrab** | `*` | 15 days |
-| **gc-core** | `*` | 15 days |
+| **serde_json** | `1.0` | 15 days |
+| **toml** | `0.8` | 15 days |
+| **reqwest** | `0.11` | 15 days |
 | **async-trait** | `0.1` | 15 days |
+| **octocrab** | `*` | 15 days |
+| **base64** | `0.22.1` | 622 days |
+| **gc-core** | `*` | 15 days |
 | **thiserror** | `*` | 15 days |
-| **tracing-subscriber** | `0.3` | 15 days |
-| **pulldown-cmark** | `0.12` | 15 days |
+| **tracing** | `*` | 15 days |
+| **tokio-process** | `0.2` | 15 days |
+| **governor** | `0.7` | 15 days |
 | **rayon** | `1.10` | 15 days |
 | **tokio-retry** | `0.3` | 15 days |
-| **serde_yaml** | `0.9` | 15 days |
-| **tracing** | `0.1` | 15 days |
-| **tokio-process** | `0.2` | 15 days |
+| **pulldown-cmark** | `0.12` | 15 days |
 | **rand** | `0.8` | 15 days |
-| **governor** | `0.7` | 15 days |
+| **tracing-subscriber** | `0.3` | 15 days |
+| **serde_yaml** | `0.9` | 15 days |
+| **walkdir** | `2.3` | 15 days |
+| **console** | `*` | 15 days |
 | **indicatif** | `*` | 15 days |
-| **gc-adapter-fs** | `*` | 15 days |
+| **slug** | `0.1.6` | 515 days |
+| **hex** | `0.4` | 15 days |
+| **gc-adapter-cli** | `*` | 15 days |
+| **gc-validator** | `0.1.0` | 15 days |
 | **gc-adapter-system** | `*` | 15 days |
+| **gc-adapter-fs** | `*` | 15 days |
 | **sha2** | `0.10` | 15 days |
 | **color-eyre** | `*` | 15 days |
-| **console** | `*` | 15 days |
-| **gc-validator** | `0.1.0` | 15 days |
-| **hex** | `0.4` | 15 days |
-| **slug** | `0.1.6` | 501 days |
+| **copypasta** | `0.10` | 15 days |
+| **zip** | `0.6` | 15 days |
 | **gc-adapter-github** | `*` | 15 days |
 | **colored** | `3.0` | 15 days |
-| **walkdir** | `2.5` | 15 days |
 | **notify** | `6.1` | 15 days |
 
 ---
-*Last updated: 2025-12-29 08:41:04 UTC*
+*Last updated: 2026-01-12 08:13:56 UTC*
 
 ## 🚧 Quarantine Status
 
 Dependencies currently in quarantine (< 14 days since release):
 
-- PR #96: ci(deps): bump actions/upload-artifact from 4 to 6 (since 2025-12-15)
-- PR #95: ci(deps): bump actions/download-artifact from 4 to 7 (since 2025-12-15)
-- PR #94: ci(deps): bump actions/cache from 4 to 5 (since 2025-12-15)
+- PR #119: chore(deps): bump rsa from 0.9.9 to 0.9.10 in /tools/git-core in the cargo group across 1 directory (since 2026-01-06)
+- PR #118: ci(deps): bump actions/checkout from 4 to 6 (since 2026-01-05)
+- PR #117: ci(deps): bump peter-evans/create-pull-request from 7 to 8 (since 2026-01-05)
 
 ---
-*Last updated: 2025-12-29 08:41:04 UTC*
+*Last updated: 2026-01-12 08:13:57 UTC*
