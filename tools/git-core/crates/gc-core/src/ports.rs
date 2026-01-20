@@ -45,7 +45,7 @@ pub trait FileSystemPort: Send + Sync {
     async fn read_file(&self, path: &str) -> Result<String>;
     async fn exists(&self, path: &str) -> Result<bool>;
     async fn move_file(&self, source: &str, dest: &str) -> Result<()>;
-    async fn list_files(&self, dir: &str, pattern: Option<&str>) -> Result<Vec<String>>;
+    async fn list_files(&self, dir: &str, pattern: Option<String>) -> Result<Vec<String>>;
 }
 
 #[async_trait]

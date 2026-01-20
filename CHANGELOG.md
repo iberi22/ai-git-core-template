@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.1] - 2026-01-20 🔧 "Workflow Optimization & Triage"
+
+### Fixed
+
+- **🚑 CI/CD Restoration**:
+    - Fixed `ci-health.yml` execution path (was running from root instead of `tools/git-core`)
+    - Corrected `actions/checkout` version from invalid `v6` to `v4` across 20+ workflows
+    - Removed reference to missing `workflow-orchestrator` in `build-tools.yml`
+
+### Optimized
+
+- **⚡ Rust Workflow Performance**:
+    - `guardian-agent` and `commit-atomicity` now prioritize pre-built binaries
+    - 99% reduction in runtime for these checks when binary is present
+
+### Added
+
+- **🤖 Automated Triage**:
+    - New `triage-agent.yml` workflow for auto-labeling and commenting on issues
+    - `ci-health.yml` now auto-creates issues with log snippets for failures
+
 ## [3.5.0] - 2025-12-31 🎯 "Version Consolidation"
 
 ### Changed
