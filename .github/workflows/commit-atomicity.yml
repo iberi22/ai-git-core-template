@@ -31,15 +31,17 @@ jobs:
       - name: 📦 Download atomicity-checker
         run: |
           # Try to use pre-built binary first (faster)
+          # Try pre-built binary first (Fastest)
           if [ -f "bin/atomicity-checker-linux" ]; then
-            echo "Using pre-built binary from repo"
+            echo "✅ Using pre-built binary from repo (Zero Compile Time)"
             chmod +x bin/atomicity-checker-linux
-            cp bin/atomicity-checker-linux /usr/local/bin/atomicity-checker
+            sudo cp bin/atomicity-checker-linux /usr/local/bin/atomicity-checker
+          # Fallback to Cargo (Slow)
           else
-            echo "Building from source..."
+            echo "⚠️ Building from source (Slow)..."
             cd tools/atomicity-checker
             cargo build --release
-            cp target/release/atomicity-checker /usr/local/bin/atomicity-checker
+            sudo cp target/release/atomicity-checker /usr/local/bin/atomicity-checker
           fi
           atomicity-checker --version
 
