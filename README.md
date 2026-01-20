@@ -29,13 +29,7 @@ version: 3.5.1
 
 <div style="flex: 1; min-width: 500px;">
 
-<<<<<<< Updated upstream
 ### ⚡ Performance-First AI Development
-=======
-### 🚀 Active Automated Evolution
-
-**Git-Core Protocol** is a living standard for AI-assisted development. It provides a structured workflow where **Human ↔ AI Agent ↔ GitHub** communicate seamlessly.
->>>>>>> Stashed changes
 
 **Git-Core Protocol** is a living standard for AI-assisted development, now powered by **Rust-native agents** for 10-30x speedup. It provides a structured workflow where **Human ↔ AI Agent ↔ GitHub** communicate seamlessly.
 
@@ -137,9 +131,6 @@ Then execute: ./scripts/init_project.sh
 
 The `gc` (Git-Core) CLI is the primary tool for interacting with the protocol.
 
-<<<<<<< Updated upstream
-> **⚠️ IMPORTANT:** Most commands (like `issue`, `pr`, `git`) require you to be inside a **Git repository** to function correctly. They automatically detect the repository context from the `.git` folder.
-=======
 ### Available Recipes (Auto-Downloaded)
 
 The system automatically downloads the latest "recipes" for:
@@ -151,7 +142,6 @@ The system automatically downloads the latest "recipes" for:
 - ⛓️ **Blockchain** (Smart Contracts, Web3)
 - 🤖 **AI Research** (Papers, State of the Art)
 - 🎓 **AI Training** (Fine-tuning, Datasets)
->>>>>>> Stashed changes
 
 ### 🛠️ Core Commands
 
@@ -299,13 +289,7 @@ Exports: Git status, recent commits, open issues, and pending tasks.
 
 Automatic detection of repository type (public/private) to optimize GitHub Actions:
 
-<<<<<<< Updated upstream
-| Mode | Schedules | Cost |
-|------|-----------|------|
-| 🟢 **Public** | Every 6 hours | $0 (unlimited) |
-| 🟡 **Private** | Event-based only | Free tier |
-=======
-The protocol now **automatically adapts** based on whether your repository is public or private:
+The protocol now **automates adaptation** based on whether your repository is public or private:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -343,15 +327,11 @@ The protocol now **automatically adapts** based on whether your repository is pu
 ```
 
 📖 **Full documentation:** [docs/ADAPTIVE_WORKFLOWS.md](docs/ADAPTIVE_WORKFLOWS.md)
->>>>>>> Stashed changes
 
 ---
 
 ### 🧠 Agent State Protocol
 
-<<<<<<< Updated upstream
-Agents persist state in GitHub Issues using XML blocks for pausable/resumable workflows:
-=======
 The latest version integrates advanced patterns from **[12-Factor Agents](https://github.com/humanlayer/12-factor-agents)** and **Agent Control Plane (ACP)**:
 
 ### 🧠 Context Protocol (Stateless Reducer)
@@ -362,7 +342,6 @@ Agents persist state in GitHub Issues using structured XML blocks. This enables:
 - **Dynamic Planning**: `<plan>` field with items marked `done`/`in_progress`/`pending`
 - **Human-as-Tool**: `<input_request>` for structured data requests (not just approvals)
 - **Observability**: `<metrics>` tracks tool calls, errors, and cost estimates
->>>>>>> Stashed changes
 
 ```bash
 ./scripts/agent-state.ps1 read -IssueNumber 42
@@ -374,9 +353,6 @@ Agents persist state in GitHub Issues using structured XML blocks. This enables:
 
 Critical operations (deletions, deploys) require explicit confirmation:
 
-<<<<<<< Updated upstream
-> ⚠️ **HIGH STAKES ACTION DETECTED**. Respond 'Proceder' to continue.
-=======
 The protocol now **self-improves** through automated weekly analysis:
 
 ```
@@ -428,7 +404,6 @@ Projects using Git-Core Protocol can **send anonymized metrics back** to the off
 - ✅ Opt-in only (you choose when to send)
 
 👉 **Full spec:** [telemetry/README.md](telemetry/README.md)
->>>>>>> Stashed changes
 
 ---
 
@@ -459,7 +434,6 @@ This protocol is in **active automated evolution**. We need you to test it and r
 1. **Friction points:** Where did the agent get stuck?
 2. **Missing recipes:** What role did you need that wasn't there?
 3. **Workflow bugs:** Did the state get out of sync?
->>>>>>> Stashed changes
 
 ### 🤖 Automated Triage Agent
 
