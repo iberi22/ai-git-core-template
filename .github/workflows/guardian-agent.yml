@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: 📋 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: 🦀 Setup Rust (if available)
         uses: dtolnay/rust-toolchain@stable
@@ -77,9 +77,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          # Try Rust version first (15,000x faster than PowerShell)
-          # Rust: <200ns | PowerShell: 2-3s
-          if command -v cargo &> /dev/null && [ -f "tools/workflow-orchestrator/Cargo.toml" ]; then
+          # Try pre-built binary first (Fastest)
+          if [ -f "bin/workflow-orchestrator-linux" ]; then
+            echo "✅ Running Pre-built Guardian Agent (Zero Compile Time)"
+            chmod +x bin/workflow-orchestrator-linux
+            ./bin/workflow-orchestrator-linux guardian \
+              --pr-number ${{ steps.pr.outputs.number }} \
+              --threshold 70 \
+              --ci-mode
+          # Fallback to Cargo (15,000x faster than PowerShell, but needs compile)
+          elif command -v cargo &> /dev/null && [ -f "tools/workflow-orchestrator/Cargo.toml" ]; then
             echo "✅ Running Guardian Agent (Rust - High Performance)"
             cd tools/workflow-orchestrator
 
