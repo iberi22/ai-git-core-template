@@ -94,7 +94,7 @@ jobs:
 
       - name: 🔀 Create Pull Request
         if: steps.check.outputs.needs_update == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: 🔄 Update Git-Core Protocol to ${{ steps.latest.outputs.version }}"
