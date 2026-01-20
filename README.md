@@ -11,15 +11,15 @@ summary: |
   Project overview, quick start guide, and core principles of the Git-Core Protocol.
   Optimized with Rust-powered agents and simplified architecture.
 keywords: [git-core, protocol, ai-agent, template, llm, copilot, claude, gemini, grok, rust]
-tags: ["#documentation", "#readme", "#core", "#v3.5.0"]
+tags: ["#documentation", "#readme", "#core", "#v3.5.1"]
 project: Git-Core-Protocol
-version: 3.5.0
+version: 3.5.1
 ---
 
 # 🧠 Git-Core Protocol
 
 [![Use this template](https://img.shields.io/badge/Use%20this-template-blue?style=for-the-badge)](https://github.com/iberi22/Git-Core-Protocol/generate)
-[![Version](https://img.shields.io/badge/Version-3.5.0-green?style=for-the-badge)](https://github.com/iberi22/Git-Core-Protocol/releases/tag/v3.5.0)
+[![Version](https://img.shields.io/badge/Version-3.5.1-green?style=for-the-badge)](https://github.com/iberi22/Git-Core-Protocol/releases/tag/v3.5.1)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg?style=for-the-badge)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![AI Code Review](https://img.shields.io/badge/AI%20Review-CodeRabbit%20%2B%20Gemini-purple?style=for-the-badge)](https://github.com/marketplace/coderabbit)
 
@@ -311,6 +311,15 @@ Automated error classification and retry for transient failures:
 - **Transient errors** (timeouts, rate limits): Auto-retry
 - **Dependency errors**: Creates issue for review
 - **Test failures**: Creates issue with diagnosis
+
+---
+
+### 🤖 Automated Triage Agent
+
+New in v3.5.1! Automatically manages incoming issues:
+- **Auto-Labeling**: Detects keywords (bug, feature, ci) and applies labels.
+- **Smart Routing**: Assigns issues to relevant teams based on context.
+- **CI Integration**: Automatically creates detailed issues for workflow failures with log snippets.
 
 ---
 
