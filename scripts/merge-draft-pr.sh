@@ -39,9 +39,9 @@ fi
 # Convertir draft a ready si es necesario
 if [ "$IS_DRAFT" = "true" ]; then
     echo -e "${YELLOW}📝 PR está en draft. Convirtiendo a ready...${NC}"
-    
+
     gh api graphql -f query="mutation { markPullRequestReadyForReview(input: {pullRequestId: \"$PR_ID\"}) { pullRequest { id isDraft } } }" > /dev/null
-    
+
     echo -e "${GREEN}✅ PR marcado como ready${NC}"
 else
     echo -e "${GREEN}✅ PR ya está listo para merge${NC}"

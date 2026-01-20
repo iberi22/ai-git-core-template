@@ -21,9 +21,9 @@ test_assert() {
     local condition=$1
     local test_name=$2
     local error_msg=${3:-}
-    
+
     ((TESTS_TOTAL++))
-    
+
     if [ "$condition" = "true" ]; then
         echo -e "  ${GREEN}✓${RESET} $test_name"
         ((TESTS_PASSED++))
@@ -82,15 +82,15 @@ if OUTPUT=$(./scripts/detect-repo-config.sh 2>&1); then
     test_assert \
         "$(echo "$OUTPUT" | grep -q 'IS_PUBLIC=' && echo true || echo false)" \
         "Script outputs IS_PUBLIC"
-    
+
     test_assert \
         "$(echo "$OUTPUT" | grep -q 'IS_MAIN_REPO=' && echo true || echo false)" \
         "Script outputs IS_MAIN_REPO"
-    
+
     test_assert \
         "$(echo "$OUTPUT" | grep -q 'ENABLE_SCHEDULES=' && echo true || echo false)" \
         "Script outputs ENABLE_SCHEDULES"
-    
+
     test_assert \
         "$(echo "$OUTPUT" | grep -q 'SCHEDULE_MODE=' && echo true || echo false)" \
         "Script outputs SCHEDULE_MODE"
@@ -113,14 +113,14 @@ WORKFLOWS=(
 
 for workflow in "${WORKFLOWS[@]}"; do
     workflow_name=$(basename "$workflow")
-    
+
     if [ -f "$workflow" ]; then
         HAS_NAME=$(grep -q "^name:" "$workflow" && echo true || echo false)
         HAS_ON=$(grep -q "^on:" "$workflow" && echo true || echo false)
         HAS_JOBS=$(grep -q "^jobs:" "$workflow" && echo true || echo false)
-        
+
         IS_VALID=$([ "$HAS_NAME" = "true" ] && [ "$HAS_ON" = "true" ] && [ "$HAS_JOBS" = "true" ] && echo true || echo false)
-        
+
         test_assert "$IS_VALID" "$workflow_name has valid YAML structure"
     fi
 done
@@ -144,7 +144,7 @@ for workflow in "${CRITICAL_WORKFLOWS[@]}"; do
     if [ -f "$workflow" ]; then
         workflow_name=$(basename "$workflow")
         HAS_TIMEOUT=$(grep -q "timeout-minutes:" "$workflow" && echo true || echo false)
-        
+
         test_assert "$HAS_TIMEOUT" "$workflow_name has timeout-minutes defined"
     fi
 done

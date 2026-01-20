@@ -47,6 +47,7 @@ Revisa cada archivo existente y clasifícalo:
 #### Opción B: Migración Manual
 
 **Para archivos de tracking:**
+
 ```bash
 # 1. Extraer tareas de TODO.md y crear issues
 cat TODO.md | grep "^- \[ \]" | while read task; do
@@ -58,6 +59,7 @@ rm TODO.md
 ```
 
 **Para guías y tutoriales:**
+
 ```bash
 # Determinar tipo y mover
 # ¿Es una lección? → tutorials/
@@ -109,6 +111,7 @@ grep -r "](./OLD_FILE.md)" . --include="*.md"
 **Problema:** Archivo enorme con tareas mezcladas.
 
 **Solución:**
+
 ```bash
 # Opción A: Script automático
 ./scripts/migrate-tasks-to-issues.ps1 -File "TODO.md"
@@ -137,6 +140,7 @@ mv TODO.md docs/archive/2025-12/TODO_MIGRATED.md
 | ¿Espera que ya sepas los básicos? | No → Tutorial / Sí → How-To | - |
 
 **Ejemplo:**
+
 ```markdown
 # Si dice: "Aprenderás a implementar autenticación paso a paso"
 → tutorials/AUTHENTICATION_IMPLEMENTATION.md
@@ -160,6 +164,7 @@ mv TODO.md docs/archive/2025-12/TODO_MIGRATED.md
 ### Caso 4: Múltiples archivos `GUIDE_*.md`
 
 **Estrategia:**
+
 ```bash
 # 1. Analizar cada uno
 for file in GUIDE_*.md; do
@@ -211,7 +216,7 @@ $files = Get-ChildItem -Path $ProjectPath -Filter "*.md" -File
 foreach ($file in $files) {
     $content = Get-Content $file.FullName -Raw
     $name = $file.Name.ToLower()
-    
+
     # Detectar tipo
     $type = if ($trackingKeywords | Where-Object { $name -match $_ }) {
         "TRACKING"
@@ -226,7 +231,7 @@ foreach ($file in $files) {
     } else {
         "UNKNOWN"
     }
-    
+
     # Determinar destino
     $destination = switch ($type) {
         "TUTORIAL"     { "docs/tutorials/$($file.Name)" }
@@ -236,9 +241,9 @@ foreach ($file in $files) {
         "TRACKING"     { "→ GitHub Issues (manual)" }
         "UNKNOWN"      { "docs/archive/2025-12/$($file.Name)" }
     }
-    
+
     Write-Host "$($file.Name) → $type → $destination"
-    
+
     if (-not $DryRun -and $type -ne "TRACKING" -and $type -ne "UNKNOWN") {
         Move-Item $file.FullName $destination -Force
     }
@@ -260,6 +265,7 @@ foreach ($file in $files) {
 | `BACKUP_*.md` | Respaldos innecesarios |
 
 **Archivar (si tiene valor histórico):**
+
 ```bash
 mkdir -p docs/archive/2025-12
 mv OLD_FILE.md docs/archive/2025-12/
@@ -298,6 +304,7 @@ mv OLD_FILE.md docs/archive/2025-12/
 ## 🎯 Ejemplo Completo: Proyecto "MyApp"
 
 **Estado inicial:**
+
 ```
 my-app/
 ├── TODO.md               # 30 tareas
@@ -310,6 +317,7 @@ my-app/
 ```
 
 **Después de migración:**
+
 ```
 my-app/
 ├── docs/
@@ -333,6 +341,7 @@ my-app/
 ```
 
 **Comandos ejecutados:**
+
 ```bash
 # 1. Crear issues
 cat TODO.md | grep "^-" | while read task; do

@@ -29,7 +29,13 @@ version: 3.5.1
 
 <div style="flex: 1; min-width: 500px;">
 
+<<<<<<< Updated upstream
 ### ⚡ Performance-First AI Development
+=======
+### 🚀 Active Automated Evolution
+
+**Git-Core Protocol** is a living standard for AI-assisted development. It provides a structured workflow where **Human ↔ AI Agent ↔ GitHub** communicate seamlessly.
+>>>>>>> Stashed changes
 
 **Git-Core Protocol** is a living standard for AI-assisted development, now powered by **Rust-native agents** for 10-30x speedup. It provides a structured workflow where **Human ↔ AI Agent ↔ GitHub** communicate seamlessly.
 
@@ -131,7 +137,21 @@ Then execute: ./scripts/init_project.sh
 
 The `gc` (Git-Core) CLI is the primary tool for interacting with the protocol.
 
+<<<<<<< Updated upstream
 > **⚠️ IMPORTANT:** Most commands (like `issue`, `pr`, `git`) require you to be inside a **Git repository** to function correctly. They automatically detect the repository context from the `.git` folder.
+=======
+### Available Recipes (Auto-Downloaded)
+
+The system automatically downloads the latest "recipes" for:
+
+- 🏗️ **Software Engineering** (Patterns, Clean Code)
+- 🔬 **Research** (Academic, Technical)
+- 🛡️ **Cybersecurity** (Auditing, Hardening)
+- 🎨 **UI/UX Design** (Accessibility, Systems)
+- ⛓️ **Blockchain** (Smart Contracts, Web3)
+- 🤖 **AI Research** (Papers, State of the Art)
+- 🎓 **AI Training** (Fine-tuning, Datasets)
+>>>>>>> Stashed changes
 
 ### 🛠️ Core Commands
 
@@ -279,16 +299,70 @@ Exports: Git status, recent commits, open issues, and pending tasks.
 
 Automatic detection of repository type (public/private) to optimize GitHub Actions:
 
+<<<<<<< Updated upstream
 | Mode | Schedules | Cost |
 |------|-----------|------|
 | 🟢 **Public** | Every 6 hours | $0 (unlimited) |
 | 🟡 **Private** | Event-based only | Free tier |
+=======
+The protocol now **automatically adapts** based on whether your repository is public or private:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  DETECTOR  →  IS_PUBLIC?  →  SCHEDULE_MODE              │
+│     ↓              ↓              ↓                       │
+│  gh repo      true/false    aggressive/moderate/         │
+│  view                       conservative                 │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Three Modes:**
+
+| Mode | When | Schedules | Consumption | Cost |
+|------|------|-----------|-------------|------|
+| 🟢 **AGGRESSIVE** | Public repos | Every 30 min | ~18,000 min/month | $0 (unlimited) |
+| 🟡 **MODERATE** | Private main | Every 6 hours | ~3,000 min/month | Requires Pro |
+| 🔴 **CONSERVATIVE** | Other private | Event-based only | ~600 min/month | $0 (Free tier) |
+
+**Key Benefits:**
+
+- ✅ **Zero-configuration**: Automatic detection and adaptation
+- ✅ **97% savings** on private repositories
+- ✅ **100% functionality** maintained via event-based triggers
+- ✅ **Cross-platform**: PowerShell + Bash support
+
+**Usage:**
+
+```bash
+# Test detection locally
+./scripts/detect-repo-config.ps1  # Windows
+./scripts/detect-repo-config.sh   # Linux/macOS
+
+# Workflows automatically use the detection
+# No manual configuration needed!
+```
+
+📖 **Full documentation:** [docs/ADAPTIVE_WORKFLOWS.md](docs/ADAPTIVE_WORKFLOWS.md)
+>>>>>>> Stashed changes
 
 ---
 
 ### 🧠 Agent State Protocol
 
+<<<<<<< Updated upstream
 Agents persist state in GitHub Issues using XML blocks for pausable/resumable workflows:
+=======
+The latest version integrates advanced patterns from **[12-Factor Agents](https://github.com/humanlayer/12-factor-agents)** and **Agent Control Plane (ACP)**:
+
+### 🧠 Context Protocol (Stateless Reducer)
+
+Agents persist state in GitHub Issues using structured XML blocks. This enables:
+
+- **Pausable/Resumable workflows**: Any agent can pick up where another left off
+- **Dynamic Planning**: `<plan>` field with items marked `done`/`in_progress`/`pending`
+- **Human-as-Tool**: `<input_request>` for structured data requests (not just approvals)
+- **Observability**: `<metrics>` tracks tool calls, errors, and cost estimates
+>>>>>>> Stashed changes
 
 ```bash
 ./scripts/agent-state.ps1 read -IssueNumber 42
@@ -300,7 +374,61 @@ Agents persist state in GitHub Issues using XML blocks for pausable/resumable wo
 
 Critical operations (deletions, deploys) require explicit confirmation:
 
+<<<<<<< Updated upstream
 > ⚠️ **HIGH STAKES ACTION DETECTED**. Respond 'Proceder' to continue.
+=======
+The protocol now **self-improves** through automated weekly analysis:
+
+```
+MEDIR → ANALIZAR → PROPONER → IMPLEMENTAR → VALIDAR → ↺
+```
+
+**Features:**
+
+- **3-Order Metrics Taxonomy**: Operational (daily), Quality (weekly), Evolution (monthly)
+- **Automated Pattern Detection**: Identifies "death loops", low adoption, high friction
+- **Weekly Reports**: Auto-generated GitHub Issues with insights
+
+```powershell
+# Collect local metrics
+./scripts/evolution-metrics.ps1 -OutputFormat markdown
+
+# Trigger evolution cycle (runs every Monday automatically)
+gh workflow run evolution-cycle.yml
+```
+
+👉 **Full spec:** [docs/agent-docs/EVOLUTION_PROTOCOL.md](docs/agent-docs/EVOLUTION_PROTOCOL.md)
+
+### 📡 Federated Telemetry System
+
+Projects using Git-Core Protocol can **send anonymized metrics back** to the official repo for centralized analysis:
+
+```
+┌─────────────────┐    PR with metrics    ┌─────────────────────┐
+│  Your Project   │ ─────────────────────▶│ Official Git-Core   │
+│  (uses protocol)│                       │ Protocol Repo       │
+└─────────────────┘                       │   (analysis)        │
+                                          └─────────────────────┘
+```
+
+**Usage:**
+
+```powershell
+# Preview what would be sent
+./scripts/send-telemetry.ps1 -DryRun
+
+# Send anonymized metrics
+./scripts/send-telemetry.ps1
+```
+
+**Privacy:**
+
+- ✅ Anonymous by default (project names hashed)
+- ✅ Only numbers (no code, no content)
+- ✅ Opt-in only (you choose when to send)
+
+👉 **Full spec:** [telemetry/README.md](telemetry/README.md)
+>>>>>>> Stashed changes
 
 ---
 
@@ -308,11 +436,30 @@ Critical operations (deletions, deploys) require explicit confirmation:
 
 Automated error classification and retry for transient failures:
 
+<<<<<<< Updated upstream
 - **Transient errors** (timeouts, rate limits): Auto-retry
 - **Dependency errors**: Creates issue for review
 - **Test failures**: Creates issue with diagnosis
 
 ---
+=======
+### 🛣️ Milestones
+
+- [x] **v1.4.0**: ✅ Model-Specific Agents, Session Export, AI Reports
+- [x] **v2.1 (Context Protocol)**: ✅ XML Agent State, Micro-Agents, HumanLayer
+- [x] **v1.5.0**: ✅ Evolution Protocol, Federated Telemetry
+- [ ] **v2.2**: "Memory Core" - Persistent semantic memory across sessions
+- [ ] **v2.3**: Multi-Agent Swarm Protocol (Coordinator + Workers)
+- [ ] **v3.0**: Native IDE Integration (VS Code Extension)
+
+### 🤝 We Need Your Feedback
+
+This protocol is in **active automated evolution**. We need you to test it and report:
+
+1. **Friction points:** Where did the agent get stuck?
+2. **Missing recipes:** What role did you need that wasn't there?
+3. **Workflow bugs:** Did the state get out of sync?
+>>>>>>> Stashed changes
 
 ### 🤖 Automated Triage Agent
 

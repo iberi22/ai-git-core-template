@@ -23,6 +23,7 @@ status: approved
 Cuando agentes como Jules crean PRs, a veces los marcan como **Draft** por defecto. Los PRs en draft no se pueden hacer merge directamente, bloqueando la automatización.
 
 **Error típico:**
+
 ```
 gh pr merge 69 --squash
 GraphQL: Pull Request is still a draft (mergePullRequest)
@@ -47,6 +48,7 @@ gh pr merge <NUMBER> --squash --delete-branch
 ```
 
 **Bash:**
+
 ```bash
 # Obtener ID
 PR_ID=$(gh pr view <NUMBER> --json id -q '.id')
@@ -76,7 +78,7 @@ gh pr merge <NUMBER> --squash --delete-branch
 param(
     [Parameter(Mandatory=$true)]
     [int]$PrNumber,
-    
+
     [switch]$DeleteBranch = $true
 )
 
@@ -93,10 +95,10 @@ if ($prInfo.state -ne "OPEN") {
 # Convertir draft a ready si es necesario
 if ($prInfo.isDraft) {
     Write-Host "📝 PR está en draft. Convirtiendo a ready..." -ForegroundColor Yellow
-    
+
     $query = "mutation { markPullRequestReadyForReview(input: {pullRequestId: `"$($prInfo.id)`"}) { pullRequest { id isDraft } } }"
     $result = gh api graphql -f query=$query | ConvertFrom-Json
-    
+
     if ($result.data.markPullRequestReadyForReview.pullRequest.isDraft -eq $false) {
         Write-Host "✅ PR marcado como ready" -ForegroundColor Green
     } else {
@@ -151,9 +153,9 @@ fi
 # Convertir draft a ready si es necesario
 if [ "$IS_DRAFT" = "true" ]; then
     echo "📝 PR está en draft. Convirtiendo a ready..."
-    
+
     gh api graphql -f query="mutation { markPullRequestReadyForReview(input: {pullRequestId: \"$PR_ID\"}) { pullRequest { id isDraft } } }"
-    
+
     echo "✅ PR marcado como ready"
 fi
 
@@ -168,7 +170,7 @@ echo "✅ PR #$PR_NUMBER mergeado exitosamente"
 
 ## 📋 Workflow para Agentes
 
-### Cuando un agente (Jules, Copilot) crea un PR:
+### Cuando un agente (Jules, Copilot) crea un PR
 
 ```powershell
 # 1. Detectar nuevo PR
@@ -202,7 +204,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    
+
     steps:
       - name: Convert draft to ready if needed
         env:
@@ -210,13 +212,13 @@ jobs:
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
           IS_DRAFT=$(gh pr view $PR_NUMBER --json isDraft -q '.isDraft')
-          
+
           if [ "$IS_DRAFT" = "true" ]; then
             echo "Converting draft PR to ready..."
             PR_ID=$(gh pr view $PR_NUMBER --json id -q '.id')
             gh api graphql -f query="mutation { markPullRequestReadyForReview(input: {pullRequestId: \"$PR_ID\"}) { pullRequest { id } } }"
           fi
-      
+
       - name: Merge PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -240,22 +242,28 @@ jobs:
 ## 🚨 Errores Comunes
 
 ### Error 1: "Pull Request is still a draft"
+
 **Solución:** Usar el script `merge-draft-pr.ps1` en lugar de `gh pr merge` directo.
 
 ### Error 2: Escapado de comillas en PowerShell
+
 **Problema:**
+
 ```powershell
 gh api graphql -f query='mutation { ... "PR_kwDO..." ... }'  # ❌ Falla
 ```
 
 **Solución:**
+
 ```powershell
 $query = 'mutation { ... "PR_kwDO..." ... }'
 gh api graphql -f query=$query  # ✅ Funciona
 ```
 
 ### Error 3: PR ya mergeado
+
 **Detección:**
+
 ```powershell
 $state = (gh pr view <N> --json state | ConvertFrom-Json).state
 if ($state -eq "MERGED") {

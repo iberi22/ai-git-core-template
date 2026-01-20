@@ -61,11 +61,11 @@ function Test-ContentType {
         [string]$Content,
         [string]$Type
     )
-    
+
     $keywords = $patterns[$Type]
     $fileName = $FileName.ToLower()
     $contentLower = $Content.ToLower()
-    
+
     foreach ($keyword in $keywords) {
         if ($fileName -match $keyword -or $contentLower -match $keyword) {
             return $true
@@ -78,19 +78,19 @@ function Get-DocumentType {
     param(
         [string]$FilePath
     )
-    
+
     $fileName = Split-Path $FilePath -Leaf
     $content = Get-Content $FilePath -Raw -ErrorAction SilentlyContinue
-    
+
     if (-not $content) { return "UNKNOWN" }
-    
+
     # Prioridad: Tracking > Tutorial > HowTo > Reference > Explanation
     if (Test-ContentType $fileName $content "Tracking") { return "TRACKING" }
     if (Test-ContentType $fileName $content "Tutorial") { return "TUTORIAL" }
     if (Test-ContentType $fileName $content "HowTo") { return "HOWTO" }
     if (Test-ContentType $fileName $content "Reference") { return "REFERENCE" }
     if (Test-ContentType $fileName $content "Explanation") { return "EXPLANATION" }
-    
+
     return "UNKNOWN"
 }
 
@@ -99,7 +99,7 @@ function Get-Destination {
         [string]$Type,
         [string]$FileName
     )
-    
+
     switch ($Type) {
         "TUTORIAL"     { return "docs/tutorials/$FileName" }
         "HOWTO"        { return "docs/how-to/$FileName" }
@@ -112,10 +112,10 @@ function Get-Destination {
 
 function Extract-Tasks {
     param([string]$FilePath)
-    
+
     $content = Get-Content $FilePath
     $tasks = @()
-    
+
     foreach ($line in $content) {
         # Detectar: - [ ] Task, * Task, - Task, etc.
         if ($line -match '^\s*[-*]\s*(\[ \])?\s*(.+)$') {
@@ -125,7 +125,7 @@ function Extract-Tasks {
             }
         }
     }
-    
+
     return $tasks
 }
 
@@ -152,7 +152,7 @@ foreach ($dir in $dirs) {
 
 # Buscar archivos .md en la raíz (excluir README.md, CHANGELOG.md, LICENSE.md)
 $excludeFiles = @("README.md", "CHANGELOG.md", "LICENSE.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md")
-$files = Get-ChildItem -Path $ProjectPath -Filter "*.md" -File | 
+$files = Get-ChildItem -Path $ProjectPath -Filter "*.md" -File |
     Where-Object { $excludeFiles -notcontains $_.Name -and $_.DirectoryName -eq (Resolve-Path $ProjectPath).Path }
 
 if ($files.Count -eq 0) {
@@ -169,18 +169,18 @@ $trackingFiles = @()
 foreach ($file in $files) {
     $type = Get-DocumentType $file.FullName
     $destination = Get-Destination $type $file.Name
-    
+
     $results += [PSCustomObject]@{
         FileName = $file.Name
         Type = $type
         Destination = $destination
         FullPath = $file.FullName
     }
-    
+
     if ($type -eq "TRACKING") {
         $trackingFiles += $file
     }
-    
+
     $color = $colors[$type]
     Write-Host "  $($file.Name)" -NoNewline
     Write-Host " → " -NoNewline -ForegroundColor Gray
@@ -200,12 +200,12 @@ foreach ($item in $summary) {
 # Mostrar tareas encontradas
 if ($trackingFiles.Count -gt 0) {
     Write-Host "`n📋 Tareas encontradas en archivos de tracking:" -ForegroundColor Yellow
-    
+
     foreach ($file in $trackingFiles) {
         $tasks = Extract-Tasks $file.FullName
         if ($tasks.Count -gt 0) {
             Write-Host "`n  📄 $($file.Name): $($tasks.Count) tarea(s)" -ForegroundColor Cyan
-            
+
             if ($CreateIssues -and -not $DryRun) {
                 Write-Host "     Creando issues..." -ForegroundColor Green
                 foreach ($task in $tasks) {
@@ -229,7 +229,7 @@ if ($trackingFiles.Count -gt 0) {
             }
         }
     }
-    
+
     if (-not $CreateIssues) {
         Write-Host "`n💡 Sugerencia: Usa -CreateIssues para crear issues automáticamente" -ForegroundColor Yellow
     }
@@ -243,10 +243,10 @@ if ($DryRun) {
 } else {
     Write-Host "⚠️  ¿Continuar con la migración? (S/N): " -NoNewline -ForegroundColor Yellow
     $confirm = Read-Host
-    
+
     if ($confirm -eq "S" -or $confirm -eq "s") {
         Write-Host "`n🚀 Ejecutando migración...`n" -ForegroundColor Green
-        
+
         foreach ($result in $results) {
             if ($result.Type -ne "TRACKING") {
                 try {
@@ -254,7 +254,7 @@ if ($DryRun) {
                     if (-not (Test-Path $destDir)) {
                         New-Item -ItemType Directory -Path $destDir -Force | Out-Null
                     }
-                    
+
                     Move-Item $result.FullPath $result.Destination -Force
                     Write-Host "  ✅ $($result.FileName) → $($result.Destination)" -ForegroundColor Green
                 } catch {
@@ -271,7 +271,7 @@ if ($DryRun) {
                 }
             }
         }
-        
+
         Write-Host "`n✅ Migración completada!`n" -ForegroundColor Green
         Write-Host "📝 Próximos pasos:" -ForegroundColor Cyan
         Write-Host "  1. Verifica los archivos migrados"

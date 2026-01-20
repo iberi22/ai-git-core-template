@@ -35,9 +35,9 @@ function Test-Assert {
         [string]$TestName,
         [string]$ErrorMessage = ""
     )
-    
+
     $script:TestsTotal++
-    
+
     if ($Condition) {
         Write-Host "  ${Green}✓${Reset} $TestName" -ForegroundColor Green
         $script:TestsPassed++
@@ -105,23 +105,23 @@ try {
     $output = & "./scripts/detect-repo-config.ps1" *>&1 | Out-String
     # Strip ANSI escape codes
     $cleanOutput = $output -replace '\x1b\[[0-9;]*m', ''
-    
+
     Test-Assert `
         ($cleanOutput -match "IS_PUBLIC=(true|false)") `
         "Script outputs IS_PUBLIC with value"
-    
+
     Test-Assert `
         ($cleanOutput -match "IS_MAIN_REPO=(true|false)") `
         "Script outputs IS_MAIN_REPO with value"
-    
+
     Test-Assert `
         ($cleanOutput -match "ENABLE_SCHEDULES=(true|false)") `
         "Script outputs ENABLE_SCHEDULES with value"
-    
+
     Test-Assert `
         ($cleanOutput -match "SCHEDULE_MODE=(aggressive|moderate|conservative)") `
         "Script outputs SCHEDULE_MODE with value"
-        
+
     if ($Verbose) {
         Write-Host "    ${Cyan}Output:${Reset}"
         Write-Host "    $cleanOutput"
@@ -147,14 +147,14 @@ foreach ($workflow in $workflowsToTest) {
     if (Test-Path $workflow) {
         $content = Get-Content $workflow -Raw
         $workflowName = Split-Path $workflow -Leaf
-        
+
         # Check for basic YAML structure
         $hasName = $content -match "(?m)^name:"
         $hasOn = $content -match "(?m)^on:"
         $hasJobs = $content -match "(?m)^jobs:"
-        
+
         $isValid = $hasName -and $hasOn -and $hasJobs
-        
+
         Test-Assert $isValid "$workflowName has valid YAML structure"
     }
 }
@@ -178,9 +178,9 @@ foreach ($workflow in $criticalWorkflows) {
     if (Test-Path $workflow) {
         $content = Get-Content $workflow -Raw
         $workflowName = Split-Path $workflow -Leaf
-        
+
         $hasTimeout = $content -match "timeout-minutes:"
-        
+
         Test-Assert $hasTimeout "$workflowName has timeout-minutes defined"
     }
 }
