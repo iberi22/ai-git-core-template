@@ -94,7 +94,7 @@ curl -fsSL <https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/ins
 
 irm <https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1> | iex
 
-After setup, read .ai-core/ARCHITECTURE.md and start with: gc issue list
+After setup, read .gitcore/ARCHITECTURE.md and start with: gc issue list
 
 ```
 
@@ -397,7 +397,7 @@ git-core upgrade
 # Check protocol integrity
 git-core check
 
-# Migrate from .ai/ to .ai-core/
+# Migrate from .ai/ to .gitcore/
 git-core migrate
 ```
 
@@ -424,7 +424,7 @@ git-core migrate
 
 ```
 /
-├── .ai-core/
+├── .gitcore/
 │   ├── ARCHITECTURE.md       # 📖 System context
 │   ├── AGENT_INDEX.md        # 🎭 Agent roles and routing
 │   └── CONTEXT_LOG.md        # 📝 Ephemeral session notes
@@ -466,7 +466,7 @@ git-core migrate
 ┌─────────────────────────────────────────────────────────┐
 │                    THE LOOP                              │
 ├─────────────────────────────────────────────────────────┤
-│   1. READ: cat .ai-core/ARCHITECTURE.md                      │
+│   1. READ: cat .gitcore/ARCHITECTURE.md                      │
 │           gh issue list --assignee "@me"                │
 │   2. ACT:  gh issue edit <id> --add-assignee "@me"      │
 │           git checkout -b feat/issue-<id>               │

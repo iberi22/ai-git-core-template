@@ -67,10 +67,10 @@ const ALLOWED_ROOT_MD: &[&str] = &[
 ];
 
 /// Required structure for Git-Core Protocol
-const REQUIRED_DIRS: &[&str] = &[".ai", ".github"];
+const REQUIRED_DIRS: &[&str] = &[".gitcore", ".github"];
 const REQUIRED_FILES: &[(&str, &str)] = &[
     ("AGENTS.md", "Agent configuration"),
-    (".ai/ARCHITECTURE.md", "System architecture"),
+    (".gitcore/ARCHITECTURE.md", "System architecture"),
     (".github/copilot-instructions.md", "Copilot rules"),
 ];
 

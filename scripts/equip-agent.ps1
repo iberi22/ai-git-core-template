@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     This script acts as the "Context Injector" for the AI. It:
-    1. Looks up the requested Role in .ai-core/AGENT_INDEX.md.
+    1. Looks up the requested Role in .gitcore/AGENT_INDEX.md.
     2. Extracts the recipe path.
     3. Downloads the recipe content from the remote repository.
     4. Appends standard protocol skills (Atomic Commits, Architecture).
@@ -26,7 +26,7 @@ param (
 Write-Warning "⚠️  DEPRECATION NOTICE: This script is deprecated. Please use 'gc context equip' instead."
 
 $RepoBaseUrl = "https://raw.githubusercontent.com/iberi22/agents-flows-recipes/main"
-$ConfigDir = ".ai-core"
+$ConfigDir = ".gitcore"
 $ContextFile = "$ConfigDir\CURRENT_CONTEXT.md"
 $IndexFile = "$ConfigDir\AGENT_INDEX.md"
 
@@ -93,7 +93,7 @@ $ProtocolSkills = @"
 ---
 ## 🛡️ MANDATORY PROTOCOL SKILLS
 1. **Token Economy:** Use GitHub Issues for state. No TODO.md.
-2. **Architecture First:** Verify against .ai-core/ARCHITECTURE.md.
+2. **Architecture First:** Verify against .gitcore/ARCHITECTURE.md.
 3. **Atomic Commits:** One logical change per commit.
 "@
 
@@ -102,4 +102,4 @@ $FinalContext = $Header + "`n" + $RecipeContent + "`n" + $ProtocolSkills
 Set-Content -Path $ContextFile -Value $FinalContext -Encoding UTF8
 
 Write-Host "✨ Agent Equipped! Context written to $ContextFile" -ForegroundColor Yellow
-Write-Host "🤖 INSTRUCTION: Read .ai-core/CURRENT_CONTEXT.md to assume your new role." -ForegroundColor Magenta
+Write-Host "🤖 INSTRUCTION: Read .gitcore/CURRENT_CONTEXT.md to assume your new role." -ForegroundColor Magenta

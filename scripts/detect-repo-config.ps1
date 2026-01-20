@@ -61,7 +61,7 @@ finally {
 }
 
 # Detect if main protocol repository
-$isMainRepo = $Repository -match "(Git-Core-Protocol|git-core|ai-git-core)"
+$isMainRepo = $Repository -match "(Git-Core-Protocol|git-core|GitCore|ai-git-core)"
 Write-Host "🏠 Is Main Repo: ${Cyan}$isMainRepo${Reset}"
 
 # Determine schedule mode

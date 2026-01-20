@@ -95,11 +95,11 @@ get_file_group() {
     local dir
     local ext
     local basename_file
-    
+
     dir=$(dirname "$file")
     ext="${file##*.}"
     basename_file=$(basename "$file")
-    
+
     # By directory patterns
     case "$dir" in
         .github/workflows|.github/workflows/*)
@@ -166,12 +166,12 @@ get_file_group() {
             echo "chore:config"
             return
             ;;
-        .ai|.ai/*)
+        .gitcore|.gitcore/*|.gitcore|.gitcore/*|.ai|.ai/*)
             echo "docs:architecture"
             return
             ;;
     esac
-    
+
     # By file extension
     case "$ext" in
         sql)
@@ -211,7 +211,7 @@ get_file_group() {
             return
             ;;
     esac
-    
+
     # By file name patterns
     case "$basename_file" in
         *.test.*|*.spec.*|test_*|*_test.*)
@@ -247,7 +247,7 @@ get_file_group() {
             return
             ;;
     esac
-    
+
     # Default based on extension for source files
     case "$ext" in
         js|ts|jsx|tsx|py|rb|go|rs|java|kt|swift|c|cpp|h|hpp)
@@ -255,7 +255,7 @@ get_file_group() {
             return
             ;;
     esac
-    
+
     # Fallback
     echo "chore:misc"
 }
@@ -266,10 +266,10 @@ generate_commit_message() {
     local file_count="$2"
     shift 2
     local files=("$@")
-    
+
     local type="${group_key%%:*}"
     local scope="${group_key#*:}"
-    
+
     # Generate description based on group
     local description=""
     case "$scope" in
@@ -358,7 +358,7 @@ generate_commit_message() {
             description="update $scope"
             ;;
     esac
-    
+
     # Format: type(scope): description
     if [[ "$scope" == "misc" || "$scope" == "source" ]]; then
         echo "${type}: ${description}"
@@ -371,7 +371,7 @@ generate_commit_message() {
 analyze_staged_files() {
     local staged_files
     staged_files=$(get_staged_files)
-    
+
     if [[ -z "$staged_files" ]]; then
         if [[ "$CI_MODE" == "true" ]]; then
             echo '{"error": "No staged files found", "groups": []}'
@@ -381,26 +381,26 @@ analyze_staged_files() {
         fi
         exit 0
     fi
-    
+
     # Count total files
     local total_files
     total_files=$(echo "$staged_files" | wc -l | tr -d ' ')
-    
+
     # Create associative array for groups
     declare -A groups
     declare -A group_files
-    
+
     # Group files
     while IFS= read -r file; do
         [[ -z "$file" ]] && continue
         local group
         group=$(get_file_group "$file")
-        
+
         if [[ -z "${groups[$group]}" ]]; then
             groups[$group]=0
             group_files[$group]=""
         fi
-        
+
         groups[$group]=$((${groups[$group]} + 1))
         if [[ -n "${group_files[$group]}" ]]; then
             group_files[$group]="${group_files[$group]}"$'\n'"$file"
@@ -408,10 +408,10 @@ analyze_staged_files() {
             group_files[$group]="$file"
         fi
     done <<< "$staged_files"
-    
+
     # Count groups
     local group_count=${#groups[@]}
-    
+
     # Check for mixed concerns in strict mode
     if [[ "$STRICT_MODE" == "true" && "$group_count" -gt 1 ]]; then
         if [[ "$CI_MODE" == "true" ]]; then
@@ -423,7 +423,7 @@ analyze_staged_files() {
         fi
         exit 1
     fi
-    
+
     # Output in CI/JSON mode
     if [[ "$CI_MODE" == "true" ]]; then
         echo '{"total_files": '"$total_files"', "group_count": '"$group_count"', "groups": ['
@@ -432,20 +432,20 @@ analyze_staged_files() {
             local count=${groups[$group]}
             local commit_msg
             local files_array
-            
+
             IFS=$'\n' read -d '' -ra files_array <<< "${group_files[$group]}" || true
             commit_msg=$(generate_commit_message "$group" "$count" "${files_array[@]}")
-            
+
             if [[ "$first" != "true" ]]; then
                 echo ","
             fi
             first=false
-            
+
             # Use json_escape for safe string output
             local escaped_group escaped_commit_msg
             escaped_group=$(json_escape "$group")
             escaped_commit_msg=$(json_escape "$commit_msg")
-            
+
             echo -n '{"group": "'"$escaped_group"'", "file_count": '"$count"', "commit_message": "'"$escaped_commit_msg"'", "files": ['
             local first_file=true
             for f in "${files_array[@]}"; do
@@ -463,30 +463,30 @@ analyze_staged_files() {
         echo ']}'
         return
     fi
-    
+
     # Human-readable output
     echo -e "${CYAN}📊 Analysis of ${YELLOW}$total_files${CYAN} staged files:${NC}"
     echo ""
-    
+
     local group_num=1
     for group in "${!groups[@]}"; do
         local count=${groups[$group]}
         local commit_msg
         local files_array
-        
+
         IFS=$'\n' read -d '' -ra files_array <<< "${group_files[$group]}" || true
         commit_msg=$(generate_commit_message "$group" "$count" "${files_array[@]}")
-        
+
         echo -e "${BLUE}📦 Group $group_num: ${MAGENTA}${group#*:}${NC} (${count} file$([ "$count" -ne 1 ] && echo "s"))"
-        
+
         for f in "${files_array[@]}"; do
             [[ -z "$f" ]] && continue
             echo -e "   ${CYAN}- $f${NC}"
         done
-        
+
         echo -e "   ${GREEN}Suggested commit: ${YELLOW}$commit_msg${NC}"
         echo ""
-        
+
         group_num=$((group_num + 1))
     done
 }
@@ -495,27 +495,27 @@ analyze_staged_files() {
 execute_commits() {
     local staged_files
     staged_files=$(get_staged_files)
-    
+
     if [[ -z "$staged_files" ]]; then
         echo -e "${YELLOW}⚠️  No staged files found.${NC}"
         exit 0
     fi
-    
+
     # Create associative array for groups
     declare -A groups
     declare -A group_files
-    
+
     # Group files
     while IFS= read -r file; do
         [[ -z "$file" ]] && continue
         local group
         group=$(get_file_group "$file")
-        
+
         if [[ -z "${groups[$group]}" ]]; then
             groups[$group]=0
             group_files[$group]=""
         fi
-        
+
         groups[$group]=$((${groups[$group]} + 1))
         if [[ -n "${group_files[$group]}" ]]; then
             group_files[$group]="${group_files[$group]}"$'\n'"$file"
@@ -523,34 +523,34 @@ execute_commits() {
             group_files[$group]="$file"
         fi
     done <<< "$staged_files"
-    
+
     local total_groups=${#groups[@]}
     local current_group=1
-    
+
     for group in "${!groups[@]}"; do
         local count=${groups[$group]}
         local commit_msg
         local files_array
-        
+
         IFS=$'\n' read -d '' -ra files_array <<< "${group_files[$group]}" || true
         commit_msg=$(generate_commit_message "$group" "$count" "${files_array[@]}")
-        
+
         echo -e "${BLUE}[$current_group/$total_groups] ${MAGENTA}${group#*:}${NC}"
         echo -e "   Files: ${count}"
         echo -e "   Commit: ${YELLOW}$commit_msg${NC}"
-        
+
         if [[ "$DRY_RUN" == "true" ]]; then
             echo -e "   ${CYAN}(dry-run: would commit these files)${NC}"
         else
             # Unstage all files first
             git reset HEAD -- . >/dev/null 2>&1 || true
-            
+
             # Stage only files in this group
             for f in "${files_array[@]}"; do
                 [[ -z "$f" ]] && continue
                 git add "$f" 2>/dev/null || true
             done
-            
+
             # Commit
             if [[ "$AUTO_MODE" == "true" ]]; then
                 git commit -m "$commit_msg" >/dev/null 2>&1
@@ -579,11 +579,11 @@ execute_commits() {
                 esac
             fi
         fi
-        
+
         echo ""
         current_group=$((current_group + 1))
     done
-    
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo -e "${CYAN}ℹ️  Dry run complete. No commits were made.${NC}"
         # Re-stage all original files
@@ -602,7 +602,7 @@ if [[ "$ANALYZE_MODE" == "true" || "$CI_MODE" == "true" || "$STRICT_MODE" == "tr
 else
     # Show analysis first, then execute
     analyze_staged_files
-    
+
     if [[ "$DRY_RUN" != "true" && "$AUTO_MODE" != "true" ]]; then
         echo -e "${YELLOW}═══════════════════════════════════════${NC}"
         echo -e "${YELLOW}Proceed with atomic commits? [Y/n]${NC} "
@@ -612,6 +612,6 @@ else
             exit 0
         fi
     fi
-    
+
     execute_commits
 fi

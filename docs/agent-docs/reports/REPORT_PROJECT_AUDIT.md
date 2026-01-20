@@ -46,13 +46,13 @@ confidence: 0.95
 
 **Archivo:** `scripts/equip-agent.ps1`
 
-**Problema:** El script aún referencia la carpeta local `agents-flows-recipes` y rutas `.ai/` en lugar de `.ai-core/`:
+**Problema:** El script aún referencia la carpeta local `agents-flows-recipes` y rutas `.ai/` en lugar de `.gitcore/`:
 
 ```powershell
 # Línea 25-27 - INCORRECTO:
 $RecipeRepo = "agents-flows-recipes"      # ❌ Carpeta ya no existe
-$ContextFile = ".ai/CURRENT_CONTEXT.md"   # ❌ Debería ser .ai-core/
-$IndexFile = ".ai/AGENT_INDEX.md"         # ❌ Debería ser .ai-core/
+$ContextFile = ".ai/CURRENT_CONTEXT.md"   # ❌ Debería ser .gitcore/
+$IndexFile = ".ai/AGENT_INDEX.md"         # ❌ Debería ser .gitcore/
 ```
 
 **Solución:**
@@ -60,7 +60,7 @@ $IndexFile = ".ai/AGENT_INDEX.md"         # ❌ Debería ser .ai-core/
 ```powershell
 # CORRECTO:
 $RepoBaseUrl = "https://raw.githubusercontent.com/iberi22/agents-flows-recipes/main"
-$ConfigDir = ".ai-core"
+$ConfigDir = ".gitcore"
 $ContextFile = "$ConfigDir/CURRENT_CONTEXT.md"
 $IndexFile = "$ConfigDir/AGENT_INDEX.md"
 ```
@@ -78,25 +78,25 @@ $IndexFile = "$ConfigDir/AGENT_INDEX.md"
 - `.windsurfrules` (línea 29)
 - `.github/copilot-instructions.md` (línea 73)
 
-**Problema:** Mezcla de referencias a `.ai/` y `.ai-core/`. La carpeta ahora es `.ai-core/`.
+**Problema:** Mezcla de referencias a `.ai/` y `.gitcore/`. La carpeta ahora es `.gitcore/`.
 
 **Ejemplo en `AGENTS.md`:**
 
 ```markdown
-1. `.ai/ARCHITECTURE.md` - Understand the system  # ❌ Debería ser .ai-core/
+1. `.ai/ARCHITECTURE.md` - Understand the system  # ❌ Debería ser .gitcore/
 ```
 
 **Solución:** Buscar y reemplazar todas las referencias:
 
-- `.ai/ARCHITECTURE.md` → `.ai-core/ARCHITECTURE.md`
-- `.ai/AGENT_INDEX.md` → `.ai-core/AGENT_INDEX.md`
-- `cat .ai/` → `cat .ai-core/`
+- `.ai/ARCHITECTURE.md` → `.gitcore/ARCHITECTURE.md`
+- `.ai/AGENT_INDEX.md` → `.gitcore/AGENT_INDEX.md`
+- `cat .ai/` → `cat .gitcore/`
 
 ---
 
 ### 3. Archivo `ARCHITECTURE.md` con Referencias Cruzadas Incorrectas
 
-**Archivo:** `.ai-core/ARCHITECTURE.md`
+**Archivo:** `.gitcore/ARCHITECTURE.md`
 
 **Problema:** El archivo referencia documentación que apunta a `.ai/`:
 
@@ -106,7 +106,7 @@ $IndexFile = "$ConfigDir/AGENT_INDEX.md"
 - `.github/copilot-instructions.md` - Architecture First Rule
 ```
 
-Pero internamente dice `.ai/ARCHITECTURE.md` en lugar de `.ai-core/ARCHITECTURE.md`.
+Pero internamente dice `.ai/ARCHITECTURE.md` en lugar de `.gitcore/ARCHITECTURE.md`.
 
 ---
 
@@ -130,7 +130,7 @@ REPO_URL="https://raw.githubusercontent.com/iberi22/agents-flows-recipes/main"
 
 ---
 
-### 5. Documentación `.ai-core/ARCHITECTURE.md` Incompleta
+### 5. Documentación `.gitcore/ARCHITECTURE.md` Incompleta
 
 **Problema:** Secciones marcadas como "TBD":
 
@@ -172,7 +172,7 @@ REPO_URL="https://raw.githubusercontent.com/iberi22/agents-flows-recipes/main"
 
 ---
 
-### 8. Falta `.gitignore` para `.ai-core/CURRENT_CONTEXT.md`
+### 8. Falta `.gitignore` para `.gitcore/CURRENT_CONTEXT.md`
 
 **Problema:** El archivo `CURRENT_CONTEXT.md` es generado dinámicamente y no debería commitearse.
 
@@ -180,7 +180,7 @@ REPO_URL="https://raw.githubusercontent.com/iberi22/agents-flows-recipes/main"
 
 ```gitignore
 # Agent context (generated)
-.ai-core/CURRENT_CONTEXT.md
+.gitcore/CURRENT_CONTEXT.md
 ```
 
 ---
@@ -235,7 +235,7 @@ REPO_URL="https://raw.githubusercontent.com/iberi22/agents-flows-recipes/main"
 
 | Componente | Estado | Notas |
 |------------|--------|-------|
-| `.ai-core/AGENT_INDEX.md` | ✅ | 33 recetas indexadas correctamente |
+| `.gitcore/AGENT_INDEX.md` | ✅ | 33 recetas indexadas correctamente |
 | `.github/workflows/agent-dispatcher.yml` | ✅ | Lógica de dispatch funcional |
 | `.github/workflows/commit-atomicity.yml` | ✅ | Validación de commits atómicos |
 | `.github/workflows/structure-validator.yml` | ✅ | Validator en Rust |
@@ -251,13 +251,13 @@ REPO_URL="https://raw.githubusercontent.com/iberi22/agents-flows-recipes/main"
 ### Prioridad Alta (Esta semana)
 
 1. [ ] Actualizar `equip-agent.ps1` para descargar recetas remotamente
-2. [ ] Reemplazar todas las referencias `.ai/` → `.ai-core/`
+2. [ ] Reemplazar todas las referencias `.ai/` → `.gitcore/`
 3. [ ] Eliminar `plan.md` de la raíz
 
 ### Prioridad Media (Próximas 2 semanas)
 
 4. [ ] Crear `equip-agent.sh` para Linux/Mac
-5. [ ] Añadir `.ai-core/CURRENT_CONTEXT.md` a `.gitignore`
+5. [ ] Añadir `.gitcore/CURRENT_CONTEXT.md` a `.gitignore`
 6. [ ] Integrar equipamiento de rol en `agent-dispatcher.yml`
 
 ### Prioridad Baja (Backlog)
@@ -277,9 +277,9 @@ gh issue create --title "fix(scripts): Update equip-agent.ps1 for remote recipes
   --body "El script aún referencia carpeta local y rutas .ai/ obsoletas. Ver REPORT_PROJECT_AUDIT.md" \
   --label "bug,high-priority"
 
-# Issue 2: Migrar referencias .ai → .ai-core
-gh issue create --title "refactor: Replace all .ai/ references with .ai-core/" \
-  --body "Múltiples archivos tienen referencias a .ai/ que debe ser .ai-core/" \
+# Issue 2: Migrar referencias .ai → .gitcore
+gh issue create --title "refactor: Replace all .ai/ references with .gitcore/" \
+  --body "Múltiples archivos tienen referencias a .ai/ que debe ser .gitcore/" \
   --label "refactor"
 
 # Issue 3: Crear equip-agent.sh

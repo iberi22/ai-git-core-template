@@ -60,7 +60,7 @@ When invoking tools, ensure parameters are:
 
 ### Before ANY Task
 ```
-1. Read .ai-core/ARCHITECTURE.md for critical decisions
+1. Read .gitcore/ARCHITECTURE.md for critical decisions
 2. Check gh issue list --assignee "@me"
 3. Verify task context against architecture
 ```
@@ -106,10 +106,10 @@ When user mentions tasks, automatically create GitHub Issues:
 For specialized tasks, load a recipe:
 ```bash
 ./scripts/equip-agent.ps1 -Role "Backend Architect"
-cat .ai-core/CURRENT_CONTEXT.md
+cat .gitcore/CURRENT_CONTEXT.md
 ```
 
-Available roles in `.ai-core/AGENT_INDEX.md`
+Available roles in `.gitcore/AGENT_INDEX.md`
 
 ## 🔧 Fallback Behavior
 

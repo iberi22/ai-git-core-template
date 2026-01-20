@@ -44,14 +44,14 @@ function Get-StagedFiles {
 # Determine the concern/group for a file
 function Get-FileGroup {
     param([string]$FilePath)
-    
+
     $dir = Split-Path -Parent $FilePath
     $ext = [System.IO.Path]::GetExtension($FilePath).TrimStart('.')
     $basename = Split-Path -Leaf $FilePath
-    
+
     # Normalize path separators
     $dir = $dir -replace '\\', '/'
-    
+
     # By directory patterns
     switch -Wildcard ($dir) {
         ".github/workflows*" { return "ci:workflows" }
@@ -78,9 +78,11 @@ function Get-FileGroup {
         "styles*" { return "style:styles" }
         "src/config*" { return "chore:config" }
         "config*" { return "chore:config" }
+        ".gitcore*" { return "docs:architecture" }
+        ".gitcore*" { return "docs:architecture" }
         ".ai*" { return "docs:architecture" }
     }
-    
+
     # By file extension
     switch ($ext) {
         "sql" { return "feat:db" }
@@ -102,7 +104,7 @@ function Get-FileGroup {
         }
         { $_ -in "css", "scss", "sass", "less" } { return "style:styles" }
     }
-    
+
     # By file name patterns
     switch -Wildcard ($basename) {
         "*.test.*" { return "test:tests" }
@@ -130,12 +132,12 @@ function Get-FileGroup {
         ".cursorrules" { return "chore:ai-config" }
         ".windsurfrules" { return "chore:ai-config" }
     }
-    
+
     # Default based on extension for source files
     if ($ext -in "js", "ts", "jsx", "tsx", "py", "rb", "go", "rs", "java", "kt", "swift", "c", "cpp", "h", "hpp") {
         return "feat:source"
     }
-    
+
     # Fallback
     return "chore:misc"
 }
@@ -147,11 +149,11 @@ function Get-CommitMessage {
         [int]$FileCount,
         [string[]]$Files
     )
-    
+
     $parts = $GroupKey -split ":"
     $type = $parts[0]
     $scope = $parts[1]
-    
+
     # Generate description based on group
     $description = switch ($scope) {
         "workflows" { "update CI/CD workflows" }
@@ -183,7 +185,7 @@ function Get-CommitMessage {
         "misc" { "update miscellaneous files" }
         default { "update $scope" }
     }
-    
+
     # Format: type(scope): description
     if ($scope -in "misc", "source") {
         return "${type}: ${description}"
@@ -194,7 +196,7 @@ function Get-CommitMessage {
 # Main analysis function
 function Invoke-Analysis {
     $stagedFiles = Get-StagedFiles
-    
+
     if (-not $stagedFiles -or $stagedFiles.Count -eq 0) {
         if ($CI) {
             $errorOutput = @{
@@ -208,30 +210,30 @@ function Invoke-Analysis {
         }
         return $null
     }
-    
+
     # Ensure stagedFiles is an array
     if ($stagedFiles -is [string]) {
         $stagedFiles = @($stagedFiles)
     }
-    
+
     $totalFiles = $stagedFiles.Count
-    
+
     # Group files
     $groups = @{}
-    
+
     foreach ($file in $stagedFiles) {
         if ([string]::IsNullOrWhiteSpace($file)) { continue }
-        
+
         $group = Get-FileGroup -FilePath $file
-        
+
         if (-not $groups.ContainsKey($group)) {
             $groups[$group] = @()
         }
         $groups[$group] += $file
     }
-    
+
     $groupCount = $groups.Count
-    
+
     # Check for mixed concerns in strict mode
     if ($Strict -and $groupCount -gt 1) {
         if ($CI) {
@@ -248,14 +250,14 @@ function Invoke-Analysis {
         }
         exit 1
     }
-    
+
     # Output in CI/JSON mode
     if ($CI) {
         $jsonGroups = @()
         foreach ($group in $groups.Keys) {
             $files = $groups[$group]
             $commitMsg = Get-CommitMessage -GroupKey $group -FileCount $files.Count -Files $files
-            
+
             $jsonGroup = @{
                 group = $group
                 file_count = $files.Count
@@ -264,47 +266,47 @@ function Invoke-Analysis {
             }
             $jsonGroups += $jsonGroup
         }
-        
+
         $output = @{
             total_files = $totalFiles
             group_count = $groupCount
             groups = $jsonGroups
         }
-        
+
         Write-Output ($output | ConvertTo-Json -Depth 3 -Compress)
         return
     }
-    
+
     # Human-readable output
     Write-Host "📊 Analysis of " -ForegroundColor Cyan -NoNewline
     Write-Host "$totalFiles" -ForegroundColor Yellow -NoNewline
     Write-Host " staged files:" -ForegroundColor Cyan
     Write-Host ""
-    
+
     $groupNum = 1
     foreach ($group in $groups.Keys) {
         $files = $groups[$group]
         $count = $files.Count
         $scope = ($group -split ":")[1]
         $commitMsg = Get-CommitMessage -GroupKey $group -FileCount $count -Files $files
-        
+
         $plural = if ($count -ne 1) { "s" } else { "" }
         Write-Host "📦 Group ${groupNum}: " -ForegroundColor Blue -NoNewline
         Write-Host "$scope" -ForegroundColor Magenta -NoNewline
         Write-Host " ($count file$plural)"
-        
+
         foreach ($f in $files) {
             if ([string]::IsNullOrWhiteSpace($f)) { continue }
             Write-Host "   - $f" -ForegroundColor Cyan
         }
-        
+
         Write-Host "   Suggested commit: " -ForegroundColor Green -NoNewline
         Write-Host "$commitMsg" -ForegroundColor Yellow
         Write-Host ""
-        
+
         $groupNum++
     }
-    
+
     # Only return groups if not in analyze-only mode
     if (-not $Analyze -and -not $Strict) {
         return $groups
@@ -314,44 +316,44 @@ function Invoke-Analysis {
 # Execute commits for each group
 function Invoke-Commits {
     param([hashtable]$Groups)
-    
+
     if (-not $Groups -or $Groups.Count -eq 0) {
         return
     }
-    
+
     # Store original staged files for dry-run restore
     $originalStagedFiles = Get-StagedFiles
     if ($originalStagedFiles -is [string]) {
         $originalStagedFiles = @($originalStagedFiles)
     }
-    
+
     $totalGroups = $Groups.Count
     $currentGroup = 1
-    
+
     foreach ($group in $Groups.Keys) {
         $files = $Groups[$group]
         $count = $files.Count
         $scope = ($group -split ":")[1]
         $commitMsg = Get-CommitMessage -GroupKey $group -FileCount $count -Files $files
-        
+
         Write-Host "[$currentGroup/$totalGroups] " -ForegroundColor Blue -NoNewline
         Write-Host "$scope" -ForegroundColor Magenta
         Write-Host "   Files: $count"
         Write-Host "   Commit: " -NoNewline
         Write-Host "$commitMsg" -ForegroundColor Yellow
-        
+
         if ($DryRun) {
             Write-Host "   (dry-run: would commit these files)" -ForegroundColor Cyan
         } else {
             # Unstage all files first
             git reset HEAD -- . 2>$null | Out-Null
-            
+
             # Stage only files in this group
             foreach ($f in $files) {
                 if ([string]::IsNullOrWhiteSpace($f)) { continue }
                 git add $f 2>$null | Out-Null
             }
-            
+
             if ($Auto) {
                 git commit -m $commitMsg 2>$null | Out-Null
                 Write-Host "   ✓ Committed" -ForegroundColor Green
@@ -359,7 +361,7 @@ function Invoke-Commits {
                 # Interactive mode - ask for confirmation
                 Write-Host "   Proceed with commit? [Y/n/e(dit message)] " -ForegroundColor Yellow -NoNewline
                 $response = Read-Host
-                
+
                 switch ($response.ToLower()) {
                     "n" {
                         Write-Host "   Skipped" -ForegroundColor Cyan
@@ -379,11 +381,11 @@ function Invoke-Commits {
                 }
             }
         }
-        
+
         Write-Host ""
         $currentGroup++
     }
-    
+
     if ($DryRun) {
         Write-Host "ℹ️  Dry run complete. No commits were made." -ForegroundColor Cyan
         # Re-stage all original files
@@ -402,21 +404,21 @@ if ($Analyze -or $CI -or $Strict) {
 } else {
     # Show analysis first, then execute
     $groups = Invoke-Analysis
-    
+
     if ($null -eq $groups) {
         exit 0
     }
-    
+
     if (-not $DryRun -and -not $Auto) {
         Write-Host "═══════════════════════════════════════" -ForegroundColor Yellow
         Write-Host "Proceed with atomic commits? [Y/n] " -ForegroundColor Yellow -NoNewline
         $proceed = Read-Host
-        
+
         if ($proceed -match "^[Nn]$") {
             Write-Host "Aborted." -ForegroundColor Cyan
             exit 0
         }
     }
-    
+
     Invoke-Commits -Groups $groups
 }

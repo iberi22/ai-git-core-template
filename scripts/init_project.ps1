@@ -193,10 +193,10 @@ if (-not $SKIP_REPO_CREATE) {
 }
 
 # 5. Setup Architecture file if empty
-$archFile = ".ai/ARCHITECTURE.md"
+$archFile = ".gitcore/ARCHITECTURE.md"
 if (-not (Test-Path $archFile) -or (Get-Item $archFile).Length -eq 0) {
     Write-Host "`n📐 Setting up ARCHITECTURE.md..." -ForegroundColor Yellow
-    New-Item -ItemType Directory -Force -Path ".ai" | Out-Null
+    New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
     @"
 # 🏗️ Architecture
 
@@ -272,7 +272,7 @@ Define and document the architectural decisions for the project.
 - [ ] Define main language/framework
 - [ ] Define database (if applicable)
 - [ ] Define folder structure
-- [ ] Document in ``.ai/ARCHITECTURE.md``
+- [ ] Document in ``.gitcore/ARCHITECTURE.md``
 
 ## Notes for AI Agent
 Read project requirements and propose an appropriate stack.

@@ -222,10 +222,10 @@ else
 fi
 
 # 5. Setup Architecture file if empty
-if [ ! -s .ai/ARCHITECTURE.md ] || [ ! -f .ai/ARCHITECTURE.md ]; then
+if [ ! -s .gitcore/ARCHITECTURE.md ] || [ ! -f .gitcore/ARCHITECTURE.md ]; then
     echo -e "\n📐 Setting up ARCHITECTURE.md..."
-    mkdir -p .ai
-    cat > .ai/ARCHITECTURE.md << 'EOF'
+    mkdir -p .gitcore
+    cat > .gitcore/ARCHITECTURE.md << 'EOF'
 # 🏗️ Architecture
 
 ## Stack
@@ -301,7 +301,7 @@ Define and document the architectural decisions for the project.
 - [ ] Define main language/framework
 - [ ] Define database (if applicable)
 - [ ] Define folder structure
-- [ ] Document in \`.ai/ARCHITECTURE.md\`
+- [ ] Document in \`.gitcore/ARCHITECTURE.md\`
 
 ## Notes for AI Agent
 Read project requirements and propose an appropriate stack." \

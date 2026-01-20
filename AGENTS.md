@@ -73,8 +73,8 @@ gh workflow run agent-dispatcher.yml --field strategy=round-robin
 
 | File | Purpose |
 |------|---------|
-| `.ai-core/ARCHITECTURE.md` | Roadmap for Planner to parse |
-| `.ai-core/features.json` | Feature status tracking |
+| `.gitcore/ARCHITECTURE.md` | Roadmap for Planner to parse |
+| `.gitcore/features.json` | Feature status tracking |
 
 ### Auto-Merge Conditions (Guardian)
 
@@ -191,7 +191,7 @@ Para operaciones críticas (borrar datos, deploys, cambios de auth), el agente *
 ```
 ✅ README.md (project overview ONLY)
 ✅ AGENTS.md (agent configuration ONLY)
-✅ .ai-core/ARCHITECTURE.md (system architecture ONLY)
+✅ .gitcore/ARCHITECTURE.md (system architecture ONLY)
 ✅ CONTRIBUTING.md, LICENSE.md (standard repo files)
 ✅ docs/prompts/*.md (session continuation prompts - SCRIPT GENERATED ONLY)
 ```
@@ -234,7 +234,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 
 ### 📖 Required Reading Before Any Task
 
-1. `.ai-core/ARCHITECTURE.md` - Understand the system
+1. `.gitcore/ARCHITECTURE.md` - Understand the system
 2. `gc issue list` - Your current task (was `gh issue list`)
 3. `gc issue list --limit 5` - Available backlog
 
@@ -244,7 +244,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 
 **BEFORE implementing ANY infrastructure/tooling:**
 
-1. Read `.ai-core/ARCHITECTURE.md` CRITICAL DECISIONS section
+1. Read `.gitcore/ARCHITECTURE.md` CRITICAL DECISIONS section
 2. Verify your implementation matches the decided stack
 3. If issue mentions alternatives, ARCHITECTURE.md decision wins
 
@@ -259,7 +259,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 
 **Related Documentation:**
 
-- `.ai-core/ARCHITECTURE.md` - CRITICAL DECISIONS table
+- `.gitcore/ARCHITECTURE.md` - CRITICAL DECISIONS table
 - `.github/copilot-instructions.md` - Architecture First Rule
 
 ---
@@ -278,7 +278,7 @@ pwd                              # Confirmar directorio de trabajo
 
 # 2. Estado del proyecto
 gc git log --limit 10            # Ver trabajo reciente
-cat .ai-core/features.json            # Ver features y su estado (passes: true/false)
+cat .gitcore/features.json            # Ver features y su estado (passes: true/false)
 
 # 3. Ejecutar tests existentes
 npm test                         # o: cargo test, pytest, etc.
@@ -298,7 +298,7 @@ npm run dev &
 
 ```bash
 # 1. Arquitectura y decisiones críticas
-cat .ai-core/ARCHITECTURE.md
+cat .gitcore/ARCHITECTURE.md
 
 # 2. Estado del agente en el issue asignado
 gc issue list --state open
@@ -308,7 +308,7 @@ gc issue list --state open
 cat docs/agent-docs/RESEARCH_STACK_CONTEXT.md
 
 # 4. Elegir feature de mayor prioridad que NO esté completado
-# (Revisar .ai-core/features.json → passes: false)
+# (Revisar .gitcore/features.json → passes: false)
 ```
 
 ### Phase 2: ACT (Development)
@@ -505,7 +505,7 @@ Cuando un issue se **cierra** en GitHub:
 | Source code (`.py`, `.js`, `.ts`, etc.) | The actual project |
 | Tests (in `tests/` folder) | Quality assurance |
 | Config files (docker, CI/CD, linters) | Infrastructure |
-| `.ai-core/ARCHITECTURE.md` | System architecture (ONLY this file) |
+| `.gitcore/ARCHITECTURE.md` | System architecture (ONLY this file) |
 | `README.md` | Project documentation |
 | `docs/agent-docs/*.md` | **ONLY when user explicitly requests** |
 | GitHub Issues | **EVERYTHING ELSE** |
@@ -1211,13 +1211,13 @@ Antigravity stores rules in `.agent/rules/`. When installing Git-Core Protocol:
 1. **Existing rules are NOT overwritten**
 2. Protocol integration is **appended** to existing rules
 3. Project-specific logic stays in `rule-0.md`
-4. Architecture decisions move to `.ai-core/ARCHITECTURE.md`
+4. Architecture decisions move to `.gitcore/ARCHITECTURE.md`
 
 **Rule Content Classification:**
 
 | Content Type | Where It Goes |
 |--------------|---------------|
-| Stack/Architecture decisions | `.ai-core/ARCHITECTURE.md` |
+| Stack/Architecture decisions | `.gitcore/ARCHITECTURE.md` |
 | Agent behavior rules | `AGENTS.md` |
 | Project-specific patterns | `.agent/rules/rule-0.md` (keep) |
 | Commands/Scripts | `README.md` or `package.json` |
@@ -1238,7 +1238,7 @@ Antigravity stores rules in `.agent/rules/`. When installing Git-Core Protocol:
 ```
 .agent/rules/rule-0.md     → Project-specific context (Next.js, Supabase, etc.)
 AGENTS.md                  → Protocol rules (all projects)
-.ai-core/ARCHITECTURE.md        → Critical decisions (hosting, DB, etc.)
+.gitcore/ARCHITECTURE.md        → Critical decisions (hosting, DB, etc.)
 ```
 
 **The agent reads ALL files**, so:
@@ -1253,7 +1253,7 @@ AGENTS.md                  → Protocol rules (all projects)
 
 ```text
 /
-├── .ai-core/
+├── .gitcore/
 │   ├── ARCHITECTURE.md    # 📖 READ THIS FIRST
 │   ├── AGENT_INDEX.md     # 🎭 Agent roles and routing
 │   └── CONTEXT_LOG.md     # 📝 Session notes only

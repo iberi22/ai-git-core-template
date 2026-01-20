@@ -16,7 +16,7 @@ $local = Get-Content .git-core-protocol-version -ErrorAction SilentlyContinue
 Write-Host "Local: $local | Remoto: $remote"
 
 # Verificar archivos del protocolo
-Test-Path ".ai-core/ARCHITECTURE.md"
+Test-Path ".gitcore/ARCHITECTURE.md"
 Test-Path "AGENTS.md"
 Test-Path ".github/copilot-instructions.md"
 ```

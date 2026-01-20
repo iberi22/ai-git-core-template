@@ -68,8 +68,8 @@ You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, 
 ### ✅ ONLY ALLOWED `.md` FILES:
 - ✅ `README.md` (project overview ONLY)
 - ✅ `AGENTS.md` (agent configuration ONLY)
-- ✅ `.ai-core/ARCHITECTURE.md` (system architecture ONLY)
-- ✅ `.ai-core/AGENT_INDEX.md` (agent routing ONLY)
+- ✅ `.gitcore/ARCHITECTURE.md` (system architecture ONLY)
+- ✅ `.gitcore/AGENT_INDEX.md` (agent routing ONLY)
 - ✅ `CONTRIBUTING.md`, `LICENSE.md` (standard repo files)
 - ✅ `docs/prompts/*.md` (session continuation prompts - SCRIPT GENERATED ONLY)
 
@@ -194,7 +194,7 @@ Agregar autenticación OAuth al sistema.
 ```bash
 # 1. Estado del proyecto
 git log --oneline -10            # Ver trabajo reciente
-cat .ai-core/features.json            # Features con passes: true/false
+cat .gitcore/features.json            # Features con passes: true/false
 
 # 2. Ejecutar tests
 npm test  # o: cargo test, pytest, etc.
@@ -208,24 +208,24 @@ npm test  # o: cargo test, pytest, etc.
 Before any task:
 ```bash
 # 1. Check the Agent Index to see if you need a specific Role
-cat .ai-core/AGENT_INDEX.md
+cat .gitcore/AGENT_INDEX.md
 
 # 2. Read Living Research Context (CRITICAL for dependencies)
 cat docs/agent-docs/RESEARCH_STACK_CONTEXT.md
 
 # 3. If a Role fits the task, EQUIP IT:
 # ./scripts/equip-agent.ps1 -Role "RoleName"
-# cat .ai-core/CURRENT_CONTEXT.md
+# cat .gitcore/CURRENT_CONTEXT.md
 
 # 4. Read architecture
-cat .ai-core/ARCHITECTURE.md
+cat .gitcore/ARCHITECTURE.md
 
 # 5. Check your assigned issues + agent state
 gh issue list --assignee "@me"
 gh issue view <id> --comments | grep -A 50 '<agent-state>'
 
 # 6. Check features.json for next priority
-cat .ai-core/features.json | jq '.features[] | select(.passes == false)'
+cat .gitcore/features.json | jq '.features[] | select(.passes == false)'
 ```
 
 ### 4. Dependency Quarantine Rule (NEW)
@@ -278,15 +278,15 @@ gh workflow run living-context.yml
 
 ### 4. Architecture First Rule
 Before implementing ANY infrastructure feature:
-1. Run: `grep -A 20 'CRITICAL DECISIONS' .ai-core/ARCHITECTURE.md`
+1. Run: `grep -A 20 'CRITICAL DECISIONS' .gitcore/ARCHITECTURE.md`
 2. Check CRITICAL DECISIONS table
 3. If conflict with issue, ARCHITECTURE wins
 
 **Why this matters:** A critical error occurred when Vercel was implemented despite ARCHITECTURE.md specifying GitHub Pages. Issues may mention multiple options, but architecture decisions are final.
 
 **Related Documentation:**
-- `.ai-core/ARCHITECTURE.md` - CRITICAL DECISIONS table
-- `.ai-core/AGENT_INDEX.md` - Agent roles and routing
+- `.gitcore/ARCHITECTURE.md` - CRITICAL DECISIONS table
+- `.gitcore/AGENT_INDEX.md` - Agent roles and routing
 - `AGENTS.md` - Architecture Verification Rule
 
 ### 5. Development Flow

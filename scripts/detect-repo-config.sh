@@ -45,7 +45,7 @@ echo -e "🔒 Visibility: ${CYAN}$VISIBILITY${RESET}"
 
 # Detect if main protocol repository
 IS_MAIN_REPO="false"
-if [[ "$REPOSITORY" =~ (Git-Core-Protocol|git-core|ai-git-core) ]]; then
+if [[ "$REPOSITORY" =~ (Git-Core-Protocol|git-core|GitCore|ai-git-core) ]]; then
     IS_MAIN_REPO="true"
 fi
 echo -e "🏠 Is Main Repo: ${CYAN}$IS_MAIN_REPO${RESET}"

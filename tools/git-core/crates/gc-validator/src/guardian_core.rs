@@ -99,7 +99,7 @@ pub struct PrData {
     pub head_ref: String,
 }
 
-/// Risk map configuration loaded from .ai-core/risk-map.json
+/// Risk map configuration loaded from .gitcore/risk-map.json
 #[derive(Debug, Clone, Deserialize)]
 pub struct RiskMap {
     pub paths: HashMap<String, PathRisk>,

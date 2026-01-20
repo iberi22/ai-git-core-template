@@ -25,7 +25,7 @@ gh issue create --title "Mi tarea" --label "enhancement"
 
 ### Antes de codear:
 ```powershell
-cat .ai-core/ARCHITECTURE.md          # Leer decisiones
+cat .gitcore/ARCHITECTURE.md          # Leer decisiones
 gh issue list --assignee "@me"   # Ver mis tareas
 ```
 

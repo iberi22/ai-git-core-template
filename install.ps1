@@ -76,30 +76,40 @@ function Test-CliInstalled {
     return $null -ne $command
 }
 
-# Function to migrate from .ai/ to .ai-core/
+# Function to migrate from legacy directories to .gitcore/
 function Invoke-Migration {
-    if (Test-Path ".ai") {
-        Write-Host "🔄 Detected legacy .ai/ directory..." -ForegroundColor Yellow
+    $hasLegacy = $false
 
-        if (-not (Test-Path ".ai-core")) {
-            New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
-        }
+    # Legacy paths
+    $legacyPaths = @(".ai", ".gitcore")
 
-        # Copy all files from .ai/ to .ai-core/
-        Get-ChildItem ".ai" -Recurse | ForEach-Object {
-            $destPath = $_.FullName -replace [regex]::Escape(".ai"), ".ai-core"
-            if ($_.PSIsContainer) {
-                New-Item -ItemType Directory -Force -Path $destPath | Out-Null
-            } else {
-                Copy-Item $_.FullName $destPath -Force
+    foreach ($legacy in $legacyPaths) {
+        if (Test-Path $legacy) {
+            Write-Host "🔄 Detected legacy $legacy directory..." -ForegroundColor Yellow
+            $hasLegacy = $true
+
+            if (-not (Test-Path ".gitcore")) {
+                New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
             }
-        }
 
-        Write-Host "  ✓ Migrated .ai/ → .ai-core/" -ForegroundColor Green
-        Write-Host "  ℹ️  You can safely delete .ai/ after verifying" -ForegroundColor Cyan
-        return $true
+            # Copy all files from legacy to .gitcore/
+            Get-ChildItem $legacy -Recurse | ForEach-Object {
+                $destPath = $_.FullName -replace [regex]::Escape($legacy), ".gitcore"
+                if ($_.PSIsContainer) {
+                    if (-not (Test-Path $destPath)) {
+                        New-Item -ItemType Directory -Force -Path $destPath | Out-Null
+                    }
+                } else {
+                    Copy-Item $_.FullName $destPath -Force
+                }
+            }
+
+            Write-Host "  ✓ Migrated $legacy → .gitcore/" -ForegroundColor Green
+            Write-Host "  ℹ️  You can safely delete $legacy after verifying" -ForegroundColor Cyan
+        }
     }
-    return $false
+
+    return $hasLegacy
 }
 
 # Function to backup user files
@@ -107,8 +117,8 @@ function Backup-UserFiles {
     Write-Host "💾 Backing up user files..." -ForegroundColor Cyan
     New-Item -ItemType Directory -Force -Path $BACKUP_DIR | Out-Null
 
-    # Check both .ai-core/ and .ai/ for backwards compatibility
-    $aiDir = if (Test-Path ".ai-core") { ".ai-core" } elseif (Test-Path ".ai") { ".ai" } else { $null }
+    # Check .gitcore/, .gitcore/, and .ai/ for backwards compatibility
+    $aiDir = if (Test-Path ".gitcore") { ".gitcore" }  elseif (Test-Path ".ai") { ".ai" } else { $null }
 
     # Backup ARCHITECTURE.md
     if ($aiDir -and (Test-Path "$aiDir/ARCHITECTURE.md")) {
@@ -140,21 +150,21 @@ function Backup-UserFiles {
 function Restore-UserFiles {
     Write-Host "📥 Restoring user files..." -ForegroundColor Cyan
 
-    # Ensure .ai-core directory exists for restoration
-    if (-not (Test-Path ".ai-core")) {
-        New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
+    # Ensure .gitcore directory exists for restoration
+    if (-not (Test-Path ".gitcore")) {
+        New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
     }
 
     # Restore ARCHITECTURE.md (unless force mode)
     if (-not $ForceMode -and (Test-Path "$BACKUP_DIR/ARCHITECTURE.md")) {
-        Copy-Item "$BACKUP_DIR/ARCHITECTURE.md" ".ai-core/ARCHITECTURE.md" -Force
-        Write-Host "  ✓ .ai-core/ARCHITECTURE.md restored" -ForegroundColor Green
+        Copy-Item "$BACKUP_DIR/ARCHITECTURE.md" ".gitcore/ARCHITECTURE.md" -Force
+        Write-Host "  ✓ .gitcore/ARCHITECTURE.md restored" -ForegroundColor Green
     }
 
     # Always restore CONTEXT_LOG.md
     if (Test-Path "$BACKUP_DIR/CONTEXT_LOG.md") {
-        Copy-Item "$BACKUP_DIR/CONTEXT_LOG.md" ".ai-core/CONTEXT_LOG.md" -Force
-        Write-Host "  ✓ .ai-core/CONTEXT_LOG.md restored" -ForegroundColor Green
+        Copy-Item "$BACKUP_DIR/CONTEXT_LOG.md" ".gitcore/CONTEXT_LOG.md" -Force
+        Write-Host "  ✓ .gitcore/CONTEXT_LOG.md restored" -ForegroundColor Green
     }
 
     # Restore custom workflows
@@ -297,32 +307,35 @@ Remove-Item -Recurse -Force "$TEMP_DIR/.git" -ErrorAction SilentlyContinue
 # Install files
 Write-Host "📦 Installing protocol files..." -ForegroundColor Cyan
 
-# Run migration from .ai/ to .ai-core/ if needed
+# Run migration from legacy to .gitcore/ if needed
 $migrated = Invoke-Migration
 
-# Handle .ai-core directory (protocol uses .ai-core, template may have .ai)
-$templateAiDir = if (Test-Path "$TEMP_DIR/.ai-core") { "$TEMP_DIR/.ai-core" } elseif (Test-Path "$TEMP_DIR/.ai") { "$TEMP_DIR/.ai" } else { $null }
+# Handle .gitcore directory (protocol uses .gitcore, template may have .ai or .gitcore)
+$templateAiDir = if (Test-Path "$TEMP_DIR/.gitcore") { "$TEMP_DIR/.gitcore" }  elseif (Test-Path "$TEMP_DIR/.ai") { "$TEMP_DIR/.ai" } else { $null }
 
 if ($templateAiDir) {
     if ($UpgradeMode) {
         # Remove old directories
-        if (Test-Path ".ai-core") { Remove-Item -Recurse -Force ".ai-core" }
-        if (Test-Path ".ai") { Remove-Item -Recurse -Force ".ai" }
+        $legacyPaths = @(".gitcore", ".gitcore", ".ai")
+        foreach ($legacy in $legacyPaths) {
+             if (Test-Path $legacy) { Remove-Item -Recurse -Force $legacy }
+        }
 
-        # Copy to .ai-core
-        New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
-        Copy-Item -Recurse "$templateAiDir/*" ".ai-core/"
-        Write-Host "  ✓ .ai-core/ (upgraded)" -ForegroundColor Green
-    } elseif (-not (Test-Path ".ai-core") -and -not (Test-Path ".ai")) {
-        # Copy .ai-core if neither .ai-core nor .ai exists
-        New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
-        Copy-Item -Recurse "$templateAiDir/*" ".ai-core/"
-        Write-Host "  ✓ .ai-core/" -ForegroundColor Green
+        # Copy to .gitcore
+        New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
+        Copy-Item -Recurse "$templateAiDir/*" ".gitcore/"
+        Write-Host "  ✓ .gitcore/ (upgraded)" -ForegroundColor Green
+    } elseif (-not (Test-Path ".gitcore") -and -not (Test-Path ".gitcore") -and -not (Test-Path ".ai")) {
+        # Copy .gitcore if none of the versions exist
+        New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
+        Copy-Item -Recurse "$templateAiDir/*" ".gitcore/"
+        Write-Host "  ✓ .gitcore/" -ForegroundColor Green
     } else {
-        Write-Host "  ~ .ai-core/ (exists, merging new files)" -ForegroundColor Yellow
+        $existingDir = if (Test-Path ".gitcore") { ".gitcore" }  else { ".ai" }
+        Write-Host "  ~ $existingDir/ (exists, merging new files)" -ForegroundColor Yellow
         Get-ChildItem $templateAiDir | ForEach-Object {
-            if (-not (Test-Path ".ai-core/$($_.Name)")) {
-                Copy-Item $_.FullName ".ai-core/"
+            if (-not (Test-Path "$existingDir/$($_.Name)")) {
+                Copy-Item $_.FullName "$existingDir/"
                 Write-Host "    + $($_.Name)" -ForegroundColor Green
             }
         }
@@ -442,7 +455,7 @@ if (Test-Path ".agent/rules") {
 > This project follows the Git-Core Protocol. See root-level files for full configuration.
 
 ### Quick Reference
-- **Architecture Decisions:** ``.ai-core/ARCHITECTURE.md``
+- **Architecture Decisions:** ``.gitcore/ARCHITECTURE.md``
 - **Agent Rules:** ``AGENTS.md``
 - **Issues:** ``.github/issues/`` or ``gh issue list``
 
@@ -501,7 +514,7 @@ if ($UpgradeMode) {
     }
 } else {
     Write-Host "📋 Files installed:"
-    Write-Host "   .ai-core/ARCHITECTURE.md    - Document your architecture here"
+    Write-Host "   .gitcore/ARCHITECTURE.md    - Document your architecture here"
     Write-Host "   .github/               - Copilot rules + workflows"
     Write-Host "   scripts/               - Init and update scripts"
     Write-Host "   AGENTS.md              - Rules for all AI agents"

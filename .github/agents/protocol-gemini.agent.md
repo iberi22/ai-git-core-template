@@ -74,7 +74,7 @@ Gemini uses `parameters` schema format:
 
 ### Before ANY Task
 ```
-1. Read .ai-core/ARCHITECTURE.md (leverage large context)
+1. Read .gitcore/ARCHITECTURE.md (leverage large context)
 2. Check gh issue list --assignee "@me"
 3. Load relevant codebase context
 ```
@@ -111,8 +111,8 @@ For specialized tasks, leverage your large context to load recipes:
 ```bash
 # Load role + full recipe content
 ./scripts/equip-agent.ps1 -Role "Backend Architect"
-cat .ai-core/CURRENT_CONTEXT.md
-cat .ai-core/AGENT_INDEX.md  # Full index
+cat .gitcore/CURRENT_CONTEXT.md
+cat .gitcore/AGENT_INDEX.md  # Full index
 ```
 
 With 1M+ context, you can load multiple recipes simultaneously!

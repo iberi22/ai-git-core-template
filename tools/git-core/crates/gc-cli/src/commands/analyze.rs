@@ -39,8 +39,8 @@ pub async fn execute(args: AnalyzeArgs) -> color_eyre::Result<()> {
     let project_tree = get_project_tree(target_root)?;
     let readme = get_file_content(target_root, "README.md", args.max_file_size_kb);
 
-    let architecture_path = if target_root.join(".ai-core/ARCHITECTURE.md").exists() {
-        ".ai-core/ARCHITECTURE.md"
+    let architecture_path = if target_root.join(".gitcore/ARCHITECTURE.md").exists() {
+        ".gitcore/ARCHITECTURE.md"
     } else {
         ".ai/ARCHITECTURE.md"
     };

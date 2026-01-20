@@ -186,7 +186,7 @@ async fn setup_artifacts(
     system: &impl SystemPort,
     force: bool
 ) -> color_eyre::Result<()> {
-    let arch_dir = if is_current { ".ai-core".to_string() } else { format!("{}/.ai-core", target_path) };
+    let arch_dir = if is_current { ".gitcore".to_string() } else { format!("{}/.gitcore", target_path) };
     let github_dir = if is_current { ".github".to_string() } else { format!("{}/.github", target_path) };
 
     // Ensure dirs
@@ -212,7 +212,7 @@ _Document architectural decisions here_
         let args = vec![
             "api".to_string(),
             "-H".to_string(), "Accept: application/vnd.github.v3.raw".to_string(),
-            "/repos/iberi22/Git-Core-Protocol/contents/.ai-core/ARCHITECTURE.md?ref=main".to_string()
+            "/repos/iberi22/Git-Core-Protocol/contents/.gitcore/ARCHITECTURE.md?ref=main".to_string()
         ];
 
         let content = match system.run_command_output(cmd, &args).await {
@@ -244,7 +244,7 @@ _Document architectural decisions here_
         let args = vec![
             "api".to_string(),
             "-H".to_string(), "Accept: application/vnd.github.v3.raw".to_string(),
-            "/repos/iberi22/Git-Core-Protocol/contents/.ai-core/AGENT_INDEX.md?ref=main".to_string()
+            "/repos/iberi22/Git-Core-Protocol/contents/.gitcore/AGENT_INDEX.md?ref=main".to_string()
         ];
 
         let content = match system.run_command_output(cmd, &args).await {

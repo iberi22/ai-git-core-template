@@ -30,7 +30,7 @@ handoffs:
     prompt: |
       CONTEXT SWITCH: Git-Core Protocol (Template/Rust)
       Path: e:\scripts-python\Git-Core Protocol
-      Load: cat ".ai-core/ARCHITECTURE.md"
+      Load: cat ".gitcore/ARCHITECTURE.md"
       Then: gh issue list --assignee "@me"
     send: false
 
@@ -39,7 +39,7 @@ handoffs:
     prompt: |
       CONTEXT SWITCH: Software Factory (Astro)
       Path: e:\scripts-python\Software Factory
-      Load: cat ".ai-core/ARCHITECTURE.md"
+      Load: cat ".gitcore/ARCHITECTURE.md"
       Then: gh issue list --assignee "@me"
     send: false
 
@@ -48,7 +48,7 @@ handoffs:
     prompt: |
       CONTEXT SWITCH: CGP-Colegios (Next.js)
       Path: e:\scripts-python\CGP-Colegios
-      Load: cat ".ai-core/ARCHITECTURE.md"
+      Load: cat ".gitcore/ARCHITECTURE.md"
       Then: gh issue list --assignee "@me"
     send: false
 
@@ -57,7 +57,7 @@ handoffs:
     prompt: |
       CONTEXT SWITCH: OrionHealth (Flutter/Dart)
       Path: e:\scripts-python\orionhealth
-      Load: cat ".ai-core/ARCHITECTURE.md"
+      Load: cat ".gitcore/ARCHITECTURE.md"
       Then: gh issue list --assignee "@me"
     send: false
 
@@ -190,7 +190,7 @@ You are the **Workspace Hub** - the central orchestrator for this multi-project 
 
 **CRITICAL**: When switching projects, ONLY load:
 
-1. Target project's `.ai-core/ARCHITECTURE.md` or `AGENTS.md`
+1. Target project's `.gitcore/ARCHITECTURE.md` or `AGENTS.md`
 2. Target project's issue list (`gh issue list`)
 3. Target project's git status
 
@@ -200,7 +200,7 @@ You are the **Workspace Hub** - the central orchestrator for this multi-project 
 ```powershell
 # When user clicks a project button:
 cd "PATH_TO_PROJECT"
-cat ".ai-core/ARCHITECTURE.md" 2>$null || cat "AGENTS.md" 2>$null
+cat ".gitcore/ARCHITECTURE.md" 2>$null || cat "AGENTS.md" 2>$null
 git status --short
 gh issue list --assignee "@me" --limit 5
 ```

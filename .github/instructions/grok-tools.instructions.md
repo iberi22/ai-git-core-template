@@ -81,7 +81,7 @@ With 2M tokens you can:
 
 ```bash
 # Load everything at once (you have room!)
-cat .ai-core/ARCHITECTURE.md
+cat .gitcore/ARCHITECTURE.md
 cat AGENTS.md
 cat README.md
 find . -name "*.md" -exec cat {} \;

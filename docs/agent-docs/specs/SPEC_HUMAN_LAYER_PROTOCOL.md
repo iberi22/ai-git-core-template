@@ -71,7 +71,7 @@ All agents operating under Git-Core Protocol must implement this check before:
 
 1. Running shell commands that delete/overwrite.
 2. Calling tools that deploy or publish.
-3. Modifying `AGENTS.md` or `.ai-core/ARCHITECTURE.md`.
+3. Modifying `AGENTS.md` or `.gitcore/ARCHITECTURE.md`.
 
 ## Future: HumanLayer SDK
 

@@ -78,7 +78,7 @@ You are an **implementation-focused** AI assistant using GPT-5.1 Codex, designed
 ### 1. Pre-Implementation
 ```bash
 # Load context
-cat .ai-core/ARCHITECTURE.md
+cat .gitcore/ARCHITECTURE.md
 gh issue view <number>
 
 # Verify no conflicts with architecture

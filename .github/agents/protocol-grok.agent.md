@@ -108,13 +108,13 @@ Load specialized roles when needed:
 
 ```bash
 # List available roles
-cat .ai-core/AGENT_INDEX.md
+cat .gitcore/AGENT_INDEX.md
 
 # Equip a specific role
 ./scripts/equip-agent.ps1 -Role "ContextResearchAgent"
 
 # Read the loaded context
-cat .ai-core/CURRENT_CONTEXT.md
+cat .gitcore/CURRENT_CONTEXT.md
 ```
 
 ### Available Recipe Categories
@@ -136,7 +136,7 @@ With 2M tokens, you can:
 ### Before ANY Task
 ```bash
 # Load everything relevant
-cat .ai-core/ARCHITECTURE.md
+cat .gitcore/ARCHITECTURE.md
 cat AGENTS.md
 cat .github/copilot-instructions.md
 

@@ -291,7 +291,7 @@ If the Rust binary is not available, workflows automatically fall back to PowerS
 
 - [Git-Core Protocol](../../AGENTS.md)
 - [Guardian Agent Issue](../../.github/issues/FEAT_rust-guardian-agent.md)
-- [Architecture Decisions](../../.ai-core/ARCHITECTURE.md)
+- [Architecture Decisions](../../.gitcore/ARCHITECTURE.md)
 
 ## 🤝 Contributing
 

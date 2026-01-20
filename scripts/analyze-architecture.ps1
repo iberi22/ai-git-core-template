@@ -73,7 +73,7 @@ Write-Host "🔍 Gathering project context..." -ForegroundColor Yellow
 # 2. Gather Context
 $projectTree = Get-ProjectTree | Out-String
 $readme = Get-FileContent "README.md"
-$architecture = if (Test-Path ".ai-core/ARCHITECTURE.md") { Get-FileContent ".ai-core/ARCHITECTURE.md" } else { Get-FileContent ".ai/ARCHITECTURE.md" }
+$architecture = if (Test-Path ".gitcore/ARCHITECTURE.md") { Get-FileContent ".gitcore/ARCHITECTURE.md" } else { Get-FileContent ".gitcore/ARCHITECTURE.md" }
 $agents = Get-FileContent "AGENTS.md"
 $installScript = Get-FileContent "install.ps1"
 

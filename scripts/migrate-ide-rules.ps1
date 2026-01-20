@@ -275,7 +275,7 @@ function New-ProtocolStructure {
     param([string]$Path)
 
     $dirs = @(
-        ".ai-core",
+        ".gitcore",
         ".github/issues"
     )
 
@@ -308,7 +308,7 @@ function Update-AntigravityRules {
 > This project follows the Git-Core Protocol. See root-level files for full configuration.
 
 ### Quick Reference
-- **Architecture Decisions:** `.ai-core/ARCHITECTURE.md`
+- **Architecture Decisions:** `.gitcore/ARCHITECTURE.md`
 - **Agent Rules:** `AGENTS.md`
 - **Issues:** `.github/issues/` or `gh issue list`
 
@@ -368,7 +368,7 @@ else {
 }
 
 # Check for existing Git-Core Protocol
-$hasProtocol = Test-Path (Join-Path $ProjectPath ".ai-core")
+$hasProtocol = Test-Path (Join-Path $ProjectPath ".gitcore")
 if ($hasProtocol -and -not $Force) {
     Write-Status "Git-Core Protocol already installed. Use -Force to re-migrate." -Type "Warning"
 }
@@ -440,7 +440,7 @@ New-ProtocolStructure -Path $ProjectPath
 
 # Generate ARCHITECTURE.md content
 if ($archSections.Count -gt 0) {
-    $archPath = Join-Path $ProjectPath ".ai-core\ARCHITECTURE.md"
+    $archPath = Join-Path $ProjectPath ".gitcore\ARCHITECTURE.md"
 
     if ((Test-Path $archPath) -and -not $Force) {
         # Append to existing
@@ -484,7 +484,7 @@ Write-Host "    • Secrets (redacted): $($secretsFound.Count)" -ForegroundColor
 
 Write-Host ""
 Write-Host "  Next steps:" -ForegroundColor White
-Write-Host "    1. Review .ai-core/ARCHITECTURE.md for extracted decisions" -ForegroundColor Gray
+Write-Host "    1. Review .gitcore/ARCHITECTURE.md for extracted decisions" -ForegroundColor Gray
 Write-Host "    2. Move secrets to .env.local or secrets manager" -ForegroundColor Gray
 Write-Host "    3. Run: git-core check" -ForegroundColor Gray
 Write-Host ""

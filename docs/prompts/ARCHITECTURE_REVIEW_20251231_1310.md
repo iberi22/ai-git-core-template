@@ -6,7 +6,7 @@ Your goal is to understand the project structure, current architecture, and goal
 ## Project Structure
 `	ext
 .agent/
-.ai-core/
+.gitcore/
 .github/
 .vscode/
 bin/
@@ -37,11 +37,11 @@ VERSION
 .agent\workflows/
 .agent\rules\rule-0.md
 .agent\workflows\reolplazr.md
-.ai-core\AGENT_INDEX.md
-.ai-core\ARCHITECTURE.md
-.ai-core\CLI_CONFIG.md
-.ai-core\CONTEXT_LOG.md
-.ai-core\features.json
+.gitcore\AGENT_INDEX.md
+.gitcore\ARCHITECTURE.md
+.gitcore\CLI_CONFIG.md
+.gitcore\CONTEXT_LOG.md
+.gitcore\features.json
 .github\actions/
 .github\agents/
 .github\instructions/
@@ -359,7 +359,7 @@ tools\git-core\crates\gc-validator\tests\integration_guardian.rs
 tools\git-core\test-debug\.github/
 tools\git-core\test-debug\.github\issues/
 tools\git-core\test-debug\.github\issues\FEAT_test.md
-tools\git-core\test-project-2\.ai-core/
+tools\git-core\test-project-2\.gitcore/
 tools\git-core\test-project-2\.github/
 tools\git-core\test-project-2\docs/
 tools\git-core\test-project-2\scripts/
@@ -367,8 +367,8 @@ tools\git-core\test-project-2\src/
 tools\git-core\test-project-2\tests/
 tools\git-core\test-project-2\.git-core-protocol-version
 tools\git-core\test-project-2\README.md
-tools\git-core\test-project-2\.ai-core\AGENT_INDEX.md
-tools\git-core\test-project-2\.ai-core\ARCHITECTURE.md
+tools\git-core\test-project-2\.gitcore\AGENT_INDEX.md
+tools\git-core\test-project-2\.gitcore\ARCHITECTURE.md
 tools\git-core\test-project-2\.github\copilot-instructions.md
 tools\git-core\test-project-2\docs\archive/
 tools\issue-syncer\benches/
@@ -491,7 +491,7 @@ curl -fsSL <https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/ins
 
 irm <https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1> | iex
 
-After setup, read .ai-core/ARCHITECTURE.md and start with: gc issue list
+After setup, read .gitcore/ARCHITECTURE.md and start with: gc issue list
 
 ```
 
@@ -794,7 +794,7 @@ git-core upgrade
 # Check protocol integrity
 git-core check
 
-# Migrate from .ai/ to .ai-core/
+# Migrate from .ai/ to .gitcore/
 git-core migrate
 ```
 
@@ -821,7 +821,7 @@ git-core migrate
 
 ```
 /
-├── .ai-core/
+├── .gitcore/
 │   ├── ARCHITECTURE.md       # 📖 System context
 │   ├── AGENT_INDEX.md        # 🎭 Agent roles and routing
 │   └── CONTEXT_LOG.md        # 📝 Ephemeral session notes
@@ -863,7 +863,7 @@ git-core migrate
 ┌─────────────────────────────────────────────────────────┐
 │                    THE LOOP                              │
 ├─────────────────────────────────────────────────────────┤
-│   1. READ: cat .ai-core/ARCHITECTURE.md                      │
+│   1. READ: cat .gitcore/ARCHITECTURE.md                      │
 │           gh issue list --assignee "@me"                │
 │   2. ACT:  gh issue edit <id> --add-assignee "@me"      │
 │           git checkout -b feat/issue-<id>               │
@@ -921,10 +921,11 @@ This protocol is inspired by and builds upon the excellent work of:
 
 We acknowledge their contributions to the field of AI-assisted development.
 
-`
+`
 
 
-### File: .ai-core/ARCHITECTURE.md
+
+### File: .gitcore/ARCHITECTURE.md
 `
 ---
 title: "System Architecture"
@@ -1017,7 +1018,8 @@ project: Git-Core-Protocol
 *Last updated by AI Agent: Never*
 
 
-`
+`
+
 
 
 ### File: AGENTS.md
@@ -1097,8 +1099,8 @@ gh workflow run agent-dispatcher.yml --field strategy=round-robin
 
 | File | Purpose |
 |------|---------|
-| `.ai-core/ARCHITECTURE.md` | Roadmap for Planner to parse |
-| `.ai-core/features.json` | Feature status tracking |
+| `.gitcore/ARCHITECTURE.md` | Roadmap for Planner to parse |
+| `.gitcore/features.json` | Feature status tracking |
 
 ### Auto-Merge Conditions (Guardian)
 
@@ -1215,7 +1217,7 @@ Para operaciones críticas (borrar datos, deploys, cambios de auth), el agente *
 ```
 ✅ README.md (project overview ONLY)
 ✅ AGENTS.md (agent configuration ONLY)
-✅ .ai-core/ARCHITECTURE.md (system architecture ONLY)
+✅ .gitcore/ARCHITECTURE.md (system architecture ONLY)
 ✅ CONTRIBUTING.md, LICENSE.md (standard repo files)
 ✅ docs/prompts/*.md (session continuation prompts - SCRIPT GENERATED ONLY)
 ```
@@ -1258,7 +1260,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 
 ### 📖 Required Reading Before Any Task
 
-1. `.ai-core/ARCHITECTURE.md` - Understand the system
+1. `.gitcore/ARCHITECTURE.md` - Understand the system
 2. `gc issue list` - Your current task (was `gh issue list`)
 3. `gc issue list --limit 5` - Available backlog
 
@@ -1268,7 +1270,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 
 **BEFORE implementing ANY infrastructure/tooling:**
 
-1. Read `.ai-core/ARCHITECTURE.md` CRITICAL DECISIONS section
+1. Read `.gitcore/ARCHITECTURE.md` CRITICAL DECISIONS section
 2. Verify your implementation matches the decided stack
 3. If issue mentions alternatives, ARCHITECTURE.md decision wins
 
@@ -1283,7 +1285,7 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 
 **Related Documentation:**
 
-- `.ai-core/ARCHITECTURE.md` - CRITICAL DECISIONS table
+- `.gitcore/ARCHITECTURE.md` - CRITICAL DECISIONS table
 - `.github/copilot-instructions.md` - Architecture First Rule
 
 ---
@@ -1302,7 +1304,7 @@ pwd                              # Confirmar directorio de trabajo
 
 # 2. Estado del proyecto
 gc git log --limit 10            # Ver trabajo reciente
-cat .ai-core/features.json            # Ver features y su estado (passes: true/false)
+cat .gitcore/features.json            # Ver features y su estado (passes: true/false)
 
 # 3. Ejecutar tests existentes
 npm test                         # o: cargo test, pytest, etc.
@@ -1322,7 +1324,7 @@ npm run dev &
 
 ```bash
 # 1. Arquitectura y decisiones críticas
-cat .ai-core/ARCHITECTURE.md
+cat .gitcore/ARCHITECTURE.md
 
 # 2. Estado del agente en el issue asignado
 gc issue list --state open
@@ -1332,7 +1334,7 @@ gc issue list --state open
 cat docs/agent-docs/RESEARCH_STACK_CONTEXT.md
 
 # 4. Elegir feature de mayor prioridad que NO esté completado
-# (Revisar .ai-core/features.json → passes: false)
+# (Revisar .gitcore/features.json → passes: false)
 ```
 
 ### Phase 2: ACT (Development)
@@ -1529,7 +1531,7 @@ Cuando un issue se **cierra** en GitHub:
 | Source code (`.py`, `.js`, `.ts`, etc.) | The actual project |
 | Tests (in `tests/` folder) | Quality assurance |
 | Config files (docker, CI/CD, linters) | Infrastructure |
-| `.ai-core/ARCHITECTURE.md` | System architecture (ONLY this file) |
+| `.gitcore/ARCHITECTURE.md` | System architecture (ONLY this file) |
 | `README.md` | Project documentation |
 | `docs/agent-docs/*.md` | **ONLY when user explicitly requests** |
 | GitHub Issues | **EVERYTHING ELSE** |
@@ -2235,13 +2237,13 @@ Antigravity stores rules in `.agent/rules/`. When installing Git-Core Protocol:
 1. **Existing rules are NOT overwritten**
 2. Protocol integration is **appended** to existing rules
 3. Project-specific logic stays in `rule-0.md`
-4. Architecture decisions move to `.ai-core/ARCHITECTURE.md`
+4. Architecture decisions move to `.gitcore/ARCHITECTURE.md`
 
 **Rule Content Classification:**
 
 | Content Type | Where It Goes |
 |--------------|---------------|
-| Stack/Architecture decisions | `.ai-core/ARCHITECTURE.md` |
+| Stack/Architecture decisions | `.gitcore/ARCHITECTURE.md` |
 | Agent behavior rules | `AGENTS.md` |
 | Project-specific patterns | `.agent/rules/rule-0.md` (keep) |
 | Commands/Scripts | `README.md` or `package.json` |
@@ -2262,7 +2264,7 @@ Antigravity stores rules in `.agent/rules/`. When installing Git-Core Protocol:
 ```
 .agent/rules/rule-0.md     → Project-specific context (Next.js, Supabase, etc.)
 AGENTS.md                  → Protocol rules (all projects)
-.ai-core/ARCHITECTURE.md        → Critical decisions (hosting, DB, etc.)
+.gitcore/ARCHITECTURE.md        → Critical decisions (hosting, DB, etc.)
 ```
 
 **The agent reads ALL files**, so:
@@ -2277,7 +2279,7 @@ AGENTS.md                  → Protocol rules (all projects)
 
 ```text
 /
-├── .ai-core/
+├── .gitcore/
 │   ├── ARCHITECTURE.md    # 📖 READ THIS FIRST
 │   ├── AGENT_INDEX.md     # 🎭 Agent roles and routing
 │   └── CONTEXT_LOG.md     # 📝 Session notes only
@@ -2303,7 +2305,8 @@ AGENTS.md                  → Protocol rules (all projects)
 *Protocol Version: 1.4.0*
 *Last Updated: 2025*
 
-`
+`
+
 
 ## Core Scripts
 
@@ -2388,18 +2391,18 @@ function Test-CliInstalled {
     return $null -ne $command
 }
 
-# Function to migrate from .ai/ to .ai-core/
+# Function to migrate from .ai/ to .gitcore/
 function Invoke-Migration {
     if (Test-Path ".ai") {
         Write-Host "🔄 Detected legacy .ai/ directory..." -ForegroundColor Yellow
 
-        if (-not (Test-Path ".ai-core")) {
-            New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
+        if (-not (Test-Path ".gitcore")) {
+            New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
         }
 
-        # Copy all files from .ai/ to .ai-core/
+        # Copy all files from .ai/ to .gitcore/
         Get-ChildItem ".ai" -Recurse | ForEach-Object {
-            $destPath = $_.FullName -replace [regex]::Escape(".ai"), ".ai-core"
+            $destPath = $_.FullName -replace [regex]::Escape(".ai"), ".gitcore"
             if ($_.PSIsContainer) {
                 New-Item -ItemType Directory -Force -Path $destPath | Out-Null
             } else {
@@ -2407,7 +2410,7 @@ function Invoke-Migration {
             }
         }
 
-        Write-Host "  ✓ Migrated .ai/ → .ai-core/" -ForegroundColor Green
+        Write-Host "  ✓ Migrated .ai/ → .gitcore/" -ForegroundColor Green
         Write-Host "  ℹ️  You can safely delete .ai/ after verifying" -ForegroundColor Cyan
         return $true
     }
@@ -2419,8 +2422,8 @@ function Backup-UserFiles {
     Write-Host "💾 Backing up user files..." -ForegroundColor Cyan
     New-Item -ItemType Directory -Force -Path $BACKUP_DIR | Out-Null
 
-    # Check both .ai-core/ and .ai/ for backwards compatibility
-    $aiDir = if (Test-Path ".ai-core") { ".ai-core" } elseif (Test-Path ".ai") { ".ai" } else { $null }
+    # Check both .gitcore/ and .ai/ for backwards compatibility
+    $aiDir = if (Test-Path ".gitcore") { ".gitcore" } elseif (Test-Path ".ai") { ".ai" } else { $null }
 
     # Backup ARCHITECTURE.md
     if ($aiDir -and (Test-Path "$aiDir/ARCHITECTURE.md")) {
@@ -2452,21 +2455,21 @@ function Backup-UserFiles {
 function Restore-UserFiles {
     Write-Host "📥 Restoring user files..." -ForegroundColor Cyan
 
-    # Ensure .ai-core directory exists for restoration
-    if (-not (Test-Path ".ai-core")) {
-        New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
+    # Ensure .gitcore directory exists for restoration
+    if (-not (Test-Path ".gitcore")) {
+        New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
     }
 
     # Restore ARCHITECTURE.md (unless force mode)
     if (-not $ForceMode -and (Test-Path "$BACKUP_DIR/ARCHITECTURE.md")) {
-        Copy-Item "$BACKUP_DIR/ARCHITECTURE.md" ".ai-core/ARCHITECTURE.md" -Force
-        Write-Host "  ✓ .ai-core/ARCHITECTURE.md restored" -ForegroundColor Green
+        Copy-Item "$BACKUP_DIR/ARCHITECTURE.md" ".gitcore/ARCHITECTURE.md" -Force
+        Write-Host "  ✓ .gitcore/ARCHITECTURE.md restored" -ForegroundColor Green
     }
 
     # Always restore CONTEXT_LOG.md
     if (Test-Path "$BACKUP_DIR/CONTEXT_LOG.md") {
-        Copy-Item "$BACKUP_DIR/CONTEXT_LOG.md" ".ai-core/CONTEXT_LOG.md" -Force
-        Write-Host "  ✓ .ai-core/CONTEXT_LOG.md restored" -ForegroundColor Green
+        Copy-Item "$BACKUP_DIR/CONTEXT_LOG.md" ".gitcore/CONTEXT_LOG.md" -Force
+        Write-Host "  ✓ .gitcore/CONTEXT_LOG.md restored" -ForegroundColor Green
     }
 
     # Restore custom workflows
@@ -2609,32 +2612,32 @@ Remove-Item -Recurse -Force "$TEMP_DIR/.git" -ErrorAction SilentlyContinue
 # Install files
 Write-Host "📦 Installing protocol files..." -ForegroundColor Cyan
 
-# Run migration from .ai/ to .ai-core/ if needed
+# Run migration from .ai/ to .gitcore/ if needed
 $migrated = Invoke-Migration
 
-# Handle .ai-core directory (protocol uses .ai-core, template may have .ai)
-$templateAiDir = if (Test-Path "$TEMP_DIR/.ai-core") { "$TEMP_DIR/.ai-core" } elseif (Test-Path "$TEMP_DIR/.ai") { "$TEMP_DIR/.ai" } else { $null }
+# Handle .gitcore directory (protocol uses .gitcore, template may have .ai)
+$templateAiDir = if (Test-Path "$TEMP_DIR/.gitcore") { "$TEMP_DIR/.gitcore" } elseif (Test-Path "$TEMP_DIR/.ai") { "$TEMP_DIR/.ai" } else { $null }
 
 if ($templateAiDir) {
     if ($UpgradeMode) {
         # Remove old directories
-        if (Test-Path ".ai-core") { Remove-Item -Recurse -Force ".ai-core" }
+        if (Test-Path ".gitcore") { Remove-Item -Recurse -Force ".gitcore" }
         if (Test-Path ".ai") { Remove-Item -Recurse -Force ".ai" }
 
-        # Copy to .ai-core
-        New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
-        Copy-Item -Recurse "$templateAiDir/*" ".ai-core/"
-        Write-Host "  ✓ .ai-core/ (upgraded)" -ForegroundColor Green
-    } elseif (-not (Test-Path ".ai-core") -and -not (Test-Path ".ai")) {
-        # Copy .ai-core if neither .ai-core nor .ai exists
-        New-Item -ItemType Directory -Force -Path ".ai-core" | Out-Null
-        Copy-Item -Recurse "$templateAiDir/*" ".ai-core/"
-        Write-Host "  ✓ .ai-core/" -ForegroundColor Green
+        # Copy to .gitcore
+        New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
+        Copy-Item -Recurse "$templateAiDir/*" ".gitcore/"
+        Write-Host "  ✓ .gitcore/ (upgraded)" -ForegroundColor Green
+    } elseif (-not (Test-Path ".gitcore") -and -not (Test-Path ".ai")) {
+        # Copy .gitcore if neither .gitcore nor .ai exists
+        New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
+        Copy-Item -Recurse "$templateAiDir/*" ".gitcore/"
+        Write-Host "  ✓ .gitcore/" -ForegroundColor Green
     } else {
-        Write-Host "  ~ .ai-core/ (exists, merging new files)" -ForegroundColor Yellow
+        Write-Host "  ~ .gitcore/ (exists, merging new files)" -ForegroundColor Yellow
         Get-ChildItem $templateAiDir | ForEach-Object {
-            if (-not (Test-Path ".ai-core/$($_.Name)")) {
-                Copy-Item $_.FullName ".ai-core/"
+            if (-not (Test-Path ".gitcore/$($_.Name)")) {
+                Copy-Item $_.FullName ".gitcore/"
                 Write-Host "    + $($_.Name)" -ForegroundColor Green
             }
         }
@@ -2754,7 +2757,7 @@ if (Test-Path ".agent/rules") {
 > This project follows the Git-Core Protocol. See root-level files for full configuration.
 
 ### Quick Reference
-- **Architecture Decisions:** ``.ai-core/ARCHITECTURE.md``
+- **Architecture Decisions:** ``.gitcore/ARCHITECTURE.md``
 - **Agent Rules:** ``AGENTS.md``
 - **Issues:** ``.github/issues/`` or ``gh issue list``
 
@@ -2813,7 +2816,7 @@ if ($UpgradeMode) {
     }
 } else {
     Write-Host "📋 Files installed:"
-    Write-Host "   .ai-core/ARCHITECTURE.md    - Document your architecture here"
+    Write-Host "   .gitcore/ARCHITECTURE.md    - Document your architecture here"
     Write-Host "   .github/               - Copilot rules + workflows"
     Write-Host "   scripts/               - Init and update scripts"
     Write-Host "   AGENTS.md              - Rules for all AI agents"
@@ -2829,7 +2832,8 @@ Write-Host '   Full reset:    $env:GIT_CORE_FORCE = "1"; irm .../install.ps1 | i
 Write-Host "   Check updates: .\scripts\check-protocol-update.ps1"
 
 
-`
+`
+
 
 ## Instructions for AI
 

@@ -107,21 +107,25 @@ if [ "$CURRENT_VERSION" != "0.0.0" ]; then
     echo ""
 fi
 
-# Function to migrate from .ai/ to .ai-core/
+# Function to migrate from legacy directories to .gitcore/
 migrate_ai_directory() {
-    if [ -d ".ai" ]; then
-        echo -e "${YELLOW}🔄 Detected legacy .ai/ directory...${NC}"
+    HAS_LEGACY=false
+    for legacy in ".ai" ".gitcore"; do
+        if [ -d "$legacy" ]; then
+            echo -e "${YELLOW}🔄 Detected legacy $legacy directory...${NC}"
+            mkdir -p ".gitcore"
+            cp -r "$legacy"/* .gitcore/ 2>/dev/null || true
+            echo -e "  ${GREEN}✓ Migrated $legacy → .gitcore/${NC}"
+            echo -e "  ${CYAN}ℹ️  You can safely delete $legacy after verifying${NC}"
+            HAS_LEGACY=true
+        fi
+    done
 
-        mkdir -p ".ai-core"
-
-        # Copy all files from .ai/ to .ai-core/
-        cp -r .ai/* .ai-core/ 2>/dev/null || true
-
-        echo -e "  ${GREEN}✓ Migrated .ai/ → .ai-core/${NC}"
-        echo -e "  ${CYAN}ℹ️  You can safely delete .ai/ after verifying${NC}"
+    if [ "$HAS_LEGACY" = true ]; then
         return 0
+    else
+        return 1
     fi
-    return 1
 }
 
 # Function to backup user files
@@ -129,10 +133,12 @@ backup_user_files() {
     echo -e "${CYAN}💾 Backing up user files...${NC}"
     mkdir -p "$BACKUP_DIR"
 
-    # Check both .ai-core/ and .ai/ for backwards compatibility
+    # Check both .gitcore, .gitcore and .ai for backwards compatibility
     AI_DIR=""
-    if [ -d ".ai-core" ]; then
-        AI_DIR=".ai-core"
+    if [ -d ".gitcore" ]; then
+        AI_DIR=".gitcore"
+    elif [ -d ".gitcore" ]; then
+        AI_DIR=".gitcore"
     elif [ -d ".ai" ]; then
         AI_DIR=".ai"
     fi
@@ -174,19 +180,19 @@ backup_user_files() {
 restore_user_files() {
     echo -e "${CYAN}📥 Restoring user files...${NC}"
 
-    # Ensure .ai-core directory exists for restoration
-    mkdir -p ".ai-core"
+    # Ensure .gitcore directory exists for restoration
+    mkdir -p ".gitcore"
 
     # Restore ARCHITECTURE.md (unless force mode)
     if [ "$FORCE_MODE" != true ] && [ -f "$BACKUP_DIR/ARCHITECTURE.md" ]; then
-        cp "$BACKUP_DIR/ARCHITECTURE.md" ".ai-core/ARCHITECTURE.md"
-        echo -e "  ${GREEN}✓ .ai-core/ARCHITECTURE.md restored${NC}"
+        cp "$BACKUP_DIR/ARCHITECTURE.md" ".gitcore/ARCHITECTURE.md"
+        echo -e "  ${GREEN}✓ .gitcore/ARCHITECTURE.md restored${NC}"
     fi
 
     # Always restore CONTEXT_LOG.md
     if [ -f "$BACKUP_DIR/CONTEXT_LOG.md" ]; then
-        cp "$BACKUP_DIR/CONTEXT_LOG.md" ".ai-core/CONTEXT_LOG.md"
-        echo -e "  ${GREEN}✓ .ai-core/CONTEXT_LOG.md restored${NC}"
+        cp "$BACKUP_DIR/CONTEXT_LOG.md" ".gitcore/CONTEXT_LOG.md"
+        echo -e "  ${GREEN}✓ .gitcore/CONTEXT_LOG.md restored${NC}"
     fi
 
     # Restore custom workflows
@@ -297,13 +303,15 @@ rm -rf "$TEMP_DIR/.git"
 # Install files
 echo -e "${CYAN}📦 Installing protocol files...${NC}"
 
-# Run migration from .ai/ to .ai-core/ if needed
+# Run migration from legacy to .gitcore/ if needed
 migrate_ai_directory
 
-# Handle .ai-core directory (protocol uses .ai-core, template may have .ai)
+# Handle .gitcore directory (protocol uses .gitcore, template may have .ai or .gitcore)
 TEMPLATE_AI_DIR=""
-if [ -d "$TEMP_DIR/.ai-core" ]; then
-    TEMPLATE_AI_DIR="$TEMP_DIR/.ai-core"
+if [ -d "$TEMP_DIR/.gitcore" ]; then
+    TEMPLATE_AI_DIR="$TEMP_DIR/.gitcore"
+elif [ -d "$TEMP_DIR/.gitcore" ]; then
+    TEMPLATE_AI_DIR="$TEMP_DIR/.gitcore"
 elif [ -d "$TEMP_DIR/.ai" ]; then
     TEMPLATE_AI_DIR="$TEMP_DIR/.ai"
 fi
@@ -311,29 +319,27 @@ fi
 if [ -n "$TEMPLATE_AI_DIR" ]; then
     if [ "$UPGRADE_MODE" = true ]; then
         # Remove old directories
-        rm -rf .ai-core .ai 2>/dev/null || true
+        rm -rf .gitcore .gitcore .ai 2>/dev/null || true
 
-        # Copy to .ai-core
-# Copy other directories
-DIRS=".github scripts docs"
-if [ "$INSTALL_BINARIES" = true ]; then
-    DIRS="$DIRS bin"
-fi
-
-for dir in $DIRS; do
-    if [ -d "$TEMP_DIR/$dir" ]; thengraded)${NC}"
-    elif [ ! -d ".ai-core" ] && [ ! -d ".ai" ]; then
-        mkdir -p ".ai-core"
-        cp -r "$TEMPLATE_AI_DIR"/* .ai-core/
-        echo -e "  ${GREEN}✓ .ai-core/${NC}"
+        # Copy to .gitcore
+        mkdir -p ".gitcore"
+        cp -r "$TEMPLATE_AI_DIR"/* .gitcore/
+        echo -e "  ${GREEN}✓ .gitcore/ (upgraded)${NC}"
+    elif [ ! -d ".gitcore" ] && [ ! -d ".gitcore" ] && [ ! -d ".ai" ]; then
+        mkdir -p ".gitcore"
+        cp -r "$TEMPLATE_AI_DIR"/* .gitcore/
+        echo -e "  ${GREEN}✓ .gitcore/${NC}"
     else
-        # Ensure .ai-core exists
-        mkdir -p ".ai-core"
-        echo -e "  ${YELLOW}~ .ai-core/ (exists, merging new files only)${NC}"
-        for file in "$TEMPLATE_AI_DIR"/*; do
-            filename=$(basename "$file")
-            if [ ! -f ".ai-core/$filename" ]; then
-                cp "$file" ".ai-core/"
+        # Ensure target dir exists
+        TARGET_DIR=".gitcore"
+        if [ ! -d "$TARGET_DIR" ]; then
+            if [ -d ".gitcore" ]; then TARGET_DIR=".gitcore"; else TARGET_DIR=".ai"; fi
+        fi
+        echo -e "  ${YELLOW}~ $TARGET_DIR/ (exists, merging new files)${NC}"
+        for item in "$TEMPLATE_AI_DIR"/*; do
+            filename=$(basename "$item")
+            if [ ! -e "$TARGET_DIR/$filename" ]; then
+                cp -r "$item" "$TARGET_DIR/"
                 echo -e "    ${GREEN}+ $filename${NC}"
             fi
         done
@@ -444,7 +450,7 @@ if [ "$UPGRADE_MODE" = true ]; then
     fi
 else
     echo -e "📋 Files installed:"
-    echo "   .ai-core/ARCHITECTURE.md    - Document your architecture here"
+    echo "   .gitcore/ARCHITECTURE.md    - Document your architecture here"
     echo "   .github/               - Copilot rules + workflows"
     echo "   scripts/               - Init and update scripts"
     echo "   AGENTS.md              - Rules for all AI agents"

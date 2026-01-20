@@ -206,8 +206,8 @@ fn test_full_protocol_project_check() {
     // Setup a minimal protocol-compliant project
     temp.child(".git").create_dir_all().unwrap();
     temp.child(".git-core-protocol-version").write_str("3.0.0").unwrap();
-    temp.child(".ai-core").create_dir_all().unwrap();
-    temp.child(".ai-core/ARCHITECTURE.md").write_str("# Architecture").unwrap();
+    temp.child(".gitcore").create_dir_all().unwrap();
+    temp.child(".gitcore/ARCHITECTURE.md").write_str("# Architecture").unwrap();
     temp.child(".github/issues").create_dir_all().unwrap();
     temp.child("AGENTS.md").write_str("# Agents").unwrap();
 

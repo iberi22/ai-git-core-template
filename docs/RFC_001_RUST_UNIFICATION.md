@@ -31,7 +31,7 @@ tools/git-core/
 ├── Cargo.toml (Workspace)
 ├── crates/
 │   ├── git-core-cli/       # The entry point (Clap)
-│   ├── git-core-config/    # Config parsing (.ai-core/ARCHITECTURE.md)
+│   ├── git-core-config/    # Config parsing (.gitcore/ARCHITECTURE.md)
 │   ├── git-core-context/   # Context management (Agent loading)
 │   ├── git-core-github/    # GitHub API client (Octocrab)
 │   ├── git-core-report/    # AI Reporting (Gemini/Copilot)
