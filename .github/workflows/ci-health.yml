@@ -55,6 +55,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          cd tools/git-core
           cargo run -q -p gc-cli -- ci-detect
 
       - name: Decide Execution
