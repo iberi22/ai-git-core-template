@@ -24,9 +24,34 @@ CYAN='\033[0;36m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e "${CYAN}🧠 Git-Core Protocol - Remote Installer v1.4.0${NC}"
+echo -e "${CYAN}🧠 Git-Core Protocol - Remote Installer v3.5.1${NC}"
 echo "=============================================="
 echo ""
+
+# Cleanup trap
+cleanup() {
+    if [ -d "$TEMP_DIR" ]; then
+        rm -rf "$TEMP_DIR"
+    fi
+}
+trap cleanup EXIT
+
+# Check dependencies
+check_dependencies() {
+    local missing_deps=0
+    for dep in git curl; do
+        if ! command -v "$dep" &> /dev/null; then
+            echo -e "${RED}❌ Error: '$dep' is not installed.${NC}"
+            missing_deps=1
+        fi
+    done
+
+    if [ $missing_deps -ne 0 ]; then
+        echo -e "${YELLOW}Please install missing dependencies and try again.${NC}"
+        exit 1
+    fi
+}
+check_dependencies
 
 # Parse arguments
 ORGANIZE_FILES=false
@@ -110,14 +135,27 @@ fi
 # Function to migrate from legacy directories to .gitcore/
 migrate_ai_directory() {
     HAS_LEGACY=false
-    for legacy in ".ai" ".gitcore"; do
+    # Priority: .gitcore (old) > .ai (older)
+    # Logic: Rename (mv) if .gitcore doesn't exist to preserve exact state (Smart Update)
+    # Fallback: Copy (cp) if .gitcore exists to merge
+
+    for legacy in ".gitcore" ".ai"; do
         if [ -d "$legacy" ]; then
             echo -e "${YELLOW}🔄 Detected legacy $legacy directory...${NC}"
-            mkdir -p ".gitcore"
-            cp -r "$legacy"/* .gitcore/ 2>/dev/null || true
-            echo -e "  ${GREEN}✓ Migrated $legacy → .gitcore/${NC}"
-            echo -e "  ${CYAN}ℹ️  You can safely delete $legacy after verifying${NC}"
-            HAS_LEGACY=true
+
+            if [ ! -d ".gitcore" ]; then
+                # Smart Migration: Atomic Rename
+                mv "$legacy" ".gitcore"
+                echo -e "  ${GREEN}✓ Renamed $legacy → .gitcore/ (Smart Update)${NC}"
+                HAS_LEGACY=true
+            else
+                # Fallback: Merge
+                echo -e "  ${YELLOW}→ .gitcore exists, merging content...${NC}"
+                cp -r "$legacy"/* .gitcore/ 2>/dev/null || true
+                echo -e "  ${GREEN}✓ Merged $legacy → .gitcore/${NC}"
+                echo -e "  ${CYAN}ℹ️  You can remove $legacy manually${NC}"
+                HAS_LEGACY=true
+            fi
         fi
     done
 

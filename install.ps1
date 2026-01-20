@@ -16,9 +16,16 @@ $RAW_URL = "https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main"
 $TEMP_DIR = ".git-core-temp"
 $BACKUP_DIR = ".git-core-backup"
 
-Write-Host "🧠 Git-Core Protocol - Remote Installer" -ForegroundColor Cyan
+Write-Host "🧠 Git-Core Protocol - Remote Installer v3.5.1" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
+
+# Check dependencies
+if (-not (Get-Command "git" -ErrorAction SilentlyContinue)) {
+    Write-Host "❌ Error: 'git' is not installed or not in PATH." -ForegroundColor Red
+    Write-Host "Please install Git and try again." -ForegroundColor Yellow
+    exit 1
+}
 
 # Check for environment variable flags
 $OrganizeFiles = $env:GIT_CORE_ORGANIZE -eq "1"
@@ -80,8 +87,8 @@ function Test-CliInstalled {
 function Invoke-Migration {
     $hasLegacy = $false
 
-    # Legacy paths
-    $legacyPaths = @(".ai", ".gitcore")
+    # Legacy paths (Priority order)
+    $legacyPaths = @(".gitcore", ".ai")
 
     foreach ($legacy in $legacyPaths) {
         if (Test-Path $legacy) {
@@ -89,23 +96,28 @@ function Invoke-Migration {
             $hasLegacy = $true
 
             if (-not (Test-Path ".gitcore")) {
-                New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
-            }
+                # Smart Migration: Rename
+                Move-Item -Path $legacy -Destination ".gitcore" -Force
+                Write-Host "  ✓ Renamed $legacy → .gitcore/ (Smart Update)" -ForegroundColor Green
+            } else {
+                # Fallback: Merge
+                Write-Host "  → .gitcore exists, merging content..." -ForegroundColor Yellow
 
-            # Copy all files from legacy to .gitcore/
-            Get-ChildItem $legacy -Recurse | ForEach-Object {
-                $destPath = $_.FullName -replace [regex]::Escape($legacy), ".gitcore"
-                if ($_.PSIsContainer) {
-                    if (-not (Test-Path $destPath)) {
-                        New-Item -ItemType Directory -Force -Path $destPath | Out-Null
+                # Copy all files from legacy to .gitcore/
+                Get-ChildItem $legacy -Recurse | ForEach-Object {
+                    $destPath = $_.FullName -replace [regex]::Escape($legacy), ".gitcore"
+                    if ($_.PSIsContainer) {
+                        if (-not (Test-Path $destPath)) {
+                            New-Item -ItemType Directory -Force -Path $destPath | Out-Null
+                        }
+                    } else {
+                        Copy-Item $_.FullName $destPath -Force
                     }
-                } else {
-                    Copy-Item $_.FullName $destPath -Force
                 }
-            }
 
-            Write-Host "  ✓ Migrated $legacy → .gitcore/" -ForegroundColor Green
-            Write-Host "  ℹ️  You can safely delete $legacy after verifying" -ForegroundColor Cyan
+                Write-Host "  ✓ Merged $legacy → .gitcore/" -ForegroundColor Green
+                Write-Host "  ℹ️  You can remove $legacy manually" -ForegroundColor Cyan
+            }
         }
     }
 
@@ -295,12 +307,13 @@ if ($UpgradeMode) {
 # Download template
 Write-Host "`n📥 Downloading Git-Core Protocol..." -ForegroundColor Cyan
 
-try {
-    git clone --depth 1 $REPO_URL $TEMP_DIR 2>$null
-} catch {
-    Write-Host "❌ Error cloning repository" -ForegroundColor Red
-    exit 1
-}
+
+
+    git clone --depth 1 $REPO_URL $TEMP_DIR
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ Error cloning repository" -ForegroundColor Red
+        exit 1
+    }
 
 Remove-Item -Recurse -Force "$TEMP_DIR/.git" -ErrorAction SilentlyContinue
 
