@@ -47,15 +47,15 @@ jobs:
       repo_list: ${{ steps.decide.outputs.repo_list }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Detect Repository Type
         id: detect
         shell: bash
+        working-directory: tools/git-core
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cd tools/git-core
           cargo run -q -p gc-cli -- ci-detect
 
       - name: Decide Execution
