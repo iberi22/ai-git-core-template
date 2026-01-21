@@ -9,7 +9,7 @@
 #   --upgrade, -u     Upgrade existing installation (PRESERVES ARCHITECTURE.md)
 #   --force, -f       Force upgrade (overwrites EVERYTHING including ARCHITECTURE.md)
 
-set -e
+set -euo pipefail
 
 REPO_URL="https://github.com/iberi22/Git-Core-Protocol"
 RAW_URL="https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main"
@@ -30,16 +30,24 @@ echo ""
 
 # Cleanup trap
 cleanup() {
+    local exit_code=$?
     if [ -d "$TEMP_DIR" ]; then
         rm -rf "$TEMP_DIR"
     fi
+    if [ $exit_code -ne 0 ]; then
+        echo -e "\n${RED}❌ Installation failed.${NC}"
+    fi
+    exit $exit_code
 }
-trap cleanup EXIT
+trap cleanup EXIT ERR SIGINT SIGTERM
 
 # Check dependencies
 check_dependencies() {
     local missing_deps=0
-    for dep in git curl; do
+    # Required dependencies for the protocol
+    local deps=("git" "curl" "unzip")
+
+    for dep in "${deps[@]}"; do
         if ! command -v "$dep" &> /dev/null; then
             echo -e "${RED}❌ Error: '$dep' is not installed.${NC}"
             missing_deps=1

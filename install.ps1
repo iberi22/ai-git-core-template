@@ -16,14 +16,38 @@ $RAW_URL = "https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main"
 $TEMP_DIR = ".git-core-temp"
 $BACKUP_DIR = ".git-core-backup"
 
-Write-Host "🧠 Git-Core Protocol - Remote Installer v3.5.1" -ForegroundColor Cyan
-Write-Host "==============================================" -ForegroundColor Cyan
+# Define colors for consistency
+$Red = "Red"
+$Green = "Green"
+$Yellow = "Yellow"
+$Cyan = "Cyan"
+$Blue = "Blue"
+
+Write-Host "🧠 Git-Core Protocol - Remote Installer v3.5.1" -ForegroundColor $Cyan
+Write-Host "==============================================" -ForegroundColor $Cyan
 Write-Host ""
 
 # Check dependencies
-if (-not (Get-Command "git" -ErrorAction SilentlyContinue)) {
-    Write-Host "❌ Error: 'git' is not installed or not in PATH." -ForegroundColor Red
-    Write-Host "Please install Git and try again." -ForegroundColor Yellow
+function Test-Dependency {
+    param([string]$name)
+    if (-not (Get-Command $name -ErrorAction SilentlyContinue)) {
+        return $false
+    }
+    return $true
+}
+
+$dependencies = @("git", "curl")
+$missingDeps = @()
+
+foreach ($dep in $dependencies) {
+    if (-not (Test-Dependency $dep)) {
+        $missingDeps += $dep
+    }
+}
+
+if ($missingDeps.Count -gt 0) {
+    Write-Host "❌ Error: The following dependencies are missing: $($missingDeps -join ', ')" -ForegroundColor $Red
+    Write-Host "Please install them and try again." -ForegroundColor $Yellow
     exit 1
 }
 
@@ -34,511 +58,359 @@ $UpgradeMode = $env:GIT_CORE_UPGRADE -eq "1"
 $ForceMode = $env:GIT_CORE_FORCE -eq "1"
 $NoBinaries = $env:GIT_CORE_NO_BINARIES -eq "1"
 
-# Force implies upgrade and auto
-if ($ForceMode) {
-    $UpgradeMode = $true
-    $AutoMode = $true
-    Write-Host "⚠️  FORCE MODE: ALL files will be overwritten (including ARCHITECTURE.md)" -ForegroundColor Red
-    Write-Host ""
-} elseif ($UpgradeMode) {
-    $AutoMode = $true
-    Write-Host "🔄 UPGRADE MODE: Protocol files updated, your ARCHITECTURE.md preserved" -ForegroundColor Yellow
-    Write-Host ""
-}
-
-# Function to get current version
-function Get-CurrentVersion {
-    if (Test-Path ".git-core-protocol-version") {
-        return (Get-Content ".git-core-protocol-version" -Raw).Trim()
+try {
+    # Force implies upgrade and auto
+    if ($ForceMode) {
+        $UpgradeMode = $true
+        $AutoMode = $true
+        Write-Host "⚠️  FORCE MODE: ALL files will be overwritten (including ARCHITECTURE.md)" -ForegroundColor $Red
+        Write-Host ""
+    } elseif ($UpgradeMode) {
+        $AutoMode = $true
+        Write-Host "🔄 UPGRADE MODE: Protocol files updated, your ARCHITECTURE.md preserved" -ForegroundColor $Yellow
+        Write-Host ""
     }
-    return "0.0.0"
-}
 
-# Function to get remote version
-function Get-RemoteVersion {
-    try {
-        $response = Invoke-WebRequest -Uri "$RAW_URL/.git-core-protocol-version" -UseBasicParsing -ErrorAction SilentlyContinue
-        return $response.Content.Trim()
-    } catch {
-        return "unknown"
+    # Function to get current version
+    function Get-CurrentVersion {
+        if (Test-Path ".git-core-protocol-version") {
+            return (Get-Content ".git-core-protocol-version" -Raw).Trim()
+        }
+        return "0.0.0"
     }
-}
 
-# Show version info
-$CurrentVersion = Get-CurrentVersion
-if ($CurrentVersion -ne "0.0.0") {
-    $RemoteVersion = Get-RemoteVersion
-    Write-Host "📊 Version Info:" -ForegroundColor Blue
-    Write-Host "   Current: $CurrentVersion" -ForegroundColor Yellow
-    Write-Host "   Latest:  $RemoteVersion" -ForegroundColor Green
-    Write-Host ""
-}
-
-# Function to check if CLI is installed globally
-function Test-CliInstalled {
-    $cliName = "context-research-agent"
-    if ($IsWindows) { $cliName += ".exe" }
-
-    $command = Get-Command $cliName -ErrorAction SilentlyContinue
-    return $null -ne $command
-}
-
-# Function to migrate from legacy directories to .gitcore/
-function Invoke-Migration {
-    $hasLegacy = $false
-
-    # Legacy paths (Priority order)
-    $legacyPaths = @(".gitcore", ".ai")
-
-    foreach ($legacy in $legacyPaths) {
-        if (Test-Path $legacy) {
-            Write-Host "🔄 Detected legacy $legacy directory..." -ForegroundColor Yellow
-            $hasLegacy = $true
-
-            if (-not (Test-Path ".gitcore")) {
-                # Smart Migration: Rename
-                Move-Item -Path $legacy -Destination ".gitcore" -Force
-                Write-Host "  ✓ Renamed $legacy → .gitcore/ (Smart Update)" -ForegroundColor Green
-            } else {
-                # Fallback: Merge
-                Write-Host "  → .gitcore exists, merging content..." -ForegroundColor Yellow
-
-                # Copy all files from legacy to .gitcore/
-                Get-ChildItem $legacy -Recurse | ForEach-Object {
-                    $destPath = $_.FullName -replace [regex]::Escape($legacy), ".gitcore"
-                    if ($_.PSIsContainer) {
-                        if (-not (Test-Path $destPath)) {
-                            New-Item -ItemType Directory -Force -Path $destPath | Out-Null
-                        }
-                    } else {
-                        Copy-Item $_.FullName $destPath -Force
-                    }
-                }
-
-                Write-Host "  ✓ Merged $legacy → .gitcore/" -ForegroundColor Green
-                Write-Host "  ℹ️  You can remove $legacy manually" -ForegroundColor Cyan
-            }
+    # Function to get remote version
+    function Get-RemoteVersion {
+        try {
+            $response = Invoke-WebRequest -Uri "$RAW_URL/.git-core-protocol-version" -UseBasicParsing -ErrorAction SilentlyContinue
+            return $response.Content.Trim()
+        } catch {
+            return "unknown"
         }
     }
 
-    return $hasLegacy
-}
-
-# Function to backup user files
-function Backup-UserFiles {
-    Write-Host "💾 Backing up user files..." -ForegroundColor Cyan
-    New-Item -ItemType Directory -Force -Path $BACKUP_DIR | Out-Null
-
-    # Check .gitcore/, .gitcore/, and .ai/ for backwards compatibility
-    $aiDir = if (Test-Path ".gitcore") { ".gitcore" }  elseif (Test-Path ".ai") { ".ai" } else { $null }
-
-    # Backup ARCHITECTURE.md
-    if ($aiDir -and (Test-Path "$aiDir/ARCHITECTURE.md")) {
-        Copy-Item "$aiDir/ARCHITECTURE.md" "$BACKUP_DIR/ARCHITECTURE.md"
-        Write-Host "  ✓ $aiDir/ARCHITECTURE.md backed up" -ForegroundColor Green
+    # Show version info
+    $CurrentVersion = Get-CurrentVersion
+    if ($CurrentVersion -ne "0.0.0") {
+        $RemoteVersion = Get-RemoteVersion
+        Write-Host "📊 Version Info:" -ForegroundColor $Blue
+        Write-Host "   Current: $CurrentVersion" -ForegroundColor $Yellow
+        Write-Host "   Latest:  $RemoteVersion" -ForegroundColor $Green
+        Write-Host ""
     }
 
-    # Backup CONTEXT_LOG.md
-    if ($aiDir -and (Test-Path "$aiDir/CONTEXT_LOG.md")) {
-        Copy-Item "$aiDir/CONTEXT_LOG.md" "$BACKUP_DIR/CONTEXT_LOG.md"
-        Write-Host "  ✓ $aiDir/CONTEXT_LOG.md backed up" -ForegroundColor Green
+    # Function to check if CLI is installed globally
+    function Test-CliInstalled {
+        $cliName = "context-research-agent"
+        if ($IsWindows) { $cliName += ".exe" }
+
+        $command = Get-Command $cliName -ErrorAction SilentlyContinue
+        return $null -ne $command
     }
 
-    # Backup custom workflows
-    if (Test-Path ".github/workflows") {
-        New-Item -ItemType Directory -Force -Path "$BACKUP_DIR/workflows" | Out-Null
-        $protocolWorkflows = @("update-protocol.yml", "structure-validator.yml", "codex-review.yml", "agent-dispatcher.yml")
+    # Function to migrate from legacy directories to .gitcore/
+    function Invoke-Migration {
+        $hasLegacy = $false
+        $legacyPaths = @(".gitcore", ".ai")
 
-        Get-ChildItem ".github/workflows/*.yml" -ErrorAction SilentlyContinue | ForEach-Object {
-            if ($_.Name -notin $protocolWorkflows) {
-                Copy-Item $_.FullName "$BACKUP_DIR/workflows/"
-                Write-Host "  ✓ Custom workflow: $($_.Name)" -ForegroundColor Green
-            }
-        }
-    }
-}
-
-# Function to restore user files
-function Restore-UserFiles {
-    Write-Host "📥 Restoring user files..." -ForegroundColor Cyan
-
-    # Ensure .gitcore directory exists for restoration
-    if (-not (Test-Path ".gitcore")) {
-        New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
-    }
-
-    # Restore ARCHITECTURE.md (unless force mode)
-    if (-not $ForceMode -and (Test-Path "$BACKUP_DIR/ARCHITECTURE.md")) {
-        Copy-Item "$BACKUP_DIR/ARCHITECTURE.md" ".gitcore/ARCHITECTURE.md" -Force
-        Write-Host "  ✓ .gitcore/ARCHITECTURE.md restored" -ForegroundColor Green
-    }
-
-    # Always restore CONTEXT_LOG.md
-    if (Test-Path "$BACKUP_DIR/CONTEXT_LOG.md") {
-        Copy-Item "$BACKUP_DIR/CONTEXT_LOG.md" ".gitcore/CONTEXT_LOG.md" -Force
-        Write-Host "  ✓ .gitcore/CONTEXT_LOG.md restored" -ForegroundColor Green
-    }
-
-    # Restore custom workflows
-    if (Test-Path "$BACKUP_DIR/workflows") {
-        Get-ChildItem "$BACKUP_DIR/workflows/*.yml" -ErrorAction SilentlyContinue | ForEach-Object {
-            Copy-Item $_.FullName ".github/workflows/" -Force
-            Write-Host "  ✓ Custom workflow restored: $($_.Name)" -ForegroundColor Green
-        }
-    }
-
-    # Cleanup backup
-    Remove-Item -Recurse -Force $BACKUP_DIR -ErrorAction SilentlyContinue
-}
-
-# Function to organize existing files
-function Invoke-OrganizeFiles {
-    Write-Host "📂 Organizing existing files..." -ForegroundColor Yellow
-
-    $dirs = @("docs/archive", "scripts", "tests", "src")
-    foreach ($dir in $dirs) {
-        New-Item -ItemType Directory -Force -Path $dir -ErrorAction SilentlyContinue | Out-Null
-    }
-
-    $keepInRoot = @("README.md", "AGENTS.md", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE.md", "LICENSE")
-
-    Get-ChildItem -Filter "*.md" -File -ErrorAction SilentlyContinue | ForEach-Object {
-        if ($_.Name -notin $keepInRoot) {
-            Move-Item $_.FullName -Destination "docs/archive/" -Force -ErrorAction SilentlyContinue
-            Write-Host "  → $($_.Name) moved to docs/archive/" -ForegroundColor Cyan
-        } else {
-            Write-Host "  ✓ Keeping $($_.Name) in root" -ForegroundColor Green
-        }
-    }
-
-    $testPatterns = @("test_*.py", "*_test.py", "*.test.js", "*.test.ts", "*.spec.js", "*.spec.ts")
-    foreach ($pattern in $testPatterns) {
-        Get-ChildItem -Filter $pattern -File -ErrorAction SilentlyContinue | ForEach-Object {
-            Move-Item $_.FullName -Destination "tests/" -Force -ErrorAction SilentlyContinue
-            Write-Host "  → $($_.Name) moved to tests/" -ForegroundColor Cyan
-        }
-    }
-
-    Write-Host "✅ Files organized" -ForegroundColor Green
-}
-
-# Check if should organize
-if ($OrganizeFiles) {
-    Invoke-OrganizeFiles
-}
-
-# Check if directory has files
-$hasFiles = (Get-ChildItem -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike ".*" } | Measure-Object).Count -gt 0
-
-if ($hasFiles -and -not $AutoMode) {
-    Write-Host "⚠️  Current directory is not empty." -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "Options:"
-    Write-Host "  1) Continue and merge files"
-    Write-Host "  2) Organize existing files first"
-    Write-Host "  3) Cancel"
-    Write-Host "  4) 🧠 Analyze Architecture & Generate Copilot Prompt"
-    Write-Host ""
-    $choice = Read-Host "Select (1/2/3)"
-
-    switch ($choice) {
-        "1" { Write-Host "Continuing..." }
-        "2" { Invoke-OrganizeFiles }
-        "3" { Write-Host "Cancelled."; exit 0 }
-        "4" {
-             if (Test-Path "scripts/analyze-architecture.ps1") {
-                 & "scripts/analyze-architecture.ps1"
-                 exit 0
-             } else {
-                 Write-Host "❌ Script not found. Please run Option 1 to install/upgrade first." -ForegroundColor Red
-                 exit 1
-             }
-        }
-        default { Write-Host "Invalid option."; exit 1 }
-    }
-}
-
-# Ask about binaries if not in auto mode
-$InstallBinaries = $true
-$GlobalCliDetected = Test-CliInstalled
-
-if (-not $AutoMode -and -not $NoBinaries) {
-    Write-Host ""
-    Write-Host "📦 Components:" -ForegroundColor Cyan
-
-    if ($GlobalCliDetected) {
-        Write-Host "   ✨ Global Git-Core CLI detected in PATH." -ForegroundColor Green
-        Write-Host "   Do you want to skip downloading local binaries to save space?"
-        $binChoice = Read-Host "   Skip local binaries? (Y/n)"
-        if ($binChoice -match "^[nN]") {
-            $InstallBinaries = $false
-            Write-Host "   → Using global CLI (skipping download)." -ForegroundColor Yellow
-        } else {
-            $InstallBinaries = $true
-            Write-Host "   → Downloading local binaries (using local version)." -ForegroundColor Green
-        }
-    } else {
-        Write-Host "   Do you want to install pre-compiled AI agent binaries (bin/)?"
-        Write-Host "   These are useful for local execution but increase download size."
-        $binChoice = Read-Host "   Install binaries? (Y/n)"
-        if ($binChoice -match "^[nN]") {
-            $InstallBinaries = $false
-            Write-Host "   → Skipping binaries." -ForegroundColor Yellow
-        } else {
-            $InstallBinaries = $true
-            Write-Host "   → Installing binaries." -ForegroundColor Green
-        }
-    }
-} elseif ($NoBinaries) {
-    $InstallBinaries = $false
-} elseif ($GlobalCliDetected -and $AutoMode) {
-    # In auto mode, if global CLI exists, verify if we should skip?
-    # Current behavior defaults to install unless specified.
-    # Let's keep $InstallBinaries = $true as default unless strict flag used, or maybe respect global?
-    # For safety in auto pipelines, usually better to have local tools unless configured otherwise.
-    # We'll leave $InstallBinaries = $true as default.
-}
-
-# Backup user files before upgrade
-if ($UpgradeMode) {
-    Backup-UserFiles
-}
-
-# Download template
-Write-Host "`n📥 Downloading Git-Core Protocol..." -ForegroundColor Cyan
-
-
-
-    git clone --depth 1 $REPO_URL $TEMP_DIR
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "❌ Error cloning repository" -ForegroundColor Red
-        exit 1
-    }
-
-Remove-Item -Recurse -Force "$TEMP_DIR/.git" -ErrorAction SilentlyContinue
-
-# Install files
-Write-Host "📦 Installing protocol files..." -ForegroundColor Cyan
-
-# Run migration from legacy to .gitcore/ if needed
-$migrated = Invoke-Migration
-
-# Handle .gitcore directory (protocol uses .gitcore, template may have .ai or .gitcore)
-$templateAiDir = if (Test-Path "$TEMP_DIR/.gitcore") { "$TEMP_DIR/.gitcore" }  elseif (Test-Path "$TEMP_DIR/.ai") { "$TEMP_DIR/.ai" } else { $null }
-
-if ($templateAiDir) {
-    if ($UpgradeMode) {
-        # Remove old directories
-        $legacyPaths = @(".gitcore", ".gitcore", ".ai")
         foreach ($legacy in $legacyPaths) {
-             if (Test-Path $legacy) { Remove-Item -Recurse -Force $legacy }
+            if (Test-Path $legacy) {
+                Write-Host "🔄 Detected legacy $legacy directory..." -ForegroundColor $Yellow
+                $hasLegacy = $true
+
+                if (-not (Test-Path ".gitcore")) {
+                    Move-Item -Path $legacy -Destination ".gitcore" -Force
+                    Write-Host "  ✓ Renamed $legacy → .gitcore/ (Smart Update)" -ForegroundColor $Green
+                } else {
+                    Write-Host "  → .gitcore exists, merging content..." -ForegroundColor $Yellow
+                    Get-ChildItem $legacy -Recurse | ForEach-Object {
+                        $destPath = $_.FullName -replace [regex]::Escape($legacy), ".gitcore"
+                        if ($_.PSIsContainer) {
+                            if (-not (Test-Path $destPath)) {
+                                New-Item -ItemType Directory -Force -Path $destPath | Out-Null
+                            }
+                        } else {
+                            Copy-Item $_.FullName $destPath -Force
+                        }
+                    }
+                    Write-Host "  ✓ Merged $legacy → .gitcore/" -ForegroundColor $Green
+                    Write-Host "  ℹ️  You can remove $legacy manually" -ForegroundColor $Cyan
+                }
+            }
+        }
+        return $hasLegacy
+    }
+
+    # Function to backup user files
+    function Backup-UserFiles {
+        Write-Host "💾 Backing up user files..." -ForegroundColor $Cyan
+        New-Item -ItemType Directory -Force -Path $BACKUP_DIR | Out-Null
+
+        $aiDir = if (Test-Path ".gitcore") { ".gitcore" }  elseif (Test-Path ".ai") { ".ai" } else { $null }
+
+        if ($aiDir -and (Test-Path "$aiDir/ARCHITECTURE.md")) {
+            Copy-Item "$aiDir/ARCHITECTURE.md" "$BACKUP_DIR/ARCHITECTURE.md"
+            Write-Host "  ✓ $aiDir/ARCHITECTURE.md backed up" -ForegroundColor $Green
         }
 
-        # Copy to .gitcore
-        New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
-        Copy-Item -Recurse "$templateAiDir/*" ".gitcore/"
-        Write-Host "  ✓ .gitcore/ (upgraded)" -ForegroundColor Green
-    } elseif (-not (Test-Path ".gitcore") -and -not (Test-Path ".gitcore") -and -not (Test-Path ".ai")) {
-        # Copy .gitcore if none of the versions exist
-        New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
-        Copy-Item -Recurse "$templateAiDir/*" ".gitcore/"
-        Write-Host "  ✓ .gitcore/" -ForegroundColor Green
-    } else {
-        $existingDir = if (Test-Path ".gitcore") { ".gitcore" }  else { ".ai" }
-        Write-Host "  ~ $existingDir/ (exists, merging new files)" -ForegroundColor Yellow
-        Get-ChildItem $templateAiDir | ForEach-Object {
-            if (-not (Test-Path "$existingDir/$($_.Name)")) {
-                Copy-Item $_.FullName "$existingDir/"
-                Write-Host "    + $($_.Name)" -ForegroundColor Green
+        if ($aiDir -and (Test-Path "$aiDir/CONTEXT_LOG.md")) {
+            Copy-Item "$aiDir/CONTEXT_LOG.md" "$BACKUP_DIR/CONTEXT_LOG.md"
+            Write-Host "  ✓ $aiDir/CONTEXT_LOG.md backed up" -ForegroundColor $Green
+        }
+
+        if (Test-Path ".github/workflows") {
+            New-Item -ItemType Directory -Force -Path "$BACKUP_DIR/workflows" | Out-Null
+            $protocolWorkflows = @("update-protocol.yml", "structure-validator.yml", "codex-review.yml", "agent-dispatcher.yml")
+
+            Get-ChildItem ".github/workflows/*.yml" -ErrorAction SilentlyContinue | ForEach-Object {
+                if ($_.Name -notin $protocolWorkflows) {
+                    Copy-Item $_.FullName "$BACKUP_DIR/workflows/"
+                    Write-Host "  ✓ Custom workflow: $($_.Name)" -ForegroundColor $Green
+                }
             }
         }
     }
-}
 
-# Internal workflows to exclude from consumer projects
-$InternalWorkflows = @("build-tools.yml", "release.yml", "protocol-propagation.yml")
-
-# Copy other directories
-$dirs = @(".github", "scripts", "docs")
-if ($InstallBinaries) {
-    $dirs += "bin"
-}
-
-foreach ($dir in $dirs) {
-    if (Test-Path "$TEMP_DIR/$dir") {
-        # Define filter for this directory
-        $ExcludeItems = @()
-        if ($dir -eq ".github") {
-             # We want to exclude workflows, but Copy-Item recurse is tricky with specific file excludes deep down
-             # So we copy then cleanup, or we clone carefully.
-             # Existing logic was copy then cleanup. Let's stick to that but enhance it.
+    # Function to restore user files
+    function Restore-UserFiles {
+        Write-Host "📥 Restoring user files..." -ForegroundColor $Cyan
+        if (-not (Test-Path ".gitcore")) {
+            New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
         }
 
-        if ($UpgradeMode) {
-            if (Test-Path $dir) {
-                Remove-Item -Recurse -Force $dir
-            }
-            Copy-Item -Recurse "$TEMP_DIR/$dir" .
+        if (-not $ForceMode -and (Test-Path "$BACKUP_DIR/ARCHITECTURE.md")) {
+            Copy-Item "$BACKUP_DIR/ARCHITECTURE.md" ".gitcore/ARCHITECTURE.md" -Force
+            Write-Host "  ✓ .gitcore/ARCHITECTURE.md restored" -ForegroundColor $Green
+        }
 
-            # Cleanup internal files
-            if ($dir -eq ".github") {
-                foreach ($workflow in $InternalWorkflows) {
-                    if (Test-Path ".github/workflows/$workflow") {
-                        Remove-Item ".github/workflows/$workflow" -ErrorAction SilentlyContinue
-                    }
-                }
-            }
-            if ($dir -eq "scripts") {
-                Remove-Item "scripts/bump-version.ps1" -ErrorAction SilentlyContinue
-                Remove-Item "scripts/bump-version.sh" -ErrorAction SilentlyContinue
-            }
+        if (Test-Path "$BACKUP_DIR/CONTEXT_LOG.md") {
+            Copy-Item "$BACKUP_DIR/CONTEXT_LOG.md" ".gitcore/CONTEXT_LOG.md" -Force
+            Write-Host "  ✓ .gitcore/CONTEXT_LOG.md restored" -ForegroundColor $Green
+        }
 
-            Write-Host "  ✓ $dir/ (upgraded)" -ForegroundColor Green
-        } elseif (-not (Test-Path $dir)) {
-            Copy-Item -Recurse "$TEMP_DIR/$dir" .
-
-            # Cleanup internal files
-            if ($dir -eq ".github") {
-                foreach ($workflow in $InternalWorkflows) {
-                    if (Test-Path ".github/workflows/$workflow") {
-                        Remove-Item ".github/workflows/$workflow" -ErrorAction SilentlyContinue
-                    }
-                }
+        if (Test-Path "$BACKUP_DIR/workflows") {
+            Get-ChildItem "$BACKUP_DIR/workflows/*.yml" -ErrorAction SilentlyContinue | ForEach-Object {
+                Copy-Item $_.FullName ".github/workflows/" -Force
+                Write-Host "  ✓ Custom workflow restored: $($_.Name)" -ForegroundColor $Green
             }
-            if ($dir -eq "scripts") {
-                Remove-Item "scripts/bump-version.ps1" -ErrorAction SilentlyContinue
-                Remove-Item "scripts/bump-version.sh" -ErrorAction SilentlyContinue
-            }
+        }
+        Remove-Item -Recurse -Force $BACKUP_DIR -ErrorAction SilentlyContinue
+    }
 
-            Write-Host "  ✓ $dir/" -ForegroundColor Green
+    # Function to organize existing files
+    function Invoke-OrganizeFiles {
+        Write-Host "📂 Organizing existing files..." -ForegroundColor $Yellow
+        $dirs = @("docs/archive", "scripts", "tests", "src")
+        foreach ($dir in $dirs) {
+            New-Item -ItemType Directory -Force -Path $dir -ErrorAction SilentlyContinue | Out-Null
+        }
+
+        $keepInRoot = @("README.md", "AGENTS.md", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE.md", "LICENSE")
+        Get-ChildItem -Filter "*.md" -File -ErrorAction SilentlyContinue | ForEach-Object {
+            if ($_.Name -notin $keepInRoot) {
+                Move-Item $_.FullName -Destination "docs/archive/" -Force -ErrorAction SilentlyContinue
+                Write-Host "  → $($_.Name) moved to docs/archive/" -ForegroundColor $Cyan
+            } else {
+                Write-Host "  ✓ Keeping $($_.Name) in root" -ForegroundColor $Green
+            }
+        }
+
+        $testPatterns = @("test_*.py", "*_test.py", "*.test.js", "*.test.ts", "*.spec.js", "*.spec.ts")
+        foreach ($pattern in $testPatterns) {
+            Get-ChildItem -Filter $pattern -File -ErrorAction SilentlyContinue | ForEach-Object {
+                Move-Item $_.FullName -Destination "tests/" -Force -ErrorAction SilentlyContinue
+                Write-Host "  → $($_.Name) moved to tests/" -ForegroundColor $Cyan
+            }
+        }
+        Write-Host "✅ Files organized" -ForegroundColor $Green
+    }
+
+    if ($OrganizeFiles) { Invoke-OrganizeFiles }
+
+    $hasFiles = (Get-ChildItem -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike ".*" } | Measure-Object).Count -gt 0
+    if ($hasFiles -and -not $AutoMode) {
+        Write-Host "⚠️  Current directory is not empty." -ForegroundColor $Yellow
+        Write-Host ""
+        Write-Host "Options:"
+        Write-Host "  1) Continue and merge files"
+        Write-Host "  2) Organize existing files first"
+        Write-Host "  3) Cancel"
+        Write-Host "  4) 🧠 Analyze Architecture & Generate Copilot Prompt"
+        Write-Host ""
+        $choice = Read-Host "Select (1/2/3/4)"
+
+        switch ($choice) {
+            "1" { Write-Host "Continuing..." }
+            "2" { Invoke-OrganizeFiles }
+            "3" { Write-Host "Cancelled."; exit 0 }
+            "4" {
+                 if (Test-Path "scripts/analyze-architecture.ps1") {
+                     & "scripts/analyze-architecture.ps1"
+                     exit 0
+                 } else {
+                     Write-Host "❌ Script not found." -ForegroundColor $Red
+                     exit 1
+                 }
+            }
+            default { Write-Host "Invalid option."; exit 1 }
+        }
+    }
+
+    $InstallBinaries = $true
+    $GlobalCliDetected = Test-CliInstalled
+    if (-not $AutoMode -and -not $NoBinaries) {
+        Write-Host ""
+        Write-Host "📦 Components:" -ForegroundColor $Cyan
+        if ($GlobalCliDetected) {
+            Write-Host "   ✨ Global Git-Core CLI detected in PATH." -ForegroundColor $Green
+            $binChoice = Read-Host "   Skip local binaries? (Y/n)"
+            if ($binChoice -match "^[nN]") {
+                $InstallBinaries = $true
+                Write-Host "   → Downloading local binaries." -ForegroundColor $Green
+            } else {
+                $InstallBinaries = $false
+                Write-Host "   → Using global CLI." -ForegroundColor $Yellow
+            }
         } else {
-            Copy-Item -Recurse -Force "$TEMP_DIR/$dir/*" $dir -ErrorAction SilentlyContinue
+            $binChoice = Read-Host "   Install binaries? (Y/n)"
+            if ($binChoice -match "^[nN]") {
+                $InstallBinaries = $false
+                Write-Host "   → Skipping binaries." -ForegroundColor $Yellow
+            } else {
+                $InstallBinaries = $true
+                Write-Host "   → Installing binaries." -ForegroundColor $Green
+            }
+        }
+    } elseif ($NoBinaries) {
+        $InstallBinaries = $false
+    }
 
-            # Cleanup internal files
-            if ($dir -eq ".github") {
-                foreach ($workflow in $InternalWorkflows) {
-                    if (Test-Path ".github/workflows/$workflow") {
-                        Remove-Item ".github/workflows/$workflow" -ErrorAction SilentlyContinue
-                    }
+    if ($UpgradeMode) { Backup-UserFiles }
+
+    Write-Host "`n📥 Downloading Git-Core Protocol..." -ForegroundColor $Cyan
+    git clone --depth 1 $REPO_URL $TEMP_DIR
+    if ($LASTEXITCODE -ne 0) { throw "Error cloning repository" }
+    Remove-Item -Recurse -Force "$TEMP_DIR/.git" -ErrorAction SilentlyContinue
+
+    Write-Host "📦 Installing protocol files..." -ForegroundColor $Cyan
+    Invoke-Migration | Out-Null
+
+    $templateAiDir = if (Test-Path "$TEMP_DIR/.gitcore") { "$TEMP_DIR/.gitcore" }  elseif (Test-Path "$TEMP_DIR/.ai") { "$TEMP_DIR/.ai" } else { $null }
+    if ($templateAiDir) {
+        if ($UpgradeMode) {
+            @(".gitcore", ".ai") | ForEach-Object { if (Test-Path $_) { Remove-Item -Recurse -Force $_ } }
+            New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
+            Copy-Item -Recurse "$templateAiDir/*" ".gitcore/"
+            Write-Host "  ✓ .gitcore/ (upgraded)" -ForegroundColor $Green
+        } elseif (-not (Test-Path ".gitcore") -and -not (Test-Path ".ai")) {
+            New-Item -ItemType Directory -Force -Path ".gitcore" | Out-Null
+            Copy-Item -Recurse "$templateAiDir/*" ".gitcore/"
+            Write-Host "  ✓ .gitcore/" -ForegroundColor $Green
+        } else {
+            $existingDir = if (Test-Path ".gitcore") { ".gitcore" }  else { ".ai" }
+            Write-Host "  ~ $existingDir/ (exists, merging new files)" -ForegroundColor $Yellow
+            Get-ChildItem $templateAiDir | ForEach-Object {
+                if (-not (Test-Path "$existingDir/$($_.Name)")) {
+                    Copy-Item $_.FullName "$existingDir/"
+                    Write-Host "    + $($_.Name)" -ForegroundColor $Green
                 }
             }
-            if ($dir -eq "scripts") {
-                Remove-Item "scripts/bump-version.ps1" -ErrorAction SilentlyContinue
-                Remove-Item "scripts/bump-version.sh" -ErrorAction SilentlyContinue
-            }
-
-            Write-Host "  ✓ $dir/ (merged)" -ForegroundColor Green
         }
     }
-}
 
-# Protocol files
-$protocolFiles = @(".cursorrules", ".windsurfrules", "AGENTS.md", ".git-core-protocol-version")
-foreach ($file in $protocolFiles) {
-    if (Test-Path "$TEMP_DIR/$file") {
-        if ($UpgradeMode) {
-            Copy-Item -Force "$TEMP_DIR/$file" .
-            Write-Host "  ✓ $file (upgraded)" -ForegroundColor Green
-        } elseif (-not (Test-Path $file)) {
+    $InternalWorkflows = @("build-tools.yml", "release.yml", "protocol-propagation.yml")
+    $dirs = @(".github", "scripts", "docs")
+    if ($InstallBinaries) { $dirs += "bin" }
+
+    foreach ($dir in $dirs) {
+        if (Test-Path "$TEMP_DIR/$dir") {
+            if ($UpgradeMode) {
+                if (Test-Path $dir) { Remove-Item -Recurse -Force $dir }
+                Copy-Item -Recurse "$TEMP_DIR/$dir" .
+                if ($dir -eq ".github") {
+                    $InternalWorkflows | ForEach-Object { if (Test-Path ".github/workflows/$_") { Remove-Item ".github/workflows/$_" -Force } }
+                }
+                if ($dir -eq "scripts") {
+                    @("bump-version.ps1", "bump-version.sh") | ForEach-Object { if (Test-Path "scripts/$_") { Remove-Item "scripts/$_" -Force } }
+                }
+                Write-Host "  ✓ $dir/ (upgraded)" -ForegroundColor $Green
+            } elseif (-not (Test-Path $dir)) {
+                Copy-Item -Recurse "$TEMP_DIR/$dir" .
+                if ($dir -eq ".github") {
+                    $InternalWorkflows | ForEach-Object { if (Test-Path ".github/workflows/$_") { Remove-Item ".github/workflows/$_" -Force } }
+                }
+                if ($dir -eq "scripts") {
+                    @("bump-version.ps1", "bump-version.sh") | ForEach-Object { if (Test-Path "scripts/$_") { Remove-Item "scripts/$_" -Force } }
+                }
+                Write-Host "  ✓ $dir/" -ForegroundColor $Green
+            } else {
+                Copy-Item -Recurse -Force "$TEMP_DIR/$dir/*" $dir -ErrorAction SilentlyContinue
+                if ($dir -eq ".github") {
+                    $InternalWorkflows | ForEach-Object { if (Test-Path ".github/workflows/$_") { Remove-Item ".github/workflows/$_" -Force } }
+                }
+                if ($dir -eq "scripts") {
+                    @("bump-version.ps1", "bump-version.sh") | ForEach-Object { if (Test-Path "scripts/$_") { Remove-Item "scripts/$_" -Force } }
+                }
+                Write-Host "  ✓ $dir/ (merged)" -ForegroundColor $Green
+            }
+        }
+    }
+
+    $protocolFiles = @(".cursorrules", ".windsurfrules", "AGENTS.md", ".git-core-protocol-version")
+    foreach ($file in $protocolFiles) {
+        if (Test-Path "$TEMP_DIR/$file") {
+            if ($UpgradeMode) {
+                Copy-Item -Force "$TEMP_DIR/$file" .
+                Write-Host "  ✓ $file (upgraded)" -ForegroundColor $Green
+            } elseif (-not (Test-Path $file)) {
+                Copy-Item "$TEMP_DIR/$file" .
+                Write-Host "  ✓ $file" -ForegroundColor $Green
+            } else {
+                Write-Host "  ~ $file (exists)" -ForegroundColor $Yellow
+            }
+        }
+    }
+
+    if (Test-Path ".agent/rules") {
+        Write-Host "`n🔮 Detected Antigravity IDE configuration" -ForegroundColor Magenta
+        $ruleFile = Get-ChildItem ".agent/rules/rule-*.md" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($ruleFile -and (Get-Content $ruleFile.FullName -Raw) -notmatch "Git-Core Protocol Integration") {
+            Add-Content -Path $ruleFile.FullName -Value "`n---`n`n## 🔗 Git-Core Protocol Integration`n`n> This project follows the Git-Core Protocol. See root-level files for full configuration.`n"
+            Write-Host "  ✓ Updated $($ruleFile.Name) with protocol integration" -ForegroundColor $Green
+        }
+    }
+
+    $preserveFiles = @(".gitignore", "README.md")
+    foreach ($file in $preserveFiles) {
+        if ((Test-Path "$TEMP_DIR/$file") -and -not (Test-Path $file)) {
             Copy-Item "$TEMP_DIR/$file" .
-            Write-Host "  ✓ $file" -ForegroundColor Green
-        } else {
-            Write-Host "  ~ $file (exists)" -ForegroundColor Yellow
-        }
-    }
-}
-
-# Antigravity IDE support - integrate, don't overwrite
-if (Test-Path ".agent/rules") {
-    Write-Host ""
-    Write-Host "🔮 Detected Antigravity IDE configuration" -ForegroundColor Magenta
-
-    # Check if already integrated
-    $ruleFile = Get-ChildItem ".agent/rules/rule-*.md" -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($ruleFile) {
-        $content = Get-Content $ruleFile.FullName -Raw
-        if ($content -notmatch "Git-Core Protocol Integration") {
-            # Add protocol integration to existing rules
-            $protocolSection = @"
-
----
-
-## 🔗 Git-Core Protocol Integration
-
-> This project follows the Git-Core Protocol. See root-level files for full configuration.
-
-### Quick Reference
-- **Architecture Decisions:** ``.gitcore/ARCHITECTURE.md``
-- **Agent Rules:** ``AGENTS.md``
-- **Issues:** ``.github/issues/`` or ``gh issue list``
-
-### Protocol Rules Apply
-1. State = GitHub Issues (not memory, not files)
-2. No TODO.md, PLANNING.md, etc.
-3. Use ``gh issue create`` or ``.github/issues/*.md``
-4. Commits reference issues: ``feat(scope): description #123``
-
-"@
-            Add-Content -Path $ruleFile.FullName -Value $protocolSection
-            Write-Host "  ✓ Updated $($ruleFile.Name) with protocol integration" -ForegroundColor Green
-        } else {
-            Write-Host "  ~ $($ruleFile.Name) already integrated" -ForegroundColor Yellow
+            Write-Host "  ✓ $file" -ForegroundColor $Green
+        } elseif (Test-Path $file) {
+            Write-Host "  ~ $file (preserved)" -ForegroundColor $Yellow
         }
     }
 
-    # Run migration script if available
-    if (Test-Path "scripts/migrate-ide-rules.ps1") {
-        Write-Host "  ℹ️  Run './scripts/migrate-ide-rules.ps1 -DryRun' to migrate rules" -ForegroundColor Cyan
+    if ($UpgradeMode) { Restore-UserFiles }
+
+    $NewVersion = Get-CurrentVersion
+    Write-Host "`n========================================" -ForegroundColor $Green
+    Write-Host "✅ Git-Core Protocol v$NewVersion installed" -ForegroundColor $Green
+    Write-Host "========================================`n" -ForegroundColor $Green
+
+    if ($UpgradeMode) {
+        Write-Host "📋 Upgraded from v$CurrentVersion → v$NewVersion" -ForegroundColor $Cyan
+    } else {
+        Write-Host "📋 Files installed:"
+        Write-Host "   .gitcore/ARCHITECTURE.md    - Document your architecture here"
+        Write-Host "   .github/               - Copilot rules + workflows"
+        Write-Host "   scripts/               - Init and update scripts"
+        Write-Host "   AGENTS.md              - Rules for all AI agents"
     }
+    Write-Host "`n🚀 Next step:" -ForegroundColor $Yellow
+    Write-Host "   .\scripts\init_project.ps1`n"
+} catch {
+    Write-Host "`n❌ Installation failed: $($_.Exception.Message)" -ForegroundColor $Red
+    exit 1
+} finally {
+    if (Test-Path $TEMP_DIR) { Remove-Item -Recurse -Force $TEMP_DIR -ErrorAction SilentlyContinue }
 }
-
-# Files that should never be overwritten
-$preserveFiles = @(".gitignore", "README.md")
-foreach ($file in $preserveFiles) {
-    if ((Test-Path "$TEMP_DIR/$file") -and -not (Test-Path $file)) {
-        Copy-Item "$TEMP_DIR/$file" .
-        Write-Host "  ✓ $file" -ForegroundColor Green
-    } elseif (Test-Path $file) {
-        Write-Host "  ~ $file (preserved)" -ForegroundColor Yellow
-    }
-}
-
-# Cleanup
-Remove-Item -Recurse -Force $TEMP_DIR -ErrorAction SilentlyContinue
-
-# Restore user files after upgrade
-if ($UpgradeMode) {
-    Restore-UserFiles
-}
-
-# Show final version
-$NewVersion = Get-CurrentVersion
-
-Write-Host ""
-Write-Host "========================================" -ForegroundColor Green
-Write-Host "✅ Git-Core Protocol v$NewVersion installed" -ForegroundColor Green
-Write-Host "========================================" -ForegroundColor Green
-Write-Host ""
-
-if ($UpgradeMode) {
-    Write-Host "📋 Upgraded from v$CurrentVersion → v$NewVersion" -ForegroundColor Cyan
-    if (-not $ForceMode) {
-        Write-Host "✓ Your ARCHITECTURE.md was preserved" -ForegroundColor Green
-    }
-} else {
-    Write-Host "📋 Files installed:"
-    Write-Host "   .gitcore/ARCHITECTURE.md    - Document your architecture here"
-    Write-Host "   .github/               - Copilot rules + workflows"
-    Write-Host "   scripts/               - Init and update scripts"
-    Write-Host "   AGENTS.md              - Rules for all AI agents"
-}
-
-Write-Host ""
-Write-Host "🚀 Next step:" -ForegroundColor Yellow
-Write-Host "   .\scripts\init_project.ps1"
-Write-Host ""
-Write-Host "💡 Commands:" -ForegroundColor Cyan
-Write-Host '   Safe upgrade:  $env:GIT_CORE_UPGRADE = "1"; irm .../install.ps1 | iex'
-Write-Host '   Full reset:    $env:GIT_CORE_FORCE = "1"; irm .../install.ps1 | iex'
-Write-Host "   Check updates: .\scripts\check-protocol-update.ps1"
-
