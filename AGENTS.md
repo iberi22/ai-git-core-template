@@ -18,7 +18,7 @@ protocol_version: 3.2.1
 
 # 🤖 AGENTS.md - AI Agent Configuration
 
-> **"⚡ Inteligente, rápida y minimalista - Rust-powered, sub-second execution"**
+> **"⚡ Intelligent, fast and minimalist - Rust-powered, sub-second execution"**
 
 ## Overview
 
@@ -96,54 +96,54 @@ PRs are auto-merged if ALL conditions are met:
 
 ## 📊 Git-Core v2.1 (12-Factor Agents + ACP Patterns)
 
-**Implementación avanzada de lógicas "12-Factor Agents", "HumanLayer" y "Agent Control Plane":**
+**Advanced implementation of "12-Factor Agents", "HumanLayer" and "Agent Control Plane" logics:**
 
 ### 1. Context Protocol (Stateless Reducer) ⭐ UPDATED
 
-Los agentes deben persistir su estado en los Issues usando bloques XML `<agent-state>`.
+Agents must persist their state in Issues using `<agent-state>` XML blocks.
 
-**Campos v2.1:**
+**Fields v2.1:**
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| `<intent>` | Objetivo de alto nivel |
-| `<step>` | Estado actual (`planning`, `coding`, `waiting_for_input`) |
-| `<plan>` | **NEW:** Lista de tareas dinámica (items con `done`/`in_progress`/`pending`) |
-| `<input_request>` | **NEW:** Solicitud de datos al humano (Human-as-Tool) |
-| `<metrics>` | **NEW:** Telemetría (`tool_calls`, `errors`, `cost_estimate`) |
-| `<memory>` | Datos JSON para retomar el trabajo |
+| `<intent>` | High-level goal |
+| `<step>` | Current state (`planning`, `coding`, `waiting_for_input`) |
+| `<plan>` | **NEW:** Dynamic task list (items with `done`/`in_progress`/`pending`) |
+| `<input_request>` | **NEW:** Data request to human (Human-as-Tool) |
+| `<metrics>` | **NEW:** Telemetry (`tool_calls`, `errors`, `cost_estimate`) |
+| `<memory>` | JSON data to resume work |
 
-👉 **Ver especificación completa:** `docs/agent-docs/CONTEXT_PROTOCOL.md`
+👉 **See full spec:** `docs/agent-docs/CONTEXT_PROTOCOL.md`
 
 **Helper Script:**
 
 ```bash
-# Leer estado desde un Issue
+# Read state from an Issue
 # ./scripts/agent-state.ps1 read -IssueNumber 42 (Legacy)
 # TODO: Implement `gc context state`
 
-# Generar bloque XML
+# Generate XML block
 # ./scripts/agent-state.ps1 write -Intent "fix_bug" -Step "coding" -Progress 50 (Legacy)
 ```
 
 ### 2. Micro-Agents (Personas)
 
-Los agentes deben adoptar roles específicos basados en las etiquetas (Labels) del Issue.
+Agents must adopt specific roles based on Issue Labels.
 
-| Label | Persona | Foco |
+| Label | Persona | Focus |
 |-------|---------|------|
-| `bug` | 🐛 The Fixer | Reproducir y corregir |
-| `enhancement` | ✨ Feature Dev | Arquitectura primero |
-| `high-stakes` | 👮 The Approver | Require "Proceder" |
+| `bug` | 🐛 The Fixer | Reproduce and fix |
+| `enhancement` | ✨ Feature Dev | Architecture first |
+| `high-stakes` | 👮 The Approver | Requires "Proceed" |
 
-👉 **Ver especificación:** `docs/agent-docs/MICRO_AGENTS.md`
+👉 **See spec:** `docs/agent-docs/MICRO_AGENTS.md`
 
 ### 3. High Stakes Operations (Human-in-the-Loop)
 
-Para operaciones críticas (borrar datos, deploys, cambios de auth), el agente **DEBE PAUSAR** y solicitar confirmación explícita:
-> "⚠️ Esta es una operación de alto riesgo. Responde **'Proceder'** para continuar."
+For critical operations (delete data, deploys, auth changes), the agent **MUST PAUSE** and request explicit confirmation:
+> "⚠️ This is a high-risk operation. Reply **'Proceed'** to continue."
 
-👉 **Ver especificación:** `docs/agent-docs/HUMAN_LAYER_PROTOCOL.md`
+👉 **See spec:** `docs/agent-docs/HUMAN_LAYER_PROTOCOL.md`
 
 ---
 
@@ -266,30 +266,33 @@ Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
 
 ## 🔄 The Loop (Workflow)
 
-### Phase 0: HEALTH CHECK (Anthropic Pattern - OBLIGATORIO)
+### Phase 0: HEALTH CHECK (Anthropic Pattern - MANDATORY)
 
-> ⚠️ **ANTES de implementar cualquier feature nuevo, verificar salud del proyecto.**
+> ⚠️ **BEFORE implementing any new feature, verify project health.**
 >
-> Inspirado por: [Anthropic's "Effective harnesses for long-running agents"](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)
+> Inspired by: [Anthropic's "Effective harnesses for long-running agents"](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)
 
 ```bash
-# 1. Orientación básica
-pwd                              # Confirmar directorio de trabajo
+# 1. Basic orientation
+pwd                              # Confirm working directory
 
-# 2. Estado del proyecto
-gc git log --limit 10            # Ver trabajo reciente
-cat .gitcore/features.json            # Ver features y su estado (passes: true/false)
+# 2. Project state
+gc git log --limit 10            # See recent work
+cat .gitcore/features.json            # See features and their status (passes: true/false)
 
-# 3. Ejecutar tests existentes
-npm test                         # o: cargo test, pytest, etc.
-# Si hay FALLOS → ARREGLAR PRIMERO (prioridad máxima)
-# Si PASAN → Continuar a Phase 1
+# 3. Run existing tests
+npm test                         # or: cargo test, pytest, etc.
+# If there are FAILURES → FIX FIRST (highest priority)
+# If PASS → Continue to Phase 1
 
-# 4. Verificación E2E (si aplica)
-# Iniciar dev server y verificar funcionalidad básica
+# 4. E2E Verification (if applicable)
+# Start dev server and verify basic functionality
 npm run dev &
 # curl http://localhost:3000/health || exit 1
 ```
+
+**Golden Rule (Anthropic):**
+> "If the agent had started implementing a new feature [with existing bugs], it would likely make the problem worse."
 
 **Regla de Oro (Anthropic):**
 > "If the agent had started implementing a new feature [with existing bugs], it would likely make the problem worse."
@@ -297,18 +300,18 @@ npm run dev &
 ### Phase 1: READ (Context Loading)
 
 ```bash
-# 1. Arquitectura y decisiones críticas
+# 1. Architecture and critical decisions
 cat .gitcore/ARCHITECTURE.md
 
-# 2. Estado del agente en el issue asignado
+# 2. Agent state in the assigned issue
 gc issue list --state open
 # gh issue view <id> --comments | grep -A 50 '<agent-state>' (Use gh for details for now)
 
-# 3. Research context para dependencias
+# 3. Research context for dependencies
 cat docs/agent-docs/RESEARCH_STACK_CONTEXT.md
 
-# 4. Elegir feature de mayor prioridad que NO esté completado
-# (Revisar .gitcore/features.json → passes: false)
+# 4. Pick highest priority feature that is NOT completed
+# (Check .gitcore/features.json → passes: false)
 ```
 
 ### Phase 2: ACT (Development)
@@ -335,7 +338,7 @@ git commit -m "feat(scope): description (closes #<ISSUE_NUMBER>)"
 git push -u origin HEAD
 gh pr create --fill --base main
 
-# Generate AI Report (NUEVO)
+# Generate AI Report (NEW)
 gc report
 
 # DO NOT manually close issues - let Git do it via commit message
@@ -349,40 +352,40 @@ gc report
 
 El agente debe **EJECUTAR** el ciclo de vida completo, no solo sugerirlo.
 
-### Ciclo de Vida Automático
+### Automatic Lifecycle
 
 ```mermaid
 graph LR
-    A[Detectar Intent] --> B[Crear Issue]
-    B --> C[Implementar]
+    A[Detect Intent] --> B[Create Issue]
+    B --> C[Implement]
     C --> D[Test/Verify]
-    D --> E[Commit Atómico]
+    D --> E[Atomic Commit]
     E --> F[PR + AI Report]
-    F --> G[Verificar Cierre]
+    F --> G[Verify Closure]
 ```
 
-### Reglas de Ejecución Proactiva
+### Proactive Execution Rules
 
-| Situación | Acción (NO sugerir) |
+| Situation | Action (DO NOT suggest) |
 |-----------|---------------------|
-| Usuario describe problema | → Crear issue + branch + fix |
-| Usuario pide feature | → Crear issue + implementar + PR |
-| Usuario menciona bug | → Crear BUG issue + hotfix |
-| Test falla | → Analizar + fix + re-run |
-| PR creado | → Ejecutar AI report |
+| User describes problem | → Create issue + branch + fix |
+| User asks for feature | → Create issue + implement + PR |
+| User mentions bug | → Create BUG issue + hotfix |
+| Test fails | → Analyze + fix + re-run |
+| PR created | → Execute AI report |
 
-### AI Report al Final de Tarea
+### AI Report at End of Task
 
-Al completar un PR, ejecutar automáticamente:
+Upon completing a PR, execute automatically:
 
 ```powershell
-# Generar análisis con Gemini y Copilot
+# Generate analysis with Gemini and Copilot
 gc report --pr <N>
 
-# Solo Gemini
+# Only Gemini
 # gc report --type gemini (if supported)
 
-# Preview sin publicar
+# Preview without publishing
 gc report --dry-run
 ```
 
@@ -405,42 +408,42 @@ gc report --dry-run
 
 ```
 .github/issues/
-├── _TEMPLATE.md              # Template para nuevos issues
-├── .issue-mapping.json       # Mapeo automático archivo↔issue
-├── FEAT_mi-feature.md        # Issue de feature
-├── BUG_fix-login.md          # Issue de bug
-└── TASK_update-deps.md       # Issue de tarea
+├── _TEMPLATE.md              # Template for new issues
+├── .issue-mapping.json       # Automatic mapping file↔issue
+├── FEAT_my-feature.md        # Feature issue
+├── BUG_fix-login.md          # Bug issue
+└── TASK_update-deps.md       # Task issue
 ```
 
-### Formato de Archivo
+### File Format
 
 ```markdown
 ---
-title: "Título del Issue"
+title: "Issue Title"
 labels:
   - ai-plan
   - enhancement
 assignees: []
 ---
 
-## Descripción
+## Description
 
-Contenido del issue...
+Issue content...
 ```
 
 ### Workflow
 
 ```bash
-# 1. Crear archivo en .github/issues/
-# Usa el formato: TYPE_descripcion.md
+# 1. Create file in .github/issues/
+# Use format: TYPE_description.md
 # Types: FEAT, BUG, TASK, DOCS, REFACTOR, TEST, CHORE
 
-# 2. Sincronizar con GitHub (local)
+# 2. Sync with GitHub (local)
 ./scripts/sync-issues.ps1      # Windows
 ./scripts/sync-issues.sh       # Linux/macOS
 
-# 3. O dejar que el workflow lo haga automáticamente
-# El workflow sync-issues.yml se ejecuta en cada push
+# 3. Or let the workflow do it automatically
+# The sync-issues.yml workflow runs on every push
 ```
 
 ### Comandos del Script
@@ -462,23 +465,23 @@ Contenido del issue...
 ./scripts/sync-issues.ps1 -DryRun
 ```
 
-### Ventajas
+### Advantages
 
-| Método | Ventaja |
+| Method | Advantage |
 |--------|---------|
-| **Archivos .md** | Versionados en Git, fácil edición en IDE |
-| **gh issue create** | Rápido para issues simples |
-| **GitHub UI** | Visual, templates automáticos |
+| **.md files** | Versioned in Git, easy editing in IDE |
+| **gh issue create** | Fast for simple issues |
+| **GitHub UI** | Visual, automatic templates |
 
-### Auto-Limpieza
+### Auto-Cleanup
 
-Cuando un issue se **cierra** en GitHub:
+When an issue is **closed** on GitHub:
 
-1. El workflow detecta el cierre
-2. Elimina el archivo `.md` correspondiente
-3. Actualiza el mapeo
+1. The workflow detects closure
+2. Deletes the corresponding `.md` file
+3. Updates mapping
 
-**Resultado:** Solo existen archivos para issues **abiertos**.
+**Result:** Only files for **open** issues exist.
 
 ---
 
@@ -632,20 +635,20 @@ See: `docs/agent-docs/PROTOCOL_NON_BLOCKING_EXECUTION.md`
 
 ---
 
-## ⚛️ Commits Atómicos (OBLIGATORIO)
+## ⚛️ Atomic Commits (MANDATORY)
 
-**UN commit = UN cambio lógico. NUNCA mezclar concerns.**
+**ONE commit = ONE logical change. NEVER mix concerns.**
 
-### Antes de hacer `git add .`, pregúntate
+### Before doing `git add .`, ask yourself
 
-1. ¿Todos los archivos son del mismo módulo/scope?
-2. ¿Es un solo tipo de cambio (feat/fix/docs/ci)?
-3. ¿Puedo describirlo en < 72 caracteres?
-4. ¿Revertirlo afectaría solo una funcionalidad?
+1. Are all files from the same module/scope?
+2. Is it a single type of change (feat/fix/docs/ci)?
+3. Can I describe it in < 72 characters?
+4. Would reverting it affect only one functionality?
 
-Si alguna respuesta es "NO" → **SEPARAR EN MÚLTIPLES COMMITS**
+If any answer is "NO" → **SEPARATE INTO MULTIPLE COMMITS**
 
-### Flujo correcto
+### Correct flow
 
 ```bash
 # ❌ NUNCA
@@ -663,12 +666,12 @@ git add docs/
 git commit -m "docs: add authentication guide"
 ```
 
-### Herramientas
+### Tools
 
 ```bash
-# Si ya tienes muchos archivos staged
-git-atomize --analyze    # Ver sugerencias de separación
-git-atomize --interactive  # Separar interactivamente
+# If you already have many staged files
+git-atomize --analyze    # See separation suggestions
+git-atomize --interactive  # Separate interactively
 ```
 
 ---
@@ -713,30 +716,30 @@ curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/inst
 
 ### Legacy Scripts (Alternative)
 
-Los scripts shell son **código visible** que puedes leer antes de ejecutar:
+Shell scripts are **visible code** that you can read before executing:
 
 ```bash
-# Ver el código ANTES de ejecutar:
+# View the code BEFORE executing:
 curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh
 
-# Si confías, entonces ejecuta:
+# If you trust it, then execute:
 curl -fsSL https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.sh | bash
 
-# Windows - ver código primero:
+# Windows - view code first:
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1" | Select-Object -ExpandProperty Content
 
-# Luego ejecutar:
+# Then execute:
 irm https://raw.githubusercontent.com/iberi22/Git-Core-Protocol/main/install.ps1 | iex
 ```
 
-**Comparación de métodos:**
+**Methods comparison:**
 
-| Método | Confianza | Velocidad | Funcionalidades |
-|--------|-----------|-----------|-----------------|
-| Shell Scripts | ⭐⭐⭐⭐⭐ (código visible) | Rápido | Básico |
-| Cargo install | ⭐⭐⭐⭐ (compila local) | Medio | Completo |
-| Build from source | ⭐⭐⭐⭐⭐ (máximo control) | Lento | Completo |
-| Pre-built binary | ⭐⭐⭐ (verificar checksum) | Muy rápido | Completo |
+| Method | Trust | Speed | Features |
+|--------|-------|-------|----------|
+| Shell Scripts | ⭐⭐⭐⭐⭐ (visible code) | Fast | Basic |
+| Cargo install | ⭐⭐⭐⭐ (compiles local) | Medium | Complete |
+| Build from source | ⭐⭐⭐⭐⭐ (maximum control) | Slow | Complete |
+| Pre-built binary | ⭐⭐⭐ (verify checksum) | Very fast | Complete |
 
 ---
 

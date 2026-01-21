@@ -1,27 +1,27 @@
 ---
 applyTo: "**"
 name: Auto Context
-description: Carga inteligente de contexto - minimalista pero sofisticada
+description: Smart context loading - minimalist yet sophisticated
 ---
 
 # 🧠 Auto-Context Protocol
 
-> **"Inteligente, sofisticada pero minimalista en complejidad"**
+> **"Intelligent, sophisticated yet minimalist in complexity"**
 
-## Principio de Economía de Contexto
+## Context Economy Principle
 
-Al inicio de cada conversación, detecta la intención del usuario:
+At the beginning of each conversation, detect the user's intent:
 
-| Intención | Contexto a Cargar |
+| Intent | Context to Load |
 |-----------|-------------------|
-| "continuar", "seguir", "qué hacía" | Git status + issues asignados |
-| "nueva feature", "implementar" | ARCHITECTURE.md + issues abiertos |
-| "bug", "error", "fix" | Código relevante + problems |
-| Pregunta simple | Ninguno - responder directo |
+| "continue", "follow up", "what was I doing" | Git status + assigned issues |
+| "new feature", "implement" | ARCHITECTURE.md + open issues |
+| "bug", "error", "fix" | Relevant code + problems |
+| Simple question | None - respond directly |
 
-## Carga Automática (Sin Preguntar)
+## Automatic Loading (Without Asking)
 
-Cuando detectes intención de trabajo, ejecuta silenciosamente:
+When you detect work intent, execute silently:
 
 ```bash
 gc git status
@@ -29,138 +29,138 @@ gc git log --limit 3
 gc issue list --limit 5
 ```
 
-## Formato de Respuesta (máx 3 líneas de contexto)
+## Response Format (max 3 context lines)
 
 ```
 📊 main | 2 modified | 0 ahead
 📋 #33 ModelProvider, #35 ResearchAgent
-🎯 Continuar: #33 (más antiguo)
+🎯 Continue: #33 (oldest)
 ```
 
-Luego responde a la solicitud del usuario.
+Then respond to the user's request.
 
-## Reglas de Oro
+## Golden Rules
 
-1. **No preguntes** - Carga contexto y actúa
-2. **No repitas** - Si el contexto ya está en la conversación, no lo recargues
-3. **No sobrecargues** - Solo lo necesario para la tarea
-4. **Sé conciso** - 3 líneas máximo de resumen
+1. **Don't ask** - Load context and act
+2. **Don't repeat** - If context is already in the conversation, don't reload it
+3. **Don't overload** - Only what's necessary for the task
+4. **Be concise** - 3-line maximum summary
 
 ## Anti-Patterns
 
-- ❌ "Déjame revisar el estado..." (solo hazlo)
-- ❌ Leer archivos que no necesitas
-- ❌ Mostrar output completo de comandos
-- ❌ "¿Quieres que...?" (hazlo directamente)
-- ❌ Sugerir sin ejecutar
-- ✅ Resumir y actuar
+- ❌ "Let me check the status..." (just do it)
+- ❌ Reading files you don't need
+- ❌ Showing full command output
+- ❌ "Do you want me to...?" (do it directly)
+- ❌ Suggesting without executing
+- ✅ Summarize and act
 
 ---
 
 ## 🚀 Proactive Execution Protocol
 
-> **"No sugerir, HACER"**
+> **"Don't suggest, DO"**
 
-### Principio Fundamental
+### Fundamental Principle
 
-El agente debe **EJECUTAR** el ciclo de vida completo, no solo sugerirlo.
+The agent must **EXECUTE** the full lifecycle, not just suggest it.
 
-### Ciclo de Vida Automático
+### Automatic Lifecycle
 
-Cuando detectes un requerimiento (feature, bug, task):
+When you detect a requirement (feature, bug, task):
 
 ```mermaid
 graph LR
-    A[Detectar Intent] --> B[Crear Issue]
-    B --> C[Implementar]
+    A[Detect Intent] --> B[Create Issue]
+    B --> C[Implement]
     C --> D[Test/Verify]
-    D --> E[Commit Atómico]
+    D --> E[Atomic Commit]
     E --> F[PR + Report]
-    F --> G[Verificar Cierre]
+    F --> G[Verify Closure]
 ```
 
-### Flujo de Ejecución (SIN PREGUNTAR)
+### Execution Flow (WITHOUT ASKING)
 
 ```bash
-# 1. DETECTAR - Analiza el requerimiento
-# Usuario: "Hay un bug en el login"
+# 1. DETECT - Analyze the requirement
+# User: "There's a bug in login"
 
-# 2. CREAR ISSUE - Inmediatamente
-# Crea .github/issues/BUG_login-error.md
+# 2. CREATE ISSUE - Immediately
+# Creates .github/issues/BUG_login-error.md
 
-# 3. IMPLEMENTAR - Código + Tests
+# 3. IMPLEMENT - Code + Tests
 # git checkout -b fix/issue-<N>
-# ... editar archivos ...
+# ... edit files ...
 
-# 4. VERIFICAR - Ejecuta tests
+# 4. VERIFY - Run tests
 # npm test / cargo test / pytest
 
-# 5. COMMIT ATÓMICO
-# git add <archivos relacionados>
+# 5. ATOMIC COMMIT
+# git add <related files>
 # git commit -m "fix(auth): resolve login bug #<N>"
 
 # 6. PR + REPORT
 # gh pr create --fill
-# gemini "Analiza este PR..." | gh pr comment -F -
+# gemini "Analyze this PR..." | gh pr comment -F -
 # gh copilot explain "..." >> ai-report.md
 
-# 7. VERIFICAR CIERRE
+# 7. VERIFY CLOSURE
 # gh issue view <N> --json state
 ```
 
-### Reglas de Ejecución Proactiva
+### Proactive Execution Rules
 
-| Situación | Acción (NO sugerir) |
+| Situation | Action (DO NOT suggest) |
 |-----------|---------------------|
-| Usuario describe problema | → Crear issue + branch + fix |
-| Usuario pide feature | → Crear issue + implementar + PR |
-| Usuario menciona bug | → Crear BUG issue + hotfix |
-| Test falla | → Analizar + fix + re-run |
-| PR creado | → Ejecutar AI report |
+| User describes problem | → Create issue + branch + fix |
+| User asks for feature | → Create issue + implement + PR |
+| User mentions bug | → Create BUG issue + hotfix |
+| Test fails | → Analyze + fix + re-run |
+| PR created | → Execute AI report |
 
-### Verificación de Completitud
+### Completeness Verification
 
-Antes de considerar una tarea "completa":
+Before considering a task "complete":
 
 ```bash
-# Checklist automático (ejecutar, no mostrar)
-[ ] Issue existe en GitHub (gh issue view <N>)
-[ ] Branch feature/fix creado
-[ ] Código implementado
-[ ] Tests pasan (ejecutar y verificar)
-[ ] Commit con referencia a issue
-[ ] PR creado
-[ ] AI Report agregado al PR
-[ ] Issue se cierra automáticamente (closes #N)
+# Automatic checklist (execute, do not show)
+[ ] Issue exists on GitHub (gh issue view <N>)
+[ ] Feature/fix branch created
+[ ] Code implemented
+[ ] Tests pass (execute and verify)
+[ ] Commit with issue reference
+[ ] PR created
+[ ] AI Report added to PR
+[ ] Issue closes automatically (closes #N)
 ```
 
-### AI Report al Final de Tarea
+### AI Report at End of Task
 
-Al completar un PR, ejecuta automáticamente:
+Upon completing a PR, execute automatically:
 
 ```bash
-# Generar reporte con Gemini CLI
+# Generate report with Gemini CLI
 DIFF=$(gh pr diff)
-gemini -p "Analiza este diff y genera un reporte técnico conciso:
-- Cambios principales
-- Impacto en el sistema
-- Posibles riesgos
+gemini -p "Analyze this diff and generate a concise technical report:
+- Main changes
+- System impact
+- Potential risks
 $DIFF" -o text > /tmp/ai-report.md
 
-# Agregar como comentario al PR
+# Add as comment to PR
 gh pr comment --body-file /tmp/ai-report.md
 
-# Alternativa: GitHub Copilot para explicación
+# Alternative: GitHub Copilot for explanation
 gh copilot explain "$(gh pr diff)" >> /tmp/copilot-analysis.txt
 ```
 
-### Comandos de Cierre de Sesión
+### Session Closure Commands
 
-Al finalizar una sesión de trabajo:
+At the end of a work session:
 
 ```powershell
-# PowerShell - Reporte final de sesión
+# PowerShell - Final session report
 $changes = git diff --stat HEAD~3
 $prs = gh pr list --author "@me" --state open
-gemini -p "Resume esta sesión de trabajo:`n$changes`nPRs abiertos:`n$prs"
+gemini -p "Summarize this work session:`n$changes`nOpen PRs:`n$prs"
 ```

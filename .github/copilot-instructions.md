@@ -1,6 +1,6 @@
 # 🧠 GitHub Copilot Instructions
 
-> **"⚡ Inteligente, rápida y minimalista - Rust-powered, sub-second execution"**
+> **"⚡ Intelligent, fast and minimalist - Rust-powered, sub-second execution"**
 
 ## Prime Directive
 You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, not internal memory.
@@ -11,13 +11,13 @@ You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, 
 
 **Usa estos prompts en el chat de Copilot:**
 
-| Prompt | Descripción |
+| Prompt | Description |
 |--------|-------------|
-| `#prompt:context` | 🆕 **Cargar contexto al inicio de sesión** |
-| `#prompt:help` | Guía rápida del protocolo |
-| `#prompt:issue` | Crear un nuevo issue |
-| `#prompt:update` | Actualizar el protocolo |
-| `#prompt:status` | Ver estado del protocolo |
+| `#prompt:context` | 🆕 **Load context at session start** |
+| `#prompt:help` | Quick protocol guide |
+| `#prompt:issue` | Create a new issue |
+| `#prompt:update` | Update the protocol |
+| `#prompt:status` | View protocol status |
 
 ---
 
@@ -108,31 +108,31 @@ When you need to export context for a new chat session:
 
 | User Intent | Trigger Phrases | Action |
 |-------------|-----------------|--------|
-| New task | "necesito", "hay que", "deberíamos", "want to", "need to" | → Create issue file |
-| Bug report | "bug", "error", "falla", "no funciona", "broken" | → Create `BUG_*.md` |
-| Feature request | "agregar", "nueva funcionalidad", "add feature" | → Create `FEAT_*.md` |
-| Planning | "planear", "plan", "roadmap", "siguiente paso" | → Create multiple issue files |
-| Task tracking | "tarea", "task", "todo", "pendiente" | → Create `TASK_*.md` |
+| New task | "I need", "must", "we should", "want to", "need to" | → Create issue file |
+| Bug report | "bug", "error", "fails", "doesn't work", "broken" | → Create `BUG_*.md` |
+| Feature request | "add", "new functionality", "add feature" | → Create `FEAT_*.md` |
+| Planning | "plan", "roadmap", "next step" | → Create multiple issue files |
+| Task tracking | "task", "todo", "pending" | → Create `TASK_*.md` |
 
 ### Issue Creation Flow (MANDATORY)
 
 When you detect issue-creation intent:
 
 ```
-1. ANNOUNCE: "Voy a crear un issue para trackear esto."
+1. ANNOUNCE: "I'm going to create an issue to track this."
 
 2. ASK (if unclear):
-   - "¿Qué título le ponemos al issue?"
-   - "¿Alguna etiqueta específica? (bug, enhancement, ai-plan)"
+   - "What title should we give the issue?"
+   - "Any specific labels? (bug, enhancement, ai-plan)"
 
 3. CREATE FILE in `.github/issues/`:
-   - Format: `{TYPE}_{descripcion-corta}.md`
+   - Format: `{TYPE}_{short-description}.md`
    - Types: FEAT, BUG, TASK, DOCS, REFACTOR, TEST, CHORE
 
 4. SHOW the user what you created:
-   "✅ Issue creado: `.github/issues/FEAT_nueva-funcionalidad.md`
-    Se sincronizará con GitHub automáticamente en el próximo push,
-    o ejecuta: `./scripts/sync-issues.ps1`"
+   "✅ Issue created: `.github/issues/FEAT_new-functionality.md`
+    It will automatically sync with GitHub on the next push,
+    or run: `./scripts/sync-issues.ps1`"
 ```
 
 ### Example Interaction
@@ -141,32 +141,32 @@ When you detect issue-creation intent:
 
 **Agent Response:**
 ```
-Voy a crear un issue para trackear esto.
+I'm going to create an issue to track this.
 
-📝 Creando: `.github/issues/FEAT_oauth-authentication.md`
+📝 Creating: `.github/issues/FEAT_oauth-authentication.md`
 
 ---
-title: "Implementar autenticación OAuth"
+title: "Implement OAuth authentication"
 labels:
   - enhancement
   - auth
 assignees: []
 ---
 
-## Descripción
-Agregar autenticación OAuth al sistema.
+## Description
+Add OAuth authentication to the system.
 
-## Tareas
-- [ ] Configurar proveedor OAuth
-- [ ] Implementar flujo de login
-- [ ] Agregar tests
+## Tasks
+- [ ] Configure OAuth provider
+- [ ] Implement login flow
+- [ ] Add tests
 
 ---
 
-✅ Issue creado. Se sincronizará automáticamente o ejecuta:
+✅ Issue created. It will sync automatically or run:
 `./scripts/sync-issues.ps1`
 
-¿Quieres que empiece a trabajar en esto ahora?
+Do you want me to start working on this now?
 ```
 
 ### DO NOT Skip This Flow
@@ -187,19 +187,19 @@ Agregar autenticación OAuth al sistema.
 - **ALWAYS** use `gh issue` commands for task management
 - **ALWAYS** use `gh issue comment` for progress updates
 
-### 2. Health Check (Anthropic Pattern - OBLIGATORIO)
+### 2. Health Check (Anthropic Pattern - MANDATORY)
 
-> ⚠️ **ANTES de cualquier feature nuevo:** Verificar que el proyecto funciona.
+> ⚠️ **BEFORE any new feature:** Verify project health.
 
 ```bash
-# 1. Estado del proyecto
-git log --oneline -10            # Ver trabajo reciente
-cat .gitcore/features.json            # Features con passes: true/false
+# 1. Project state
+git log --oneline -10            # See recent work
+cat .gitcore/features.json            # Features with passes: true/false
 
-# 2. Ejecutar tests
-npm test  # o: cargo test, pytest, etc.
-# Si FALLAN → ARREGLAR PRIMERO
-# Si PASAN → Continuar
+# 2. Run tests
+npm test  # or: cargo test, pytest, etc.
+# If they FAIL → FIX FIRST
+# If they PASS → Continue
 ```
 
 > **Anthropic:** "If the agent had started implementing a new feature [with existing bugs], it would likely make the problem worse."
@@ -303,7 +303,7 @@ git commit -m "feat: description (closes #<id>)"
 # Create PR
 gh pr create --fill
 
-# Generate AI Report (NUEVO)
+# Generate AI Report (NEW)
 ./scripts/ai-report.ps1  # Windows
 ./scripts/ai-report.sh   # Linux/macOS
 ```
@@ -334,15 +334,15 @@ graph LR
 | Test falla | → Analizar + fix + re-run |
 | PR creado | → Ejecutar AI report |
 
-**AI Report al completar tarea:**
+**AI Report when completing task:**
 ```powershell
-# Generar análisis automático del PR
+# Generate automatic PR analysis
 ./scripts/ai-report.ps1 -PrNumber $prNumber
 
-# Solo Gemini
+# Gemini only
 ./scripts/ai-report.ps1 -ReportType gemini
 
-# Preview sin publicar
+# Preview without publishing
 ./scripts/ai-report.ps1 -DryRun
 ```
 
@@ -695,25 +695,25 @@ gh workflow run agent-dispatcher.yml
 - `.coderabbit.yaml` - CodeRabbit rules
 - `.gemini/config.yaml` - Gemini style guide
 
-### 17. Commits Atómicos (OBLIGATORIO)
+### 17. Atomic Commits (MANDATORY)
 
-**UN commit = UN cambio lógico. NUNCA mezclar concerns.**
+**ONE commit = ONE logical change. NEVER mix concerns.**
 
-#### Antes de hacer `git add .`, pregúntate:
-1. ¿Todos los archivos son del mismo módulo/scope?
-2. ¿Es un solo tipo de cambio (feat/fix/docs/ci)?
-3. ¿Puedo describirlo en < 72 caracteres?
-4. ¿Revertirlo afectaría solo una funcionalidad?
+#### Before doing `git add .`, ask yourself:
+1. Are all files from the same module/scope?
+2. Is it a single type of change (feat/fix/docs/ci)?
+3. Can I describe it in < 72 characters?
+4. Would reverting it affect only one functionality?
 
-Si alguna respuesta es "NO" → **SEPARAR EN MÚLTIPLES COMMITS**
+If any answer is "NO" → **SEPARATE INTO MULTIPLE COMMITS**
 
-#### Flujo correcto:
+#### Correct flow:
 ```bash
-# ❌ NUNCA
+# ❌ NEVER
 git add .
 git commit -m "feat: big update with everything"
 
-# ✅ SIEMPRE
+# ✅ ALWAYS
 git add src/migrations/
 git commit -m "feat(db): add user sessions table"
 
@@ -724,11 +724,11 @@ git add docs/
 git commit -m "docs: add authentication guide"
 ```
 
-#### Herramientas:
+#### Tools:
 ```bash
-# Si ya tienes muchos archivos staged
-git-atomize --analyze    # Ver sugerencias de separación
-git-atomize --interactive  # Separar interactivamente
+# If you already have many staged files
+git-atomize --analyze    # See separation suggestions
+git-atomize --interactive  # Separate interactively
 ```
 
 ---

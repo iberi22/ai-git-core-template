@@ -4,7 +4,7 @@ trigger: always_on
 
 # 🧠 GitHub Copilot Instructions
 
-> **"Inteligente, sofisticada pero minimalista en complejidad"**
+> **"Intelligent, sophisticated yet minimalist in complexity"**
 
 ## Prime Directive
 You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, not internal memory.
@@ -13,34 +13,34 @@ You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, 
 
 ## 🚀 Quick Commands (Prompt Files)
 
-**Usa estos prompts en el chat de Copilot:**
+**Use these prompts in Copilot chat:**
 
-| Prompt | Descripción |
+| Prompt | Description |
 |--------|-------------|
-| `#prompt:context` | 🆕 **Cargar contexto al inicio de sesión** |
-| `#prompt:help` | Guía rápida del protocolo |
-| `#prompt:issue` | Crear un nuevo issue |
-| `#prompt:update` | Actualizar el protocolo |
-| `#prompt:status` | Ver estado del protocolo |
+| `#prompt:context` | 🆕 **Load context at session start** |
+| `#prompt:help` | Quick protocol guide |
+| `#prompt:issue` | Create a new issue |
+| `#prompt:update` | Update the protocol |
+| `#prompt:status` | View protocol status |
 
 ---
 
 ## 🤖 Model-Specific Agents (NEW)
 
-**Custom agents optimizados para cada modelo LLM:**
+**Custom agents optimized for each LLM model:**
 
-| Agent | Modelo | Uso |
+| Agent | Model | Usage |
 |-------|--------|-----|
-| `@protocol-claude` | Claude Sonnet 4 | Tareas estándar |
-| `@architect` | Claude Opus 4.5 | Decisiones de arquitectura |
-| `@quick` | Claude Haiku 4.5 | Respuestas rápidas |
-| `@protocol-gemini` | Gemini 3 Pro | Contexto grande (1M+) |
-| `@protocol-codex` | GPT-5.1 Codex | Implementación de código |
-| `@protocol-grok` | Grok Code Fast 1 | Contexto masivo (2M) |
-| `@router` | Auto | Selección de agente |
+| `@protocol-claude` | Claude Sonnet 4 | Standard tasks |
+| `@architect` | Claude Opus 4.5 | Architecture decisions |
+| `@quick` | Claude Haiku 4.5 | Quick responses |
+| `@protocol-gemini` | Gemini 3 Pro | Large context (1M+) |
+| `@protocol-codex` | GPT-5.1 Codex | Code implementation |
+| `@protocol-grok` | Grok Code Fast 1 | Massive context (2M) |
+| `@router` | Auto | Agent selection |
 
-**Ubicación:** `.github/agents/`
-**Instrucciones:** `.github/instructions/`
+**Location:** `.github/agents/`
+**Instructions:** `.github/instructions/`
 
 ---
 
@@ -112,65 +112,65 @@ When you need to export context for a new chat session:
 
 | User Intent | Trigger Phrases | Action |
 |-------------|-----------------|--------|
-| New task | "necesito", "hay que", "deberíamos", "want to", "need to" | → Create issue file |
-| Bug report | "bug", "error", "falla", "no funciona", "broken" | → Create `BUG_*.md` |
-| Feature request | "agregar", "nueva funcionalidad", "add feature" | → Create `FEAT_*.md` |
-| Planning | "planear", "plan", "roadmap", "siguiente paso" | → Create multiple issue files |
-| Task tracking | "tarea", "task", "todo", "pendiente" | → Create `TASK_*.md` |
+| New task | "I need", "must", "we should", "want to", "need to" | → Create issue file |
+| Bug report | "bug", "error", "fails", "doesn't work", "broken" | → Create `BUG_*.md` |
+| Feature request | "add", "new functionality", "add feature" | → Create `FEAT_*.md` |
+| Planning | "plan", "roadmap", "next step" | → Create multiple issue files |
+| Task tracking | "task", "todo", "pending" | → Create `TASK_*.md` |
 
 ### Issue Creation Flow (MANDATORY)
 
 When you detect issue-creation intent:
 
 ```
-1. ANNOUNCE: "Voy a crear un issue para trackear esto."
+1. ANNOUNCE: "I'm going to create an issue to track this."
 
 2. ASK (if unclear):
-   - "¿Qué título le ponemos al issue?"
-   - "¿Alguna etiqueta específica? (bug, enhancement, ai-plan)"
+   - "What title should we give the issue?"
+   - "Any specific labels? (bug, enhancement, ai-plan)"
 
 3. CREATE FILE in `.github/issues/`:
-   - Format: `{TYPE}_{descripcion-corta}.md`
+   - Format: `{TYPE}_{short-description}.md`
    - Types: FEAT, BUG, TASK, DOCS, REFACTOR, TEST, CHORE
 
 4. SHOW the user what you created:
-   "✅ Issue creado: `.github/issues/FEAT_nueva-funcionalidad.md`
-    Se sincronizará con GitHub automáticamente en el próximo push,
-    o ejecuta: `./scripts/sync-issues.ps1`"
+   "✅ Issue created: `.github/issues/FEAT_new-functionality.md`
+    It will automatically sync with GitHub on the next push,
+    or run: `./scripts/sync-issues.ps1`"
 ```
 
 ### Example Interaction
 
-**User:** "Necesito agregar autenticación OAuth"
+**User:** "I need to add OAuth authentication"
 
 **Agent Response:**
 ```
-Voy a crear un issue para trackear esto.
+I'm going to create an issue to track this.
 
-📝 Creando: `.github/issues/FEAT_oauth-authentication.md`
+📝 Creating: `.github/issues/FEAT_oauth-authentication.md`
 
 ---
-title: "Implementar autenticación OAuth"
+title: "Implement OAuth authentication"
 labels:
   - enhancement
   - auth
 assignees: []
 ---
 
-## Descripción
-Agregar autenticación OAuth al sistema.
+## Description
+Add OAuth authentication to the system.
 
-## Tareas
-- [ ] Configurar proveedor OAuth
-- [ ] Implementar flujo de login
-- [ ] Agregar tests
+## Tasks
+- [ ] Configure OAuth provider
+- [ ] Implement login flow
+- [ ] Add tests
 
 ---
 
-✅ Issue creado. Se sincronizará automáticamente o ejecuta:
+✅ Issue created. It will sync automatically or run:
 `./scripts/sync-issues.ps1`
 
-¿Quieres que empiece a trabajar en esto ahora?
+Do you want me to start working on this now?
 ```
 
 ### DO NOT Skip This Flow
@@ -228,7 +228,7 @@ When working with dependencies:
 This protocol replaces external tools like Context7 with a native, self-hosted solution.
 
 **How it works:**
-1. **Context Research Agent** analyzes dependencies and creates `RESEARCH_STACK_CONTEXT.md`
+1. **Context Research Agent** analyzes dependencies and announces `RESEARCH_STACK_CONTEXT.md`
 2. **Living Context PR** is always open at `living-context/main` branch
 3. **AI Agents** (Gemini, CodeRabbit) automatically review the context for accuracy
 4. **Merge** updates the context, which all AI agents should read
@@ -286,46 +286,46 @@ git commit -m "feat: description (closes #<id>)"
 # Create PR
 gh pr create --fill
 
-# Generate AI Report (NUEVO)
+# Generate AI Report (NEW)
 ./scripts/ai-report.ps1  # Windows
 ./scripts/ai-report.sh   # Linux/macOS
 ```
 
-### 5.1 Proactive Execution Protocol (NUEVO)
+### 5.1 Proactive Execution Protocol (NEW)
 
-> **"No sugerir, HACER"**
+> **"Don't suggest, DO"**
 
-El agente debe **EJECUTAR** el ciclo de vida completo, no solo sugerirlo:
+The agent must **EXECUTE** the full lifecycle, not just suggest it:
 
 ```mermaid
 graph LR
-    A[Detectar Intent] --> B[Crear Issue]
-    B --> C[Implementar]
+    A[Detect Intent] --> B[Create Issue]
+    B --> C[Implement]
     C --> D[Test/Verify]
-    D --> E[Commit Atómico]
+    D --> E[Atomic Commit]
     E --> F[PR + AI Report]
-    F --> G[Verificar Cierre]
+    F --> G[Verify Closure]
 ```
 
-**Reglas de Ejecución Proactiva:**
+**Proactive Execution Rules:**
 
-| Situación | Acción (NO sugerir) |
+| Situation | Action (DO NOT suggest) |
 |-----------|---------------------|
-| Usuario describe problema | → Crear issue + branch + fix |
-| Usuario pide feature | → Crear issue + implementar + PR |
-| Usuario menciona bug | → Crear BUG issue + hotfix |
-| Test falla | → Analizar + fix + re-run |
-| PR creado | → Ejecutar AI report |
+| User describes problem | → Create issue + branch + fix |
+| User asks for feature | → Create issue + implement + PR |
+| User mentions bug | → Create BUG issue + hotfix |
+| Test fails | → Analyze + fix + re-run |
+| PR created | → Execute AI report |
 
-**AI Report al completar tarea:**
+**AI Report when completing task:**
 ```powershell
-# Generar análisis automático del PR
+# Generate automatic PR analysis
 ./scripts/ai-report.ps1 -PrNumber $prNumber
 
-# Solo Gemini
+# Gemini only
 ./scripts/ai-report.ps1 -ReportType gemini
 
-# Preview sin publicar
+# Preview without publishing
 ./scripts/ai-report.ps1 -DryRun
 ```
 
@@ -341,7 +341,7 @@ gh issue create --title "TASK: Description" --body "Details..." --label "ai-plan
 **ALTERNATIVE (RECOMMENDED):** Create issue files in `.github/issues/`:
 ```bash
 # Create a file instead of running gh issue create
-# File: .github/issues/FEAT_mi-feature.md
+# File: .github/issues/FEAT_my-feature.md
 
 ---
 title: "My Feature Description"
