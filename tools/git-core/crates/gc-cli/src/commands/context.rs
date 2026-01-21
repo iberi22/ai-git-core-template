@@ -17,61 +17,92 @@ pub async fn execute(
     fs: &impl FileSystemPort,
     github: &impl GitHubPort,
 ) -> color_eyre::Result<()> {
+    let agent_dir = ".github/agents";
+    let index_path = ".gitcore/AGENT_INDEX.md";
+
     match cmd {
         ContextCmd::List => {
-            // MVP: Just cat the index file or something simple
-            println!("Available roles (check .gitcore/AGENT_INDEX.md):");
-            // ... implementation skipped for MVP smoothness on 'equip' focus
-        }
-        ContextCmd::Equip { role } => {
-            println!("{}", style(format!("🔍 Searching for role '{}'...", role)).cyan());
+            println!("{} Available Agent Personas:", style("🤖").cyan());
 
-            let index_path = ".gitcore/AGENT_INDEX.md";
-            if !fs.exists(index_path).await? {
-                color_eyre::eyre::bail!("Index file not found at {}", index_path);
+            // 1. List Local Agents (Agent v2)
+            if fs.exists(agent_dir).await? {
+                println!("  {} Local Agents (.github/agents/):", style("📂").blue());
+                let local_agents = fs.list_files(agent_dir, Some("*.agent.md".to_string())).await?;
+                for agent in local_agents {
+                    let name = agent.trim_end_matches(".agent.md");
+                    println!("    - {}", style(name).yellow());
+                }
             }
 
-            let content = fs.read_file(index_path).await?;
-
-            // Basic line matching logic (Functional style ideally, but imperative is pragmatic here)
-            let mut recipe_path = None;
-
-            for line in content.lines() {
-                // Check if line contains role (case insensitive)
-                if line.to_lowercase().contains(&role.to_lowercase()) {
-                    // Extract path between backticks
-                    if let Some(start) = line.find('`') {
-                        if let Some(end) = line[start+1..].find('`') {
-                             recipe_path = Some(line[start+1..start+1+end].to_string());
-                             break;
+            // 2. List Indexed Agents (Legacy/Remote)
+            if fs.exists(index_path).await? {
+                println!("\n  {} Indexed Roles (.gitcore/AGENT_INDEX.md):", style("📋").blue());
+                let content = fs.read_file(index_path).await?;
+                for line in content.lines() {
+                    if line.starts_with("| **") {
+                        if let Some(name) = line.split('|').nth(1) {
+                             println!("    - {}", style(name.trim().trim_matches('*')).cyan());
                         }
                     }
                 }
             }
+        }
+        ContextCmd::Equip { role } => {
+            println!("{}", style(format!("🔍 Searching for role '{}'...", role)).cyan());
 
-            let recipe_path = match recipe_path {
-                Some(p) => p,
-                None => color_eyre::eyre::bail!("Role '{}' not found in index.", role),
-            };
+            let mut final_persona_content = String::new();
+            let mut found_locally = false;
 
-            println!("{}", style(format!("✅ Found Recipe Path: {}", recipe_path)).green());
+            // 1. Try Local Agent Definition (Priority)
+            let local_path = format!("{}/{}.agent.md", agent_dir, role.to_lowercase());
+            if fs.exists(&local_path).await? {
+                println!("{}", style(format!("✅ Found local agent: {}", local_path)).green());
+                final_persona_content = fs.read_file(&local_path).await?;
+                found_locally = true;
+            }
 
-            println!("{}", style(format!("⬇️ Downloading from iberi22/agents-flows-recipes...")).cyan());
+            // 2. Fallback to Index + Remote
+            if !found_locally {
+                if fs.exists(index_path).await? {
+                    let content = fs.read_file(index_path).await?;
+                    let mut recipe_path = None;
 
-            let recipe_content = github.get_file_content(
-                "iberi22",
-                "agents-flows-recipes",
-                "main",
-                &recipe_path
-            ).await?;
+                    for line in content.lines() {
+                        if line.to_lowercase().contains(&role.to_lowercase()) {
+                            if let Some(start) = line.find('`') {
+                                if let Some(end) = line[start+1..].find('`') {
+                                     recipe_path = Some(line[start+1..start+1+end].to_string());
+                                     break;
+                                }
+                            }
+                        }
+                    }
+
+                    if let Some(path) = recipe_path {
+                        println!("{}", style(format!("🌐 Found Remote Recipe: {}", path)).green());
+                        println!("{}", style(format!("⬇️ Downloading from iberi22/agents-flows-recipes...")).cyan());
+
+                        final_persona_content = github.get_file_content(
+                            "iberi22",
+                            "agents-flows-recipes",
+                            "main",
+                            &path
+                        ).await?;
+                    }
+                }
+            }
+
+            if final_persona_content.is_empty() {
+                color_eyre::eyre::bail!("Role '{}' not found locally or in index.", role);
+            }
 
             let context_path = ".gitcore/CURRENT_CONTEXT.md";
             let header = format!(r#"# 🎭 ACTIVE AGENT PERSONA: {}
 > GENERATED CONTEXT - DO NOT EDIT MANUALLY
-> Loaded via Git-Core CLI
+> Loaded via Git-Core CLI ({})
 
 ---
-"#, role);
+"#, role, if found_locally { "Local Agent v2" } else { "Remote Recipe v1" });
 
             let protocol_skills = r#"
 ---
@@ -81,7 +112,7 @@ pub async fn execute(
 3. **Atomic Commits:** One logical change per commit.
 "#;
 
-            let final_context = format!("{}{}{}", header, recipe_content, protocol_skills);
+            let final_context = format!("{}{}{}", header, final_persona_content, protocol_skills);
 
             fs.write_file(context_path, &final_context).await?;
 
@@ -98,17 +129,47 @@ mod tests {
     use mockall::predicate::*;
 
     #[tokio::test]
-    async fn test_context_equip_success() {
+    async fn test_context_equip_local_success() {
+        let cmd = ContextCmd::Equip { role: "Architect".to_string() };
+        let mut mock_fs = MockFileSystemPort::new();
+        let mock_github = MockGitHubPort::new();
+
+        // 1. Check Local Agent Exists
+        mock_fs.expect_exists()
+            .with(eq(".github/agents/architect.agent.md"))
+            .returning(|_| Ok(true));
+
+        // 2. Read Local Agent
+        mock_fs.expect_read_file()
+            .with(eq(".github/agents/architect.agent.md"))
+            .returning(|_| Ok("# Architect Persona\nYou are local.".to_string()));
+
+        // 3. Write Context
+        mock_fs.expect_write_file()
+            .with(eq(".gitcore/CURRENT_CONTEXT.md"), always())
+            .returning(|_, _| Ok(()));
+
+        let res = execute(cmd, &mock_fs, &mock_github).await;
+        assert!(res.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_context_equip_remote_fallback_success() {
         let cmd = ContextCmd::Equip { role: "Architect".to_string() };
         let mut mock_fs = MockFileSystemPort::new();
         let mut mock_github = MockGitHubPort::new();
 
-        // 1. Check Index Exists
+        // 1. Check Local Agent (NOT Found)
+        mock_fs.expect_exists()
+            .with(eq(".github/agents/architect.agent.md"))
+            .returning(|_| Ok(false));
+
+        // 2. Check Index Exists
         mock_fs.expect_exists()
             .with(eq(".gitcore/AGENT_INDEX.md"))
             .returning(|_| Ok(true));
 
-        // 2. Read Index
+        // 3. Read Index
         let index_content = r#"
 # Agent Index
 - **Architect**: `roles/architect.md`
@@ -117,14 +178,14 @@ mod tests {
             .with(eq(".gitcore/AGENT_INDEX.md"))
             .returning(move |_| Ok(index_content.to_string()));
 
-        // 3. GitHub Fetch Recipe
+        // 4. GitHub Fetch Recipe
         mock_github.expect_get_file_content()
             .with(eq("iberi22"), eq("agents-flows-recipes"), eq("main"), eq("roles/architect.md"))
-            .returning(|_, _, _, _| Ok("# Architect Persona\nYou are an architect.".to_string()));
+            .returning(|_, _, _, _| Ok("# Architect Persona\nYou are remote.".to_string()));
 
-        // 4. Write Context
+        // 5. Write Context
         mock_fs.expect_write_file()
-            .with(eq(".gitcore/CURRENT_CONTEXT.md"), always()) // Check content if strict
+            .with(eq(".gitcore/CURRENT_CONTEXT.md"), always())
             .returning(|_, _| Ok(()));
 
         let res = execute(cmd, &mock_fs, &mock_github).await;

@@ -23,21 +23,28 @@ pub async fn execute(
         println!("{} Local Agent Workflows:", style("📋").cyan());
 
         if fs.exists(workflow_dir).await? {
-            // Since FileSystemPort might not have 'read_dir', we assume it does or use a workaround.
-            // Actually, TokioFileSystem usually has it. Let's assume the port needs it.
-            // For MVP, we'll try to use the system if the port is too simple.
-            // But let's check what FileSystemPort has.
-            println!("(Scanning {}...)", workflow_dir);
-            // ... for now, hardcoded detection or simple print
-            println!("- reolplazr (reolplazr.md)");
+            let files = fs.list_files(workflow_dir, Some("*.md".to_string())).await?;
+            if files.is_empty() {
+                println!("   (No .md workflows found in {})", workflow_dir);
+            } else {
+                for file in files {
+                    let name = file.trim_end_matches(".md");
+                    println!("  - {} ({})", style(name).yellow(), file);
+                }
+            }
         } else {
-            println!("   (No workflows found in {})", workflow_dir);
+            println!("   (Directory not found: {})", workflow_dir);
         }
         return Ok(());
     }
 
     if let Some(name) = args.name {
-        let path = format!("{}/{}.md", workflow_dir, name);
+        let path = if name.ends_with(".md") {
+            format!("{}/{}", workflow_dir, name)
+        } else {
+            format!("{}/{}.md", workflow_dir, name)
+        };
+
         if fs.exists(&path).await? {
             let content = fs.read_file(&path).await?;
             println!("{} Workflow: {}", style("📖").yellow(), name);

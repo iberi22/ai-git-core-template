@@ -1,4 +1,5 @@
 ---
+github_issue: 120
 title: "PLAN: Git-Core Protocol CLI v1.0 Roadmap"
 labels:
   - enhancement
@@ -54,3 +55,4 @@ The current CLI is well-structured using a hexagonal/adapter pattern:
 1. Audit `task.rs` and `finish.rs` for edge cases.
 2. Create "Good First Issue" tickets for `gc doctor`.
 3. Set up a "nightly" build workflow.
+

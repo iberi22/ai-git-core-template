@@ -1243,7 +1243,7 @@ dependencies = [
 
 [[package]]
 name = "gc-adapter-cli"
-version = "3.5.0"
+version = "3.5.1"
 dependencies = [
  "async-trait",
  "gc-core",
@@ -1253,7 +1253,7 @@ dependencies = [
 
 [[package]]
 name = "gc-adapter-fs"
-version = "3.5.0"
+version = "3.5.1"
 dependencies = [
  "async-trait",
  "gc-core",
@@ -1263,7 +1263,7 @@ dependencies = [
 
 [[package]]
 name = "gc-adapter-github"
-version = "3.5.0"
+version = "3.5.1"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -1276,7 +1276,7 @@ dependencies = [
 
 [[package]]
 name = "gc-adapter-system"
-version = "3.5.0"
+version = "3.5.1"
 dependencies = [
  "async-trait",
  "gc-core",
@@ -1286,7 +1286,7 @@ dependencies = [
 
 [[package]]
 name = "gc-cli"
-version = "3.5.0"
+version = "3.5.1"
 dependencies = [
  "assert_cmd",
  "assert_fs",
@@ -1322,7 +1322,7 @@ dependencies = [
 
 [[package]]
 name = "gc-core"
-version = "3.5.0"
+version = "3.5.1"
 dependencies = [
  "async-trait",
  "serde",
