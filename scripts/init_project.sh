@@ -266,6 +266,10 @@ create_label "ai-blocked" "Blocked - requires human intervention" "D93F0B"
 create_label "in-progress" "Task in progress" "1D76DB"
 create_label "needs-review" "Requires review" "5319E7"
 
+# Wait for GitHub API to propagate labels (fixes race condition)
+echo -e "  ${CYAN}⏳ Waiting for labels to propagate...${NC}"
+sleep 3
+
 # 7. Create Initial Issues
 echo -e "\n📝 Checking for existing issues..."
 

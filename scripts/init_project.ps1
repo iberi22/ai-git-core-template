@@ -17,7 +17,9 @@ param(
     [switch]$Private
 )
 
-Write-Warning "⚠️  DEPRECATION NOTICE: This script is deprecated. Please use 'gc init' instead."
+Write-Warning "⚠️  DEPRECATION NOTICE: This script is deprecated. Use 'gc init' for the full experience."
+Write-Host "   Install Git-Core CLI: cargo install git-core-cli (requires Rust)" -ForegroundColor Yellow
+Write-Host ""
 
 $ErrorActionPreference = "Stop"
 
@@ -235,6 +237,10 @@ Create-Label "ai-context" "Critical context information" "FBCA04"
 Create-Label "ai-blocked" "Blocked - requires human intervention" "D93F0B"
 Create-Label "in-progress" "Task in progress" "1D76DB"
 Create-Label "needs-review" "Requires review" "5319E7"
+
+# Wait for GitHub API to propagate labels (fixes race condition)
+Write-Host "  ⏳ Waiting for labels to propagate..." -ForegroundColor Cyan
+Start-Sleep -Seconds 3
 
 # 7. Create Initial Issues
 Write-Host "`n📝 Checking for existing issues..." -ForegroundColor Yellow
