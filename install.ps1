@@ -8,6 +8,7 @@
 #   $env:GIT_CORE_AUTO = "1"      - Non-interactive mode
 #   $env:GIT_CORE_UPGRADE = "1"   - Upgrade (preserves ARCHITECTURE.md)
 #   $env:GIT_CORE_FORCE = "1"     - Force upgrade (overwrites everything)
+#   $env:GIT_CORE_MIGRATE = "1"   - Create new branch and auto-commit
 
 $ErrorActionPreference = "Stop"
 
@@ -57,6 +58,7 @@ $AutoMode = $env:GIT_CORE_AUTO -eq "1"
 $UpgradeMode = $env:GIT_CORE_UPGRADE -eq "1"
 $ForceMode = $env:GIT_CORE_FORCE -eq "1"
 $NoBinaries = $env:GIT_CORE_NO_BINARIES -eq "1"
+$MigrateMode = $env:GIT_CORE_MIGRATE -eq "1"
 
 try {
     # Force implies upgrade and auto
@@ -64,6 +66,29 @@ try {
         $UpgradeMode = $true
         $AutoMode = $true
         Write-Host "⚠️  FORCE MODE: ALL files will be overwritten (including ARCHITECTURE.md)" -ForegroundColor $Red
+        Write-Host ""
+    } elseif ($MigrateMode) {
+        $AutoMode = $true
+        Write-Host "🔀 MIGRATE MODE: Creating new branch and auto-committing changes" -ForegroundColor $Cyan
+        Write-Host ""
+
+        # Create branch name with timestamp
+        $BranchName = "protocol-migration-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+
+        # Check if we're in a git repo
+        $gitDir = git rev-parse --git-dir 2>$null
+        if (-not $gitDir) {
+            Write-Host "⚠️  Not a git repository. Initializing..." -ForegroundColor $Yellow
+            git init
+        }
+
+        # Create and switch to new branch
+        Write-Host "🔀 Creating branch: $BranchName" -ForegroundColor $Cyan
+        git checkout -b $BranchName 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to create branch"
+        }
+        Write-Host "✓ Switched to branch: $BranchName" -ForegroundColor $Green
         Write-Host ""
     } elseif ($UpgradeMode) {
         $AutoMode = $true
@@ -406,8 +431,39 @@ try {
         Write-Host "   scripts/               - Init and update scripts"
         Write-Host "   AGENTS.md              - Rules for all AI agents"
     }
-    Write-Host "`n🚀 Next step:" -ForegroundColor $Yellow
-    Write-Host "   .\scripts\init_project.ps1`n"
+
+    # Migrate mode: auto-commit changes
+    if ($MigrateMode) {
+        Write-Host ""
+        Write-Host "📦 Committing changes..." -ForegroundColor $Cyan
+        git add -A
+        $commitMessage = @"
+chore: install Git-Core Protocol v$NewVersion
+
+- Installed protocol files and structure
+- Added .gitcore/, .github/, scripts/, docs/
+- Branch: $BranchName
+
+Installed via: `$env:GIT_CORE_MIGRATE = "1"; irm .../install.ps1 | iex
+"@
+        git commit -m $commitMessage
+
+        Write-Host ""
+        Write-Host "✅ Changes committed to branch: $BranchName" -ForegroundColor $Green
+        Write-Host "🚀 Next steps:" -ForegroundColor $Yellow
+        Write-Host "   1. Review changes: git diff main...$BranchName"
+        Write-Host "   2. Push branch:    git push -u origin $BranchName"
+        Write-Host "   3. Create PR to merge into main"
+    } else {
+        Write-Host "`n🚀 Next step:" -ForegroundColor $Yellow
+        Write-Host "   .\scripts\init_project.ps1`n"
+    }
+
+    Write-Host ""
+    Write-Host "💡 Commands:" -ForegroundColor $Cyan
+    Write-Host "   Safe upgrade:  `$env:GIT_CORE_UPGRADE = '1'; irm .../install.ps1 | iex"
+    Write-Host "   Full reset:    `$env:GIT_CORE_FORCE = '1'; irm .../install.ps1 | iex"
+    Write-Host "   Auto-migrate:  `$env:GIT_CORE_MIGRATE = '1'; irm .../install.ps1 | iex"
 } catch {
     Write-Host "`n❌ Installation failed: $($_.Exception.Message)" -ForegroundColor $Red
     exit 1

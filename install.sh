@@ -44,8 +44,8 @@ trap cleanup EXIT ERR SIGINT SIGTERM
 # Check dependencies
 check_dependencies() {
     local missing_deps=0
-    # Required dependencies for the protocol
-    local deps=("git" "curl" "unzip")
+    # Required dependencies for the protocol (unzip not needed - we use git clone)
+    local deps=("git" "curl")
 
     for dep in "${deps[@]}"; do
         if ! command -v "$dep" &> /dev/null; then
@@ -67,6 +67,7 @@ AUTO_MODE=false
 UPGRADE_MODE=false
 FORCE_MODE=false
 NO_BINARIES=false
+MIGRATE_MODE=false
 
 for arg in "$@"; do
     case $arg in
@@ -85,6 +86,10 @@ for arg in "$@"; do
             UPGRADE_MODE=true
             AUTO_MODE=true
             ;;
+        --migrate|-m)
+            MIGRATE_MODE=true
+            AUTO_MODE=true
+            ;;
         --no-binaries)
             NO_BINARIES=true
             ;;
@@ -96,6 +101,7 @@ for arg in "$@"; do
             echo "  --auto, -y        Non-interactive mode"
             echo "  --upgrade, -u     Upgrade protocol files (PRESERVES your ARCHITECTURE.md)"
             echo "  --force, -f       Force full upgrade (overwrites everything)"
+            echo "  --migrate, -m     Create a new branch and auto-commit changes"
             echo "  --no-binaries     Skip installing pre-compiled binaries"
             echo "  --help, -h        Show this help"
             echo ""
@@ -103,6 +109,7 @@ for arg in "$@"; do
             echo "  curl -fsSL .../install.sh | bash                    # New install"
             echo "  curl -fsSL .../install.sh | bash -s -- --upgrade    # Safe upgrade"
             echo "  curl -fsSL .../install.sh | bash -s -- --force      # Full reset"
+            echo "  curl -fsSL .../install.sh | bash -s -- --migrate    # Install on new branch"
             exit 0
             ;;
     esac
@@ -111,10 +118,32 @@ done
 # Show mode
 if [ "$FORCE_MODE" = true ]; then
     echo -e "${RED}⚠️  FORCE MODE: ALL files will be overwritten (including ARCHITECTURE.md)${NC}"
+elif [ "$MIGRATE_MODE" = true ]; then
+    echo -e "${CYAN}🔀 MIGRATE MODE: Creating new branch and auto-committing changes${NC}"
 elif [ "$UPGRADE_MODE" = true ]; then
     echo -e "${YELLOW}🔄 UPGRADE MODE: Protocol files updated, your ARCHITECTURE.md preserved${NC}"
 fi
 echo ""
+
+# Migrate mode: create new branch
+if [ "$MIGRATE_MODE" = true ]; then
+    BRANCH_NAME="protocol-migration-$(date +%Y%m%d-%H%M%S)"
+
+    # Check if we're in a git repo
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
+        echo -e "${YELLOW}⚠️  Not a git repository. Initializing...${NC}"
+        git init
+    fi
+
+    # Create and switch to new branch
+    echo -e "${CYAN}🔀 Creating branch: $BRANCH_NAME${NC}"
+    git checkout -b "$BRANCH_NAME" 2>/dev/null || {
+        echo -e "${RED}❌ Failed to create branch${NC}"
+        exit 1
+    }
+    echo -e "${GREEN}✓ Switched to branch: $BRANCH_NAME${NC}"
+    echo ""
+fi
 
 # Function to get current version
 get_current_version() {
@@ -502,11 +531,34 @@ else
     echo "   AGENTS.md              - Rules for all AI agents"
 fi
 
-echo ""
-echo -e "${YELLOW}🚀 Next step:${NC}"
-echo "   ./scripts/init_project.sh"
+# Migrate mode: auto-commit changes
+if [ "$MIGRATE_MODE" = true ]; then
+    echo ""
+    echo -e "${CYAN}📦 Committing changes...${NC}"
+    git add -A
+    git commit -m "chore: install Git-Core Protocol v$NEW_VERSION
+
+- Installed protocol files and structure
+- Added .gitcore/, .github/, scripts/, docs/
+- Branch: $BRANCH_NAME
+
+Installed via: curl -fsSL .../install.sh | bash -s -- --migrate"
+
+    echo ""
+    echo -e "${GREEN}✅ Changes committed to branch: $BRANCH_NAME${NC}"
+    echo -e "${YELLOW}🚀 Next steps:${NC}"
+    echo "   1. Review changes: git diff main...$BRANCH_NAME"
+    echo "   2. Push branch:    git push -u origin $BRANCH_NAME"
+    echo "   3. Create PR to merge into main"
+else
+    echo ""
+    echo -e "${YELLOW}🚀 Next step:${NC}"
+    echo "   ./scripts/init_project.sh"
+fi
+
 echo ""
 echo -e "${CYAN}💡 Commands:${NC}"
 echo "   Safe upgrade:  curl -fsSL .../install.sh | bash -s -- --upgrade"
 echo "   Full reset:    curl -fsSL .../install.sh | bash -s -- --force"
+echo "   Auto-migrate:  curl -fsSL .../install.sh | bash -s -- --migrate"
 echo "   Check updates: ./scripts/check-protocol-update.sh"
